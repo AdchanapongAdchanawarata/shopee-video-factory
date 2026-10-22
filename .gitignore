@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+.env
+workspace_data/
+temp_assembly/
+bin/
+scratch/
+output/**/*.mp4
+output/**/*.jpg
+output/**/*.mp3
+output/**/temp_*
+.vercel/
+

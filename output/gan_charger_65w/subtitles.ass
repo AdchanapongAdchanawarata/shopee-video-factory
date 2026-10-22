@@ -1,0 +1,38 @@
+[Script Info]
+Title: Shopee Thai Dynamic Captions
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.601
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
+Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
+Style: HookHeader,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,285,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,พกตัวเดียวจบ!\Nหัวชาร์จ GaN 65W ชาร์จครบทุกเครื่อง
+Dialogue: 0,0:00:00.00,0:00:04.63,Highlight,,0,0,0,,เบื่อไหมที่ต้องพกหัวชาร์จหลายอันหนักกระเป๋า
+Dialogue: 0,0:00:04.63,0:00:06.35,Default,,0,0,0,,ตัวนี้ตัวเดียวจบ
+Dialogue: 0,0:00:06.35,0:00:08.50,Highlight,,0,0,0,,ชาร์จได้ทั้งโน้ตบุ๊ก
+Dialogue: 0,0:00:08.50,0:00:10.33,Default,,0,0,0,,และมือถือพร้อมกัน
+Dialogue: 0,0:00:10.33,0:00:11.41,Highlight,,0,0,0,,ตัวนี้เป็น
+Dialogue: 0,0:00:11.41,0:00:12.05,Default,,0,0,0,,Ugreen
+Dialogue: 0,0:00:12.05,0:00:14.42,Highlight,,0,0,0,,หัวชาร์จเร็ว GaN 65W 3
+Dialogue: 0,0:00:14.42,0:00:14.96,Default,,0,0,0,,พอร์ต
+Dialogue: 0,0:00:14.96,0:00:16.57,Highlight,,0,0,0,,ชาร์จโน้ตบุ๊ก +
+Dialogue: 0,0:00:16.57,0:00:18.08,Default,,0,0,0,,มือถือพร้อมกัน
+Dialogue: 0,0:00:18.08,0:00:18.83,Highlight,,0,0,0,,ไม่ร้อน
+Dialogue: 0,0:00:18.83,0:00:22.17,Default,,0,0,0,,ขนาดเล็กกว่าหัวชาร์จเดิมเยอะมาก
+Dialogue: 0,0:00:22.17,0:00:22.70,Highlight,,0,0,0,,ชาร์จ
+Dialogue: 0,0:00:22.70,0:00:23.89,Default,,0,0,0,,MacBook Pro
+Dialogue: 0,0:00:23.89,0:00:24.64,Highlight,,0,0,0,,ไวทันใจ
+Dialogue: 0,0:00:24.64,0:00:25.72,Default,,0,0,0,,ไม่ร้อนเลย
+Dialogue: 0,0:00:25.72,0:00:26.79,Highlight,,0,0,0,,ใช้งานง่าย
+Dialogue: 0,0:00:26.79,0:00:28.51,Default,,0,0,0,,คุ้มค่ามากเลยค่ะ
+Dialogue: 0,0:00:28.51,0:00:32.49,Highlight,,0,0,0,,รีบกดสั่งที่ตะกร้าสีส้มซ้ายมือด่วนเลย
+Dialogue: 0,0:00:32.49,0:00:35.40,Default,,0,0,0,,ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ

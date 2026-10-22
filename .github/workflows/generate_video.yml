@@ -1,0 +1,60 @@
+name: 🎬 Generate Shopee Affiliate Video (Free Cloud Runner)
+
+on:
+  workflow_dispatch:
+    inputs:
+      product_id:
+        description: 'Select Product ID'
+        required: true
+        default: 'cat_fountain_01'
+        type: choice
+        options:
+          - cat_fountain_01
+          - gan_charger_65w
+          - uv_dust_mite_vacuum
+          - tyeso_tumbler_304
+          - spray_mop_360
+          - solar_sensor_light
+          - air_fryer_visual
+          - sonic_electric_toothbrush
+          - kitchen_dish_rack_stainless
+          - wireless_earbuds_anc
+      duration:
+        description: 'Target Video Duration (seconds)'
+        required: true
+        default: '20'
+        type: string
+
+jobs:
+  build-video:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: 📦 Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: 📦 Install Python Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🎬 Run Video Generation Pipeline
+        run: |
+          python main.py --product_id ${{ inputs.product_id }} --duration ${{ inputs.duration }} --mock
+
+      - name: 📤 Upload MP4 Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: final_shopee_video_${{ inputs.product_id }}
+          path: output/${{ inputs.product_id }}/*.mp4
+          retention-days: 14

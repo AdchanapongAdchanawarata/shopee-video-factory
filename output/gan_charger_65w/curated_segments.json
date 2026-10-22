@@ -1,0 +1,74 @@
+[
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
+    "start_sec": 0.0,
+    "end_sec": 2.0,
+    "duration": 2.0,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Local CV high-clarity segment demonstrating hook_action"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_2_detail.mp4",
+    "start_sec": 0.0,
+    "end_sec": 2.0,
+    "duration": 2.0,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Local CV high-clarity segment demonstrating hook_action"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_3_cat.mp4",
+    "start_sec": 0.0,
+    "end_sec": 2.0,
+    "duration": 2.0,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Local CV high-clarity segment demonstrating hook_action"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
+    "start_sec": 2.0,
+    "end_sec": 4.0,
+    "duration": 2.0,
+    "shot_type": "closeup",
+    "visual_score": 8,
+    "reason": "Local CV high-clarity segment demonstrating closeup"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
+    "start_sec": 4.0,
+    "end_sec": 6.0,
+    "duration": 2.0,
+    "shot_type": "before_after",
+    "visual_score": 8,
+    "reason": "Local CV high-clarity segment demonstrating before_after"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_2_detail.mp4",
+    "start_sec": 2.0,
+    "end_sec": 4.0,
+    "duration": 2.0,
+    "shot_type": "closeup",
+    "visual_score": 8,
+    "reason": "Local CV high-clarity segment demonstrating closeup"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_2_detail.mp4",
+    "start_sec": 4.0,
+    "end_sec": 6.0,
+    "duration": 2.0,
+    "shot_type": "before_after",
+    "visual_score": 8,
+    "reason": "Local CV high-clarity segment demonstrating before_after"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_3_cat.mp4",
+    "start_sec": 2.0,
+    "end_sec": 4.0,
+    "duration": 2.0,
+    "shot_type": "closeup",
+    "visual_score": 8,
+    "reason": "Local CV high-clarity segment demonstrating closeup"
+  }
+]

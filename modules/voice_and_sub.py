@@ -1,0 +1,6 @@
+import importlib
+_mod = importlib.import_module("modules.3_voice_and_sub")
+generate_voiceover_and_subtitles = _mod.generate_voiceover_and_subtitles
+get_audio_duration = _mod.get_audio_duration
+synthesize_edge_tts = _mod.synthesize_edge_tts
+generate_subtitles_from_phrases = _mod.generate_subtitles_from_phrases

@@ -5,8 +5,8 @@
     "end_sec": 2.0,
     "duration": 2.0,
     "shot_type": "hook_action",
-    "visual_score": 9,
-    "reason": "Local CV high-clarity segment demonstrating hook_action"
+    "visual_score": 10,
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_2_detail.mp4",
@@ -14,8 +14,8 @@
     "end_sec": 2.0,
     "duration": 2.0,
     "shot_type": "hook_action",
-    "visual_score": 9,
-    "reason": "Local CV high-clarity segment demonstrating hook_action"
+    "visual_score": 10,
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_3_cat.mp4",
@@ -23,52 +23,70 @@
     "end_sec": 2.0,
     "duration": 2.0,
     "shot_type": "hook_action",
+    "visual_score": 10,
+    "reason": "Primary hook action showing live product movement"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_1_action.mp4",
+    "start_sec": 2.0,
+    "end_sec": 4.3,
+    "duration": 2.3,
+    "shot_type": "hook_action",
     "visual_score": 9,
-    "reason": "Local CV high-clarity segment demonstrating hook_action"
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_1_action.mp4",
-    "start_sec": 2.0,
-    "end_sec": 4.0,
-    "duration": 2.0,
-    "shot_type": "closeup",
-    "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating closeup"
-  },
-  {
-    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_1_action.mp4",
-    "start_sec": 4.0,
-    "end_sec": 6.0,
-    "duration": 2.0,
-    "shot_type": "before_after",
-    "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating before_after"
+    "start_sec": 4.3,
+    "end_sec": 6.1,
+    "duration": 1.8,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_2_detail.mp4",
     "start_sec": 2.0,
-    "end_sec": 4.0,
-    "duration": 2.0,
-    "shot_type": "closeup",
-    "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating closeup"
+    "end_sec": 4.3,
+    "duration": 2.3,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_2_detail.mp4",
-    "start_sec": 4.0,
-    "end_sec": 6.0,
-    "duration": 2.0,
-    "shot_type": "before_after",
-    "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating before_after"
+    "start_sec": 4.3,
+    "end_sec": 6.1,
+    "duration": 1.8,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_3_cat.mp4",
     "start_sec": 2.0,
-    "end_sec": 4.0,
-    "duration": 2.0,
-    "shot_type": "closeup",
+    "end_sec": 4.3,
+    "duration": 2.3,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Primary hook action showing live product movement"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_3_cat.mp4",
+    "start_sec": 4.3,
+    "end_sec": 5.97,
+    "duration": 1.67,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Primary hook action showing live product movement"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\cat_fountain_01\\raw_media\\clip_1_action.mp4",
+    "start_sec": 6.1,
+    "end_sec": 7.97,
+    "duration": 1.87,
+    "shot_type": "feature_demo",
     "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating closeup"
+    "reason": "High-clarity detail showing product build and usage"
   }
 ]

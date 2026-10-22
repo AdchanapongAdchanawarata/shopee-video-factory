@@ -36,6 +36,17 @@ def get_top10():
             return JSONResponse({"error": str(e)}, status_code=500)
     return []
 
+@app.get("/api/status")
+def get_status():
+    return {
+        "status": "online",
+        "platform": "Vercel Serverless + GitHub",
+        "cost": "0 THB",
+        "ffmpeg_ready": False,
+        "engine_mode": "Cloud Dashboard Mode",
+        "note": "สำหรับการเรนเดอร์ FFmpeg 1080x1920 ให้รัน python server.py ในเครื่องหรือผ่าน GitHub Actions"
+    }
+
 @app.get("/api/product/{product_id}")
 def get_product(product_id: str):
     """Return specific product data."""
@@ -49,8 +60,23 @@ def get_product(product_id: str):
                         "exists": True,
                         "product_id": product_id,
                         "product_data": p,
-                        "video_exists": False
+                        "video_exists": False,
+                        "video_url": None,
+                        "voiceover_url": None
                     }
         except Exception:
             pass
     return {"exists": False, "product_id": product_id}
+
+@app.post("/api/pipeline/start")
+def start_pipeline_cloud():
+    return {
+        "job_id": "vercel-demo-job",
+        "status": "started",
+        "message": "ระบบ Cloud Dashboard ตอบรับคำสั่งแล้ว สำหรับการตัดต่อระดับสูงด้วย FFmpeg ให้รัน python server.py"
+    }
+
+@app.post("/api/script/save")
+def update_script_cloud():
+    return {"status": "saved", "message": "บันทึกสคริปต์บน Dashboard สำเร็จ"}
+

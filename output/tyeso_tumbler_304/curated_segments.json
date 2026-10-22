@@ -5,8 +5,8 @@
     "end_sec": 2.0,
     "duration": 2.0,
     "shot_type": "hook_action",
-    "visual_score": 9,
-    "reason": "Local CV high-clarity segment demonstrating hook_action"
+    "visual_score": 10,
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
@@ -14,43 +14,232 @@
     "end_sec": 2.0,
     "duration": 2.0,
     "shot_type": "hook_action",
+    "visual_score": 10,
+    "reason": "Primary hook action showing live product movement"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 2.0,
+    "end_sec": 4.3,
+    "duration": 2.3,
+    "shot_type": "hook_action",
     "visual_score": 9,
-    "reason": "Local CV high-clarity segment demonstrating hook_action"
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
-    "start_sec": 2.0,
-    "end_sec": 4.0,
-    "duration": 2.0,
-    "shot_type": "closeup",
-    "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating closeup"
-  },
-  {
-    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
-    "start_sec": 4.0,
-    "end_sec": 6.0,
-    "duration": 2.0,
-    "shot_type": "before_after",
-    "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating before_after"
+    "start_sec": 4.3,
+    "end_sec": 6.1,
+    "duration": 1.8,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
     "start_sec": 2.0,
-    "end_sec": 4.0,
-    "duration": 2.0,
-    "shot_type": "closeup",
-    "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating closeup"
+    "end_sec": 4.3,
+    "duration": 2.3,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Primary hook action showing live product movement"
   },
   {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
-    "start_sec": 4.0,
-    "end_sec": 6.0,
-    "duration": 2.0,
-    "shot_type": "before_after",
+    "start_sec": 4.3,
+    "end_sec": 6.1,
+    "duration": 1.8,
+    "shot_type": "hook_action",
+    "visual_score": 9,
+    "reason": "Primary hook action showing live product movement"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 6.1,
+    "end_sec": 8.3,
+    "duration": 2.2,
+    "shot_type": "feature_demo",
     "visual_score": 8,
-    "reason": "Local CV high-clarity segment demonstrating before_after"
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 8.3,
+    "end_sec": 10.2,
+    "duration": 1.9,
+    "shot_type": "closeup",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 10.2,
+    "end_sec": 12.6,
+    "duration": 2.4,
+    "shot_type": "feature_demo",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 12.6,
+    "end_sec": 14.6,
+    "duration": 2.0,
+    "shot_type": "closeup",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 14.6,
+    "end_sec": 16.9,
+    "duration": 2.3,
+    "shot_type": "feature_demo",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 16.9,
+    "end_sec": 18.7,
+    "duration": 1.8,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 18.7,
+    "end_sec": 20.9,
+    "duration": 2.2,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 20.9,
+    "end_sec": 22.8,
+    "duration": 1.9,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 22.8,
+    "end_sec": 25.2,
+    "duration": 2.4,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 25.2,
+    "end_sec": 27.2,
+    "duration": 2.0,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_1_unboxing.mp4",
+    "start_sec": 27.2,
+    "end_sec": 28.83,
+    "duration": 1.63,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 6.1,
+    "end_sec": 8.3,
+    "duration": 2.2,
+    "shot_type": "feature_demo",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 8.3,
+    "end_sec": 10.2,
+    "duration": 1.9,
+    "shot_type": "closeup",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 10.2,
+    "end_sec": 12.6,
+    "duration": 2.4,
+    "shot_type": "feature_demo",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 12.6,
+    "end_sec": 14.6,
+    "duration": 2.0,
+    "shot_type": "closeup",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 14.6,
+    "end_sec": 16.9,
+    "duration": 2.3,
+    "shot_type": "feature_demo",
+    "visual_score": 8,
+    "reason": "High-clarity detail showing product build and usage"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 16.9,
+    "end_sec": 18.7,
+    "duration": 1.8,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 18.7,
+    "end_sec": 20.9,
+    "duration": 2.2,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 20.9,
+    "end_sec": 22.8,
+    "duration": 1.9,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 22.8,
+    "end_sec": 25.2,
+    "duration": 2.4,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\tyeso_tumbler_304\\raw_media\\clip_2_straw_lid.mp4",
+    "start_sec": 25.2,
+    "end_sec": 26.83,
+    "duration": 1.63,
+    "shot_type": "lifestyle_context",
+    "visual_score": 8,
+    "reason": "Demonstration of practical real-world result"
   }
 ]

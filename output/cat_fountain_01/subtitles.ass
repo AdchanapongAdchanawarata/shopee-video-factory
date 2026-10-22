@@ -11,20 +11,24 @@ PlayResY: 1920
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
 Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
-Style: HookHeader,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,285,1
+Style: HookHeader,Kanit,94,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,240,1
+Style: BadgePill,Kanit,46,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,5.5,2.5,8,30,30,130,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,ทาสแมวต้องดู!\Nน้ำพุไร้สายตัวจบ
-Dialogue: 0,0:00:00.00,0:00:01.33,Highlight,,0,0,0,,ใครที่น้องแมวดื่มน้ำน้อย
-Dialogue: 0,0:00:01.33,0:00:02.60,Default,,0,0,0,,หรือกลัวเรื่องสายไฟช็อต
-Dialogue: 0,0:00:02.60,0:00:03.64,Highlight,,0,0,0,,ฟังทางนี้ด่วนเลยค่ะ
-Dialogue: 0,0:00:03.64,0:00:04.97,Default,,0,0,0,,ตัวนี้เป็นน้ำพุแมวไร้สาย
-Dialogue: 0,0:00:04.97,0:00:05.80,Highlight,,0,0,0,,สแตนเลส 304 แท้
-Dialogue: 0,0:00:05.80,0:00:06.68,Default,,0,0,0,,เซนเซอร์อัจฉริยะ
-Dialogue: 0,0:00:06.68,0:00:07.62,Highlight,,0,0,0,,เดินผ่านน้ำถึงไหล
-Dialogue: 0,0:00:07.62,0:00:08.39,Default,,0,0,0,,เสียงเงียบกริบ
-Dialogue: 0,0:00:08.39,0:00:09.22,Highlight,,0,0,0,,แบตอึดเป็นเดือน
-Dialogue: 0,0:00:09.22,0:00:10.66,Default,,0,0,0,,ล้างง่ายไม่เป็นเมือกเลยค่ะ
-Dialogue: 0,0:00:10.66,0:00:12.48,Highlight,,0,0,0,,รีบกดที่ตะกร้าสีส้มซ้ายมือด่วนเลย
-Dialogue: 0,0:00:12.48,0:00:13.97,Default,,0,0,0,,ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ
+Dialogue: 2,0:00:00.00,0:00:04.50,BadgePill,,0,0,0,,{\c&H00D7FF&}★ 4.9/5{\c&HFFFFFF&}  |  ยอดขายพุ่ง 3,800+ ชิ้น
+Dialogue: 2,0:00:04.50,0:00:12.00,BadgePill,,0,0,0,,{\c&H00FF88&}✔ ของแท้ 100%{\c&HFFFFFF&}  |  สเปกตรงปก คุณภาพพรีเมียม
+Dialogue: 2,0:00:12.00,0:00:16.08,BadgePill,,0,0,0,,{\c&H0080FF&}🛒 จิ้มตะกร้าส้มมุมล่างซ้ายได้เลย 👇
+Dialogue: 0,0:00:00.00,0:00:01.53,Highlight,,0,0,0,,ใครที่น้องแมวดื่มน้ำน้อย
+Dialogue: 0,0:00:01.53,0:00:02.99,Default,,0,0,0,,หรือกลัวเรื่องสายไฟช็อต
+Dialogue: 0,0:00:02.99,0:00:04.19,Highlight,,0,0,0,,ฟังทางนี้ด่วนเลยค่ะ
+Dialogue: 0,0:00:04.19,0:00:05.72,Default,,0,0,0,,ตัวนี้เป็นน้ำพุแมวไร้สาย
+Dialogue: 0,0:00:05.72,0:00:06.67,Highlight,,0,0,0,,สแตนเลส 304 แท้
+Dialogue: 0,0:00:06.67,0:00:07.69,Default,,0,0,0,,เซนเซอร์อัจฉริยะ
+Dialogue: 0,0:00:07.69,0:00:08.77,Highlight,,0,0,0,,เดินผ่านน้ำถึงไหล
+Dialogue: 0,0:00:08.77,0:00:09.66,Default,,0,0,0,,เสียงเงียบกริบ
+Dialogue: 0,0:00:09.66,0:00:10.61,Highlight,,0,0,0,,แบตอึดเป็นเดือน
+Dialogue: 0,0:00:10.61,0:00:12.27,Default,,0,0,0,,ล้างง่ายไม่เป็นเมือกเลยค่ะ
+Dialogue: 0,0:00:12.27,0:00:14.36,Highlight,,0,0,0,,รีบกดที่ตะกร้าสีส้มซ้ายมือด่วนเลย
+Dialogue: 0,0:00:14.36,0:00:16.08,Default,,0,0,0,,ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ

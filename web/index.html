@@ -51,13 +51,18 @@
     
     /* Smartphone Mockup Frame Styling */
     .phone-mockup {
-      width: 310px;
-      height: 560px;
+      width: 320px;
+      height: 570px;
       border-radius: 40px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 8px #1f242c, 0 0 0 10px #2d333b;
       position: relative;
       background: #090B0E;
       overflow: hidden;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .phone-mockup.expanded {
+      width: 390px;
+      height: 693px;
     }
     .phone-notch {
       position: absolute;
@@ -373,9 +378,15 @@
               <i class="ph-bold ph-device-mobile text-shopee text-base"></i>
               <span class="text-xs font-semibold text-white">หน้าจอพรีวิว 9:16 (TikTok & Shopee Video)</span>
             </div>
-            <span id="video-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400">
-              Ready to Play
-            </span>
+            <div class="flex items-center space-x-2">
+              <button onclick="toggleMockupSize()" id="btn-toggle-size" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition flex items-center space-x-1" title="สลับขนาดจอพรีวิว">
+                <i class="ph ph-arrows-out" id="size-icon"></i>
+                <span id="size-label">ขยายใหญ่ (390px)</span>
+              </button>
+              <span id="video-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400">
+                Ready to Play
+              </span>
+            </div>
           </div>
 
           <!-- REALISTIC SMARTPHONE MOCKUP FRAME -->
@@ -763,6 +774,21 @@
       } else {
         overlay.classList.add('hidden');
         btn.classList.remove('bg-shopee/20', 'text-shopee', 'border-shopee/40');
+      }
+    }
+
+    function toggleMockupSize() {
+      const mockup = document.querySelector('.phone-mockup');
+      const label = document.getElementById('size-label');
+      const icon = document.getElementById('size-icon');
+      if (mockup.classList.contains('expanded')) {
+        mockup.classList.remove('expanded');
+        label.innerText = 'ขยายใหญ่ (390px)';
+        icon.className = 'ph ph-arrows-out';
+      } else {
+        mockup.classList.add('expanded');
+        label.innerText = 'ย่อลง (320px)';
+        icon.className = 'ph ph-arrows-in';
       }
     }
 

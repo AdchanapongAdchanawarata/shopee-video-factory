@@ -11,28 +11,32 @@ PlayResY: 1920
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
 Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
-Style: HookHeader,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,285,1
+Style: HookHeader,Kanit,94,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,240,1
+Style: BadgePill,Kanit,46,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,5.5,2.5,8,30,30,130,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,พกตัวเดียวจบ!\Nหัวชาร์จ GaN 65W ชาร์จครบทุกเครื่อง
-Dialogue: 0,0:00:00.00,0:00:02.34,Highlight,,0,0,0,,เบื่อไหมที่ต้องพกหัวชาร์จหลายอันหนักกระเป๋า
-Dialogue: 0,0:00:02.34,0:00:03.21,Default,,0,0,0,,ตัวนี้ตัวเดียวจบ
-Dialogue: 0,0:00:03.21,0:00:04.29,Highlight,,0,0,0,,ชาร์จได้ทั้งโน้ตบุ๊ก
-Dialogue: 0,0:00:04.29,0:00:05.22,Default,,0,0,0,,และมือถือพร้อมกัน
-Dialogue: 0,0:00:05.22,0:00:05.76,Highlight,,0,0,0,,ตัวนี้เป็น
-Dialogue: 0,0:00:05.76,0:00:06.09,Default,,0,0,0,,Ugreen
-Dialogue: 0,0:00:06.09,0:00:07.28,Highlight,,0,0,0,,หัวชาร์จเร็ว GaN 65W 3
-Dialogue: 0,0:00:07.28,0:00:07.55,Default,,0,0,0,,พอร์ต
-Dialogue: 0,0:00:07.55,0:00:08.37,Highlight,,0,0,0,,ชาร์จโน้ตบุ๊ก +
-Dialogue: 0,0:00:08.37,0:00:09.13,Default,,0,0,0,,มือถือพร้อมกัน
-Dialogue: 0,0:00:09.13,0:00:09.51,Highlight,,0,0,0,,ไม่ร้อน
-Dialogue: 0,0:00:09.51,0:00:11.20,Default,,0,0,0,,ขนาดเล็กกว่าหัวชาร์จเดิมเยอะมาก
-Dialogue: 0,0:00:11.20,0:00:11.47,Highlight,,0,0,0,,ชาร์จ
-Dialogue: 0,0:00:11.47,0:00:12.06,Default,,0,0,0,,MacBook Pro
-Dialogue: 0,0:00:12.06,0:00:12.45,Highlight,,0,0,0,,ไวทันใจ
-Dialogue: 0,0:00:12.45,0:00:12.99,Default,,0,0,0,,ไม่ร้อนเลย
-Dialogue: 0,0:00:12.99,0:00:13.53,Highlight,,0,0,0,,ใช้งานง่าย
-Dialogue: 0,0:00:13.53,0:00:14.40,Default,,0,0,0,,คุ้มค่ามากเลยค่ะ
-Dialogue: 0,0:00:14.40,0:00:16.41,Highlight,,0,0,0,,รีบกดสั่งที่ตะกร้าสีส้มซ้ายมือด่วนเลย
-Dialogue: 0,0:00:16.41,0:00:17.88,Default,,0,0,0,,ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ
+Dialogue: 2,0:00:00.00,0:00:04.50,BadgePill,,0,0,0,,{\c&H00D7FF&}★ 4.9/5{\c&HFFFFFF&}  |  ยอดขายพุ่ง 3,800+ ชิ้น
+Dialogue: 2,0:00:04.50,0:00:12.00,BadgePill,,0,0,0,,{\c&H00FF88&}✔ ของแท้ 100%{\c&HFFFFFF&}  |  สเปกตรงปก คุณภาพพรีเมียม
+Dialogue: 2,0:00:12.00,0:00:21.65,BadgePill,,0,0,0,,{\c&H0080FF&}🛒 จิ้มตะกร้าส้มมุมล่างซ้ายได้เลย 👇
+Dialogue: 0,0:00:00.00,0:00:02.83,Highlight,,0,0,0,,เบื่อไหมที่ต้องพกหัวชาร์จหลายอันหนักกระเป๋า
+Dialogue: 0,0:00:02.83,0:00:03.88,Default,,0,0,0,,ตัวนี้ตัวเดียวจบ
+Dialogue: 0,0:00:03.88,0:00:05.20,Highlight,,0,0,0,,ชาร์จได้ทั้งโน้ตบุ๊ก
+Dialogue: 0,0:00:05.20,0:00:06.32,Default,,0,0,0,,และมือถือพร้อมกัน
+Dialogue: 0,0:00:06.32,0:00:06.98,Highlight,,0,0,0,,ตัวนี้เป็น
+Dialogue: 0,0:00:06.98,0:00:07.37,Default,,0,0,0,,Ugreen
+Dialogue: 0,0:00:07.37,0:00:08.82,Highlight,,0,0,0,,หัวชาร์จเร็ว GaN 65W 3
+Dialogue: 0,0:00:08.82,0:00:09.15,Default,,0,0,0,,พอร์ต
+Dialogue: 0,0:00:09.15,0:00:10.13,Highlight,,0,0,0,,ชาร์จโน้ตบุ๊ก +
+Dialogue: 0,0:00:10.13,0:00:11.06,Default,,0,0,0,,มือถือพร้อมกัน
+Dialogue: 0,0:00:11.06,0:00:11.52,Highlight,,0,0,0,,ไม่ร้อน
+Dialogue: 0,0:00:11.52,0:00:13.56,Default,,0,0,0,,ขนาดเล็กกว่าหัวชาร์จเดิมเยอะมาก
+Dialogue: 0,0:00:13.56,0:00:13.88,Highlight,,0,0,0,,ชาร์จ
+Dialogue: 0,0:00:13.88,0:00:14.61,Default,,0,0,0,,MacBook Pro
+Dialogue: 0,0:00:14.61,0:00:15.07,Highlight,,0,0,0,,ไวทันใจ
+Dialogue: 0,0:00:15.07,0:00:15.73,Default,,0,0,0,,ไม่ร้อนเลย
+Dialogue: 0,0:00:15.73,0:00:16.39,Highlight,,0,0,0,,ใช้งานง่าย
+Dialogue: 0,0:00:16.39,0:00:17.44,Default,,0,0,0,,คุ้มค่ามากเลยค่ะ
+Dialogue: 0,0:00:17.44,0:00:19.87,Highlight,,0,0,0,,รีบกดสั่งที่ตะกร้าสีส้มซ้ายมือด่วนเลย
+Dialogue: 0,0:00:19.87,0:00:21.65,Default,,0,0,0,,ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ

@@ -102,10 +102,12 @@ def prepare_trimmed_segment(
     seg: Dict[str, Any],
     seg_idx: int,
     temp_dir: Path,
-    target_dur: float
+    target_dur: float,
+    speed_factor: float = 1.05
 ) -> Optional[Path]:
     """
-    Trim, crop to 9:16 (1080x1920), apply 103% zoom/scale, and subtle color grading.
+    Trim, crop to 9:16 (1080x1920), apply dynamic zoom/scale (102-106%), 
+    snappy speed ramp (1.05x), and rich pro color grading.
     """
     src_video = Path(seg["source_video"])
     if not src_video.is_file():
@@ -116,28 +118,36 @@ def prepare_trimmed_segment(
     dur = float(seg.get("duration", target_dur))
     dur = min(dur, target_dur)
 
+    # Alternate subtle zoom factors across cuts (102% -> 105% -> 103% -> 106%)
+    scales = [1.03, 1.05, 1.02, 1.06]
+    cur_scale = scales[seg_idx % len(scales)]
+
     # Video filter chain:
     # 1. Scale & Crop to 9:16 (1080x1920)
-    # 2. Subtle 103% scale & center crop for unique hash
-    # 3. Subtle color grade (contrast 1.03, brightness 0.01, saturation 1.05)
+    # 2. Dynamic scale & center crop
+    # 3. Pro color grade (contrast 1.04, saturation 1.08, brightness 0.01)
+    # 4. Setpts for snappier mobile creator tempo (speed_factor)
     vf = (
         f"scale={config.VIDEO_WIDTH}:{config.VIDEO_HEIGHT}:force_original_aspect_ratio=increase,"
         f"crop={config.VIDEO_WIDTH}:{config.VIDEO_HEIGHT},"
-        f"scale={config.SCALE_TRANSFORM}*iw:{config.SCALE_TRANSFORM}*ih,"
+        f"scale={cur_scale}*iw:{cur_scale}*ih,"
         f"crop={config.VIDEO_WIDTH}:{config.VIDEO_HEIGHT},"
-        f"eq=contrast=1.03:brightness=0.01:saturation=1.05,"
+        f"eq=contrast=1.04:brightness=0.01:saturation=1.08,"
+        f"setpts=PTS/{speed_factor},"
         f"setsar=1,fps={config.VIDEO_FPS}"
     )
+
+    actual_input_dur = dur * speed_factor
 
     cmd = [
         config.FFMPEG_PATH, "-y",
         "-ss", str(start_sec),
-        "-t", str(dur),
+        "-t", str(actual_input_dur),
         "-i", str(src_video),
         "-vf", vf,
         "-c:v", "libx264",
         "-preset", "veryfast",
-        "-crf", "22",
+        "-crf", "20",
         "-pix_fmt", "yuv420p",
         "-an",
         "-map_metadata", "-1",
@@ -158,12 +168,12 @@ def assemble_curated_video(
 ) -> Path:
     """
     Main entry point for Module 4:
-    1. Reads curated_segments.json (sorted by visual_score and hook_action).
-    2. Trims and stitches segments into 1.8-2.2s cuts.
-    3. Crops to 9:16 (1080x1920) with unique transform (103% zoom + color grade).
-    4. Mixes Thai voiceover and BGM (at 10% volume).
-    5. Burns .ass subtitles cleanly above the Shopee orange basket safe zone.
-    6. Strips all original metadata (-map_metadata -1).
+    1. Reads curated_segments.json with continuous unique slicing.
+    2. Interleaves cuts across DIFFERENT source video files so the view angle changes constantly.
+    3. Guarantees ZERO footage repetition (each second seen only once).
+    4. Applies mobile creator speed ramping and pro color grading.
+    5. Mixes Thai voiceover and BGM with audio ducking.
+    6. Burns ASS subtitles and high-converting proof badges above the Shopee orange basket.
     """
     out_dir = config.OUTPUT_DIR / product_id
     temp_dir = out_dir / "temp_assembly"
@@ -185,7 +195,7 @@ def assemble_curated_video(
             voice_dur = int(m.group(1))*3600 + int(m.group(2))*60 + float(m.group(3))
 
     total_target_dur = target_duration or max(15.0, min(25.0, voice_dur + 0.5))
-    print(f"🎬 Assembling Hybrid Video: Target Duration {total_target_dur:.2f}s (Voiceover: {voice_dur:.2f}s)")
+    print(f"🎬 Assembling Pro Video: Target Duration {total_target_dur:.2f}s (Voiceover: {voice_dur:.2f}s)")
 
     # 1. Load curated segments
     segments = []
@@ -196,26 +206,70 @@ def assemble_curated_video(
         except Exception:
             segments = []
 
-    # Sort segments: Ensure hook_action is 1st, then descending visual_score
-    segments.sort(key=lambda x: (x.get("shot_type") == "hook_action", x.get("visual_score", 0)), reverse=True)
-
-    # 2. Process trimmed clips
+    # 2. Build non-repeating interleaved queue
     processed_clips: List[Path] = []
     accumulated_dur = 0.0
     seg_counter = 0
 
     if segments:
-        # Loop over segments until total_target_dur is filled
-        pool_idx = 0
-        while accumulated_dur < total_target_dur and pool_idx < (len(segments) * 3):
-            seg = segments[pool_idx % len(segments)]
-            clip_target = min(config.VIDEO_SEGMENT_DURATION, total_target_dur - accumulated_dur)
-            trimmed = prepare_trimmed_segment(seg, seg_counter, temp_dir, clip_target)
-            if trimmed:
-                processed_clips.append(trimmed)
-                accumulated_dur += clip_target
-                seg_counter += 1
-            pool_idx += 1
+        # Group segments by unique source_video to interleave camera angles
+        by_source: Dict[str, List[Dict[str, Any]]] = {}
+        for s in segments:
+            sv = s.get("source_video")
+            if sv:
+                by_source.setdefault(sv, []).append(s)
+
+        # Prioritize action, unboxing, and detail clips over static desk/environment shots
+        def source_priority(k: str) -> int:
+            k_lower = k.lower()
+            if "action" in k_lower or "hook" in k_lower:
+                return 0
+            if "unboxing" in k_lower or "hands" in k_lower:
+                return 1
+            if "detail" in k_lower or "straw" in k_lower or "filter" in k_lower:
+                return 2
+            return 3  # static context/desk
+
+        source_keys = sorted(list(by_source.keys()), key=source_priority)
+        source_ptrs = {k: 0 for k in source_keys}
+        source_usage_counts = {k: 0 for k in source_keys}
+        
+        src_turn = 0
+        max_attempts = len(segments) + 20
+        attempts = 0
+
+        while accumulated_dur < total_target_dur and attempts < max_attempts:
+            attempts += 1
+            cur_src = source_keys[src_turn % len(source_keys)]
+            src_turn += 1
+
+            # Cap static desk/context shots to at most 1 single cut in the whole video
+            is_static_context = source_priority(cur_src) == 3
+            if is_static_context and source_usage_counts[cur_src] >= 1:
+                continue
+
+            ptr = source_ptrs[cur_src]
+            src_segs = by_source[cur_src]
+
+            if ptr < len(src_segs):
+                seg = src_segs[ptr]
+                source_ptrs[cur_src] += 1
+                source_usage_counts[cur_src] += 1
+
+                clip_target = min(2.1, total_target_dur - accumulated_dur)
+                if clip_target < 0.8:
+                    clip_target = total_target_dur - accumulated_dur
+
+                trimmed = prepare_trimmed_segment(seg, seg_counter, temp_dir, clip_target)
+                if trimmed:
+                    processed_clips.append(trimmed)
+                    accumulated_dur += clip_target
+                    seg_counter += 1
+            else:
+                # If all primary action clips have been exhausted, break
+                all_exhausted = all(source_ptrs[k] >= len(by_source[k]) for k in source_keys if source_priority(k) < 3)
+                if all_exhausted:
+                    break
 
     # Check for real product images in raw_media if visual clips are insufficient
     raw_media_dir = out_dir / "raw_media"

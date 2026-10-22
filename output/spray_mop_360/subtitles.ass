@@ -1,0 +1,36 @@
+[Script Info]
+Title: Shopee Thai Dynamic Captions
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.601
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
+Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
+Style: HookHeader,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,285,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,ถูบ้านง่ายขึ้น 10 เท่า!\Nไม้ถูพื้นฉีดน้ำในตัว ไม่ต้องหิ้วถัง
+Dialogue: 0,0:00:00.00,0:00:01.33,Highlight,,0,0,0,,เลิกหิ้วถังน้ำหนักๆ
+Dialogue: 0,0:00:01.33,0:00:02.73,Default,,0,0,0,,ให้ปวดหลังได้แล้วค่ะ
+Dialogue: 0,0:00:02.73,0:00:05.19,Highlight,,0,0,0,,ไม้ถูพื้นตัวนี้ฉีดสเปรย์น้ำได้ในตัว
+Dialogue: 0,0:00:05.19,0:00:06.45,Default,,0,0,0,,ถูเสร็จไวใน 5 นาที
+Dialogue: 0,0:00:06.45,0:00:07.15,Highlight,,0,0,0,,ตัวนี้เป็น
+Dialogue: 0,0:00:07.15,0:00:08.41,Default,,0,0,0,,ไม้ถูพื้นสเปรย์น้ำ
+Dialogue: 0,0:00:08.41,0:00:09.05,Highlight,,0,0,0,,Spray Mop
+Dialogue: 0,0:00:09.05,0:00:10.17,Default,,0,0,0,,หัวหมุน 360 องศา
+Dialogue: 0,0:00:10.17,0:00:11.15,Highlight,,0,0,0,,ฉีดพ่นน้ำในตัว
+Dialogue: 0,0:00:11.15,0:00:12.20,Default,,0,0,0,,ไม่ต้องยกถังน้ำ
+Dialogue: 0,0:00:12.20,0:00:12.62,Highlight,,0,0,0,,ชอบมาก
+Dialogue: 0,0:00:12.62,0:00:14.59,Default,,0,0,0,,ไม่ต้องแบกถังน้ำไปมาอีกต่อไป
+Dialogue: 0,0:00:14.59,0:00:16.27,Highlight,,0,0,0,,บีบฉีดสเปรย์ละอองละเอียด
+Dialogue: 0,0:00:16.27,0:00:16.90,Default,,0,0,0,,แห้งไวมาก
+Dialogue: 0,0:00:16.90,0:00:17.60,Highlight,,0,0,0,,ใช้งานง่าย
+Dialogue: 0,0:00:17.60,0:00:18.72,Default,,0,0,0,,คุ้มค่ามากเลยค่ะ
+Dialogue: 0,0:00:18.72,0:00:21.32,Highlight,,0,0,0,,รีบกดสั่งที่ตะกร้าสีส้มซ้ายมือด่วนเลย
+Dialogue: 0,0:00:21.32,0:00:23.21,Default,,0,0,0,,ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ

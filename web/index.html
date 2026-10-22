@@ -248,8 +248,23 @@
                   <option value="google_tts">🌐 Google Translate TTS (สำเนียงคุ้นเคย ฟังสบาย)</option>
                 </select>
               </div>
-              <p class="text-[11px] text-zinc-400 leading-relaxed">
-                * ปรับจูนความเร็วให้พอดี ไม่เร่งเสียง +15% จนรัวลิ้นพันกัน คำพูดฟังชัดเป็นธรรมชาติ
+              <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                <span class="text-[10px] text-zinc-400 font-mono">ทดลองกดฟัง:</span>
+                <button type="button" onclick="playSampleVoice('/assets/sample_premwadee.mp3')" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[11px] flex items-center space-x-1 transition">
+                  <i class="ph-bold ph-speaker-high text-shopee"></i>
+                  <span>👩 เปรมวดี</span>
+                </button>
+                <button type="button" onclick="playSampleVoice('/assets/sample_niwat.mp3')" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[11px] flex items-center space-x-1 transition">
+                  <i class="ph-bold ph-speaker-high text-blue-400"></i>
+                  <span>👨 นิวัฒน์</span>
+                </button>
+                <button type="button" onclick="playSampleVoice('/assets/sample_google.mp3')" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[11px] flex items-center space-x-1 transition">
+                  <i class="ph-bold ph-speaker-high text-emerald-400"></i>
+                  <span>🌐 Google</span>
+                </button>
+              </div>
+              <p class="text-[11px] text-zinc-400 leading-relaxed pt-0.5">
+                * ปรับจูนความเร็วระดับธรรมชาติ 1.0x ไม่เร่งสปีด +15% ช่วยให้ฟังง่ายขึ้น
               </p>
             </div>
 
@@ -727,6 +742,16 @@
         `"ใครที่กำลังมองหา ${prod.title.slice(0, 30)}... ฟังทางนี้ด่วน! ตัวนี้ใช้ดีมาก คุ้มราคา ได้เรตติ้ง 4.9 ดาว ยอดขายถล่มทลาย รีบกดที่ตะกร้าสีส้มด้านล่างเลยค่ะ!"`;
 
       loadVideo(pid);
+    }
+
+    let currentSampleAudio = null;
+    function playSampleVoice(src) {
+      if (currentSampleAudio) {
+        currentSampleAudio.pause();
+        currentSampleAudio.currentTime = 0;
+      }
+      currentSampleAudio = new Audio(src + '?t=' + Date.now());
+      currentSampleAudio.play();
     }
 
     function toggleSafeZone() {

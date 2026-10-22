@@ -1,0 +1,36 @@
+[Script Info]
+Title: Shopee Thai Dynamic Captions
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.601
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
+Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
+Style: HookHeader,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,285,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,คนเป็นภูมิแพ้ต้องดู!\Nดูดไรฝุ่นที่นอนออกมาเป็นก้อน
+Dialogue: 0,0:00:00.00,0:00:01.32,Highlight,,0,0,0,,ใครที่ตื่นมาแล้วจาม
+Dialogue: 0,0:00:01.32,0:00:01.80,Default,,0,0,0,,คัดจมูก
+Dialogue: 0,0:00:01.80,0:00:02.84,Highlight,,0,0,0,,คันยุบยิบตามตัว
+Dialogue: 0,0:00:02.84,0:00:05.76,Default,,0,0,0,,ที่นอนของคุณอาจเต็มไปด้วยไรฝุ่นเป็นล้านตัว
+Dialogue: 0,0:00:05.76,0:00:06.45,Highlight,,0,0,0,,ตัวนี้เป็น
+Dialogue: 0,0:00:06.45,0:00:07.77,Default,,0,0,0,,เครื่องดูดไรฝุ่น UV
+Dialogue: 0,0:00:07.77,0:00:08.39,Highlight,,0,0,0,,ไร้สาย 12
+Dialogue: 0,0:00:08.39,0:00:08.74,Default,,0,0,0,,000Pa
+Dialogue: 0,0:00:08.74,0:00:10.40,Highlight,,0,0,0,,ฆ่าเชื้อโรคบนที่นอน โซฟา
+Dialogue: 0,0:00:10.40,0:00:11.65,Default,,0,0,0,,กำจัดสารก่อภูมิแพ้
+Dialogue: 0,0:00:11.65,0:00:12.97,Highlight,,0,0,0,,ดูดรอบเดียวฝุ่นขาวๆ
+Dialogue: 0,0:00:12.97,0:00:13.94,Default,,0,0,0,,ออกมาเต็มกล่อง
+Dialogue: 0,0:00:13.94,0:00:14.43,Highlight,,0,0,0,,ตกใจมาก
+Dialogue: 0,0:00:14.43,0:00:16.37,Default,,0,0,0,,ทั้งที่เพิ่งซักผ้าปูที่นอนไป
+Dialogue: 0,0:00:16.37,0:00:17.06,Highlight,,0,0,0,,ใช้งานง่าย
+Dialogue: 0,0:00:17.06,0:00:18.17,Default,,0,0,0,,คุ้มค่ามากเลยค่ะ
+Dialogue: 0,0:00:18.17,0:00:20.74,Highlight,,0,0,0,,รีบกดสั่งที่ตะกร้าสีส้มซ้ายมือด่วนเลย
+Dialogue: 0,0:00:20.74,0:00:22.61,Default,,0,0,0,,ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ

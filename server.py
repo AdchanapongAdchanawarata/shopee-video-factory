@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import base64
 import asyncio
 import uuid
 from pathlib import Path
@@ -51,6 +52,7 @@ class PipelineRunRequest(BaseModel):
     step: str = "all"
     mock: bool = False
     duration: float = 20.0
+    voice_engine: str = "edge_premwadee_natural"
 
 class ScriptUpdateRequest(BaseModel):
     product_id: str
@@ -121,7 +123,7 @@ def run_pipeline_worker(job_id: str, req: PipelineRunRequest):
         if req.step in ("all", "3"):
             ACTIVE_JOBS[job_id]["step_label"] = "Step 3: Voice & Subtitles"
             ACTIVE_JOBS[job_id]["progress"] = 80
-            emit_log(job_id, "\n[Step 3] กำลังสังเคราะห์เสียงพากย์ไทย (+15%) และสร้างซับไตเติลภาษาไทย (.ass)...")
+            emit_log(job_id, f"\n[Step 3] กำลังจัดการเสียงพากย์ ({req.voice_engine}) และสร้างซับไตเติลภาษาไทย (.ass)...")
             if not script_data:
                 s_file = config.OUTPUT_DIR / pid / "script.json"
                 if s_file.is_file():
@@ -129,7 +131,7 @@ def run_pipeline_worker(job_id: str, req: PipelineRunRequest):
                         script_data = json.load(f)
                 else:
                     script_data = generate_shopee_script(pid, pname, use_mock=use_mock)
-            sub_meta = generate_voiceover_and_subtitles(pid, script_data)
+            sub_meta = generate_voiceover_and_subtitles(pid, script_data, voice_choice=req.voice_engine)
             emit_log(job_id, f"🎙️ สร้างเสียงพากย์เสร็จสิ้น: ความยาว {sub_meta['duration']:.2f} วินาที (เว้นระยะขอบล่าง 25% ไม่บังตะกร้าส้ม)")
 
         # STEP 4
@@ -281,6 +283,44 @@ async def update_script(req: ScriptUpdateRequest):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
     return {"status": "saved", "script": data}
+
+class VoiceoverUploadRequest(BaseModel):
+    product_id: str
+    audio_base64: str
+
+@app.post("/api/voiceover/upload")
+async def upload_custom_voiceover(req: VoiceoverUploadRequest):
+    """
+    Accept user mic recording or custom MP3 upload as base64 string.
+    Automatically saves it and re-aligns subtitles to the exact duration.
+    """
+    p_dir = config.OUTPUT_DIR / req.product_id
+    p_dir.mkdir(parents=True, exist_ok=True)
+    dest_audio = p_dir / "voiceover.mp3"
+
+    raw_b64 = req.audio_base64
+    if "," in raw_b64:
+        raw_b64 = raw_b64.split(",", 1)[1]
+
+    with open(dest_audio, "wb") as f:
+        f.write(base64.b64decode(raw_b64))
+
+    # Automatically align subtitles with this custom voice
+    s_file = p_dir / "script.json"
+    script_data = {}
+    if s_file.is_file():
+        try:
+            with open(s_file, "r", encoding="utf-8") as pf:
+                script_data = json.load(pf)
+        except Exception:
+            pass
+
+    sub_meta = generate_voiceover_and_subtitles(req.product_id, script_data, voice_choice="custom")
+    return {
+        "status": "success",
+        "duration": sub_meta["duration"],
+        "audio_url": f"/output/{req.product_id}/voiceover.mp3"
+    }
 
 if __name__ == "__main__":
     import uvicorn

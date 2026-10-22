@@ -9,6 +9,8 @@ bin/
 scratch/
 output/**/*.mp4
 output/**/*.jpg
+output/**/*.png
+output/**/*.webp
 output/**/*.mp3
 output/**/temp_*
 .vercel/

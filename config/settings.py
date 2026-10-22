@@ -124,7 +124,7 @@ GOOGLE_CLOUD_TTS_API_KEY = os.getenv("GOOGLE_CLOUD_TTS_API_KEY", os.getenv("GEMI
 
 
 EDGE_TTS_VOICE = os.getenv("EDGE_TTS_VOICE", "th-TH-PremwadeeNeural")
-EDGE_TTS_RATE = os.getenv("EDGE_TTS_RATE", "+15%")
+EDGE_TTS_RATE = os.getenv("EDGE_TTS_RATE", "+0%")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "")
 

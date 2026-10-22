@@ -46,6 +46,58 @@ def generate_motion_clip_from_color(output_path: Path, duration: float, color: s
     ]
     subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
+def generate_motion_clip_from_image(
+    image_path: Path,
+    output_path: Path,
+    duration: float = 2.5,
+    motion_idx: int = 0
+) -> bool:
+    """
+    Transforms a real high-res product photo into an ultra-clean 9:16 (1080x1920)
+    Ken-Burns motion video clip with blurred aesthetic backdrop.
+    """
+    frames = max(30, int(duration * config.VIDEO_FPS))
+    
+    # 4 dynamic motion variations to keep the video energetic
+    motion_patterns = [
+        # 0: Smooth zoom in
+        f"zoompan=z='min(zoom+0.0016,1.15)':d={frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={config.VIDEO_WIDTH}x{config.VIDEO_HEIGHT}:fps={config.VIDEO_FPS}",
+        # 1: Smooth zoom out
+        f"zoompan=z='max(1.15-0.0016*on,1.0)':d={frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={config.VIDEO_WIDTH}x{config.VIDEO_HEIGHT}:fps={config.VIDEO_FPS}",
+        # 2: Subtle dynamic pan & scale
+        f"zoompan=z='1.10':d={frames}:x='iw/2-(iw/zoom/2)+sin(on/25)*30':y='ih/2-(ih/zoom/2)':s={config.VIDEO_WIDTH}x{config.VIDEO_HEIGHT}:fps={config.VIDEO_FPS}",
+        # 3: Slight upward float
+        f"zoompan=z='1.08':d={frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)+(on/{frames})*35':s={config.VIDEO_WIDTH}x{config.VIDEO_HEIGHT}:fps={config.VIDEO_FPS}"
+    ]
+    zp = motion_patterns[motion_idx % len(motion_patterns)]
+
+    filter_complex = (
+        f"split[bg_in][fg_in];"
+        f"[bg_in]scale={config.VIDEO_WIDTH}:{config.VIDEO_HEIGHT}:force_original_aspect_ratio=increase,"
+        f"crop={config.VIDEO_WIDTH}:{config.VIDEO_HEIGHT},"
+        f"boxblur=22:5,eq=brightness=-0.12:saturation=1.25[bg];"
+        f"[fg_in]scale=920:920:force_original_aspect_ratio=decrease[fg];"
+        f"[bg][fg]overlay=(W-w)/2:(H-h)/2,"
+        f"{zp},"
+        f"setsar=1,fps={config.VIDEO_FPS}"
+    )
+
+    cmd = [
+        config.FFMPEG_PATH, "-y",
+        "-loop", "1",
+        "-i", str(image_path),
+        "-filter_complex", filter_complex,
+        "-t", str(duration),
+        "-c:v", "libx264",
+        "-preset", "veryfast",
+        "-crf", "20",
+        "-pix_fmt", "yuv420p",
+        "-an",
+        str(output_path)
+    ]
+    res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+    return res.returncode == 0 and output_path.is_file()
+
 def prepare_trimmed_segment(
     seg: Dict[str, Any],
     seg_idx: int,
@@ -165,9 +217,35 @@ def assemble_curated_video(
                 seg_counter += 1
             pool_idx += 1
 
-    # Fallback: if no video reviews were available, generate high quality motion b-roll clips
+    # Check for real product images in raw_media if visual clips are insufficient
+    raw_media_dir = out_dir / "raw_media"
+    image_exts = ("*.png", "*.jpg", "*.jpeg", "*.webp")
+    image_files = []
+    if raw_media_dir.is_dir():
+        for ext in image_exts:
+            image_files.extend(sorted(raw_media_dir.glob(ext)))
+
+    if accumulated_dur < total_target_dur and image_files:
+        print(f"📸 Generating Ken-Burns 9:16 cuts from {len(image_files)} real product image(s)...")
+        img_idx = 0
+        while accumulated_dur < total_target_dur:
+            cur_img = image_files[img_idx % len(image_files)]
+            clip_dur = min(2.5, total_target_dur - accumulated_dur)
+            if clip_dur < 0.8:
+                clip_dur = total_target_dur - accumulated_dur
+            clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
+            ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
+            if ok:
+                processed_clips.append(clip_p)
+                accumulated_dur += clip_dur
+                seg_counter += 1
+            img_idx += 1
+            if img_idx > 30:  # Safety circuit breaker
+                break
+
+    # Fallback: if no video reviews AND no product images were available
     if not processed_clips:
-        print("ℹ️ Creating dynamic motion b-roll sequence (no raw review videos found)...")
+        print("ℹ️ Creating dynamic motion b-roll sequence (no raw review videos or images found)...")
         broll_themes = [
             ("0x2c3e50", "SHOCKING PROBLEM"),
             ("0x16a085", "INNOVATIVE SOLUTION"),

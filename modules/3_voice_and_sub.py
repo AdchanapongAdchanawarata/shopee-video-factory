@@ -6,7 +6,7 @@ import asyncio
 import subprocess
 import argparse
 from pathlib import Path
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any, Tuple, Optional
 import requests
 
 # Add parent directory to path for config
@@ -352,10 +352,14 @@ def split_thai_script_into_phrases(script_data: Dict[str, Any]) -> List[str]:
 
     return merged
 
-def generate_voiceover_and_subtitles(product_id: str, script_data: Dict[str, Any]) -> Dict[str, Any]:
+def generate_voiceover_and_subtitles(
+    product_id: str,
+    script_data: Dict[str, Any],
+    voice_choice: Optional[str] = None
+) -> Dict[str, Any]:
     """
     Main entry point for Module 3:
-    1. Synthesizes Thai voiceover via edge-tts (+15% speed).
+    1. Synthesizes Thai voiceover (or uses custom recorded/uploaded voice).
     2. Measures exact audio duration.
     3. Builds styled .ass and .srt subtitles preserving safe zone for Shopee orange basket.
     """
@@ -369,38 +373,30 @@ def generate_voiceover_and_subtitles(product_id: str, script_data: Dict[str, Any
     full_text = script_data.get("full_script") or f"{script_data.get('hook_text', '')} {script_data.get('body_text', '')} {script_data.get('cta_text', '')}"
     headline = script_data.get("on_screen_headline", "สินค้ายอดฮิต ป้ายยาของดี!")
 
-    # 1. Synthesize audio
+    # 1. Synthesize or preserve audio
     success = False
-    tts_engine = getattr(config, "TTS_ENGINE", "edge").lower()
-    voice_name = getattr(config, "GOOGLE_TTS_VOICE", "th-TH-Neural2-C")
+    chosen_engine = (voice_choice or getattr(config, "TTS_ENGINE", "edge")).lower()
 
-    if tts_engine == "edge":
-        # 100% Free Studio Thai Voice via Edge-TTS (th-TH-PremwadeeNeural)
-        success = asyncio.run(synthesize_edge_tts(full_text, audio_path))
+    if chosen_engine == "custom" and audio_path.is_file():
+        print(f"🎙️ Using existing user recorded / uploaded audio: {audio_path.name}")
+        success = True
+    elif chosen_engine == "edge_niwat":
+        print("🎙️ Synthesizing male voice via Edge-TTS (th-TH-NiwatNeural, natural pace)...")
+        success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-NiwatNeural", rate="+0%"))
+    elif chosen_engine == "edge_premwadee_fast":
+        print("🎙️ Synthesizing upbeat female voice via Edge-TTS (th-TH-PremwadeeNeural, +6%)...")
+        success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural", rate="+6%"))
+    elif chosen_engine == "google_tts":
+        print("🎙️ Synthesizing voice via Google Translate TTS (gTTS)...")
+        success = synthesize_google_tts(full_text, audio_path, speed=1.0)
+    elif chosen_engine in ("neural2", "google_neural2"):
+        voice_name = getattr(config, "GOOGLE_TTS_VOICE", "th-TH-Neural2-C")
+        success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name=voice_name)
+    else:
+        # Default: Edge-TTS Premwadee at natural human speed (+0%)
+        success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural", rate="+0%"))
         if not success:
             print("ℹ️ Falling back to Google gTTS...")
-            success = synthesize_google_tts(full_text, audio_path)
-    elif tts_engine == "elevenlabs" and config.ELEVENLABS_API_KEY:
-        success = synthesize_elevenlabs(full_text, audio_path)
-    elif tts_engine in ("neural2", "google_neural2"):
-        # Google Cloud Neural2 (e.g. th-TH-Neural2-C)
-        success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name=voice_name)
-        if not success:
-            print("ℹ️ Falling back to Edge-TTS...")
-            success = asyncio.run(synthesize_edge_tts(full_text, audio_path))
-        if not success:
-            success = synthesize_google_tts(full_text, audio_path)
-    elif tts_engine == "google":
-        if getattr(config, "GOOGLE_CLOUD_TTS_API_KEY", "") or getattr(config, "GEMINI_API_KEY", ""):
-            success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name=voice_name)
-        if not success:
-            success = synthesize_google_tts(full_text, audio_path)
-        if not success:
-            print("ℹ️ Falling back to Edge-TTS...")
-            success = asyncio.run(synthesize_edge_tts(full_text, audio_path))
-    else:
-        success = asyncio.run(synthesize_edge_tts(full_text, audio_path))
-        if not success:
             success = synthesize_google_tts(full_text, audio_path)
 
 

@@ -325,12 +325,6 @@ def scout_shopee_products(product_id: str, url: Optional[str] = None, use_mock: 
                 f"is below required minimum ({config.MIN_AMS_COMMISSION_RATE}%). Aborting selection."
             )
 
-        # Ensure raw_media has sample clips for offline/mock pipeline video assembly
-        demo_src = config.OUTPUT_DIR / "cat_fountain_01" / "raw_media"
-        if demo_src.is_dir() and not list(raw_media_dir.glob("*.mp4")):
-            import shutil
-            for vf in demo_src.glob("*.mp4"):
-                shutil.copy2(vf, raw_media_dir / vf.name)
 
         # Save to output folder
         product_file = out_dir / "product_data.json"

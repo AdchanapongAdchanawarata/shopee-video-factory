@@ -1,0 +1,35 @@
+[Script Info]
+Title: Shopee Thai Dynamic Captions
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.601
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
+Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
+Style: HookHeader,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,285,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,แก้วเก็บความเย็นตัวท็อป!\Nใส่น้ำแข็งข้ามคืนยังไม่ละลาย
+Dialogue: 0,0:00:00.00,0:00:02.44,Highlight,,0,0,0,,อากาศร้อนแบบนี้ต้องแก้วตัวนี้เลยค่ะ
+Dialogue: 0,0:00:02.44,0:00:04.10,Default,,0,0,0,,ใส่น้ำแข็งไว้ตั้งแต่เช้า
+Dialogue: 0,0:00:04.10,0:00:06.12,Highlight,,0,0,0,,ตอนเย็นน้ำแข็งยังอยู่เต็มแก้ว
+Dialogue: 0,0:00:06.12,0:00:06.82,Default,,0,0,0,,ตัวนี้เป็น
+Dialogue: 0,0:00:06.82,0:00:07.17,Highlight,,0,0,0,,TYESO
+Dialogue: 0,0:00:07.17,0:00:08.28,Default,,0,0,0,,แก้วเก็บความเย็น
+Dialogue: 0,0:00:08.28,0:00:09.32,Highlight,,0,0,0,,สแตนเลส 304 แท้
+Dialogue: 0,0:00:09.32,0:00:10.51,Default,,0,0,0,,มีหูหิ้วพร้อมหลอด
+Dialogue: 0,0:00:10.51,0:00:12.18,Highlight,,0,0,0,,เก็บน้ำแข็งข้ามวัน 24 ชม
+Dialogue: 0,0:00:12.18,0:00:13.85,Default,,0,0,0,,ไม่มีไอน้ำเกาะรอบแก้วเลย
+Dialogue: 0,0:00:13.85,0:00:14.89,Highlight,,0,0,0,,สแตนเลส 304 หนา
+Dialogue: 0,0:00:14.89,0:00:15.38,Default,,0,0,0,,แข็งแรง
+Dialogue: 0,0:00:15.38,0:00:16.56,Highlight,,0,0,0,,ฝาปิดแน่นน้ำไม่หก
+Dialogue: 0,0:00:16.56,0:00:17.25,Default,,0,0,0,,ใช้งานง่าย
+Dialogue: 0,0:00:17.25,0:00:18.37,Highlight,,0,0,0,,คุ้มค่ามากเลยค่ะ
+Dialogue: 0,0:00:18.37,0:00:20.94,Default,,0,0,0,,รีบกดสั่งที่ตะกร้าสีส้มซ้ายมือด่วนเลย
+Dialogue: 0,0:00:20.94,0:00:22.82,Highlight,,0,0,0,,ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ

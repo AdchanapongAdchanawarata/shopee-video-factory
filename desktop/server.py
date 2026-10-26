@@ -12,7 +12,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# Add current root directory to sys.path
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config
 from modules import (
@@ -53,6 +54,13 @@ class PipelineRunRequest(BaseModel):
     mock: bool = False
     duration: float = 20.0
     voice_engine: str = "chirp3_aoede"
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+AUTHORIZED_EMAIL = "adchanawarata@gmail.com"
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "shopee2026")
 
 class ScriptUpdateRequest(BaseModel):
     product_id: str
@@ -158,6 +166,37 @@ async def index_page():
     if html_file.is_file():
         return HTMLResponse(content=html_file.read_text(encoding="utf-8"))
     return HTMLResponse("<h1>Shopee AI Video Factory</h1><p>Web dashboard file not found.</p>")
+
+@app.post("/api/auth/login")
+async def login(req: LoginRequest):
+    """Enforce access exclusively for adchanawarata@gmail.com."""
+    user_email = req.email.strip().lower()
+    if user_email != AUTHORIZED_EMAIL:
+        return JSONResponse(
+            status_code=403,
+            content={
+                "status": "forbidden",
+                "message": f"ขออภัย บัญชี '{req.email}' ไม่ได้รับอนุญาตให้ใช้งานระบบ (ระบบจำกัดสิทธิ์เฉพาะ {AUTHORIZED_EMAIL} เท่านั้น)"
+            }
+        )
+    if req.password != ADMIN_PASSWORD:
+        return JSONResponse(
+            status_code=401,
+            content={
+                "status": "unauthorized",
+                "message": "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบรหัสผ่านอีกครั้ง"
+            }
+        )
+    return {
+        "status": "authenticated",
+        "email": AUTHORIZED_EMAIL,
+        "token": "shopee_auth_token_adchanawarata_secure_session",
+        "user": {
+            "email": AUTHORIZED_EMAIL,
+            "role": "Super Admin",
+            "name": "Adchanapong"
+        }
+    }
 
 @app.get("/api/status")
 async def get_system_status():

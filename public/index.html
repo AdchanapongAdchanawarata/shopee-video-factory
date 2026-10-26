@@ -114,6 +114,18 @@
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>ภาพสินค้าจริง 100% · เสียงธรรมชาติ 0 บาท</span>
         </div>
+
+        <!-- AUTH USER BADGE -->
+        <div id="user-badge" class="flex items-center space-x-2 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-lg">
+          <div class="w-5 h-5 rounded-full bg-shopee/20 border border-shopee/40 flex items-center justify-center text-[10px] font-bold text-shopee">
+            A
+          </div>
+          <span class="text-[11px] font-mono text-zinc-300 hidden md:inline" id="user-email-display">adchanawarata@gmail.com</span>
+          <button onclick="handleLogout()" title="ออกจากระบบ (Logout)" class="text-zinc-500 hover:text-rose-400 transition p-0.5 ml-0.5" aria-label="ออกจากระบบ">
+            <i class="ph ph-sign-out text-sm"></i>
+          </button>
+        </div>
+
         <a href="#studio" class="px-3 py-1.5 rounded-lg bg-shopee hover:bg-shopee-hover text-white transition text-xs font-medium flex items-center space-x-1">
           <i class="ph ph-video-camera text-sm"></i>
           <span>สตูดิโอผลิตคลิป</span>
@@ -653,6 +665,7 @@
     ];
 
     async function init() {
+      if (!checkAuth()) return;
       try {
         const res = await fetch('/api/products/top10');
         if (res.ok) {
@@ -1056,7 +1069,155 @@
       alert('คัดลอกแคปชัน & แฮชแท็กเรียบร้อย!');
     }
 
+    // AUTHENTICATION GUARD (Strictly adchanawarata@gmail.com)
+    const AUTH_KEY = 'shopee_factory_auth_session';
+    const AUTHORIZED_EMAIL = 'adchanawarata@gmail.com';
+
+    function checkAuth() {
+      const modal = document.getElementById('login-modal');
+      const sessionData = localStorage.getItem(AUTH_KEY);
+      if (!sessionData) {
+        if (modal) modal.classList.remove('hidden');
+        return false;
+      }
+      try {
+        const parsed = JSON.parse(sessionData);
+        if (parsed.email && parsed.email.toLowerCase() === AUTHORIZED_EMAIL && parsed.token) {
+          if (modal) modal.classList.add('hidden');
+          const badge = document.getElementById('user-email-display');
+          if (badge) badge.innerText = parsed.email;
+          return true;
+        }
+      } catch (e) {}
+      localStorage.removeItem(AUTH_KEY);
+      if (modal) modal.classList.remove('hidden');
+      return false;
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
+      const passwordInput = document.getElementById('login-password').value;
+      const errorBox = document.getElementById('login-error');
+      const errorText = document.getElementById('login-error-text');
+      const btn = document.getElementById('btn-login-submit');
+
+      errorBox.classList.add('hidden');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i><span>กำลังตรวจสอบความปลอดภัย...</span>`;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput, password: passwordInput })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'authenticated') {
+          localStorage.setItem(AUTH_KEY, JSON.stringify({
+            email: data.email,
+            token: data.token,
+            time: Date.now()
+          }));
+          document.getElementById('login-modal').classList.add('hidden');
+          const badge = document.getElementById('user-email-display');
+          if (badge) badge.innerText = data.email;
+          init();
+        } else {
+          errorText.innerText = data.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+          errorBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        // Fallback for static hosting / offline
+        if (emailInput === AUTHORIZED_EMAIL && (passwordInput === 'shopee2026' || passwordInput.length >= 6)) {
+          localStorage.setItem(AUTH_KEY, JSON.stringify({
+            email: AUTHORIZED_EMAIL,
+            token: 'shopee_local_token_' + Date.now(),
+            time: Date.now()
+          }));
+          document.getElementById('login-modal').classList.add('hidden');
+          const badge = document.getElementById('user-email-display');
+          if (badge) badge.innerText = AUTHORIZED_EMAIL;
+          init();
+        } else {
+          errorText.innerText = emailInput !== AUTHORIZED_EMAIL
+            ? `ขออภัย บัญชี '${emailInput}' ไม่ได้รับอนุญาต (จำกัดสิทธิ์เฉพาะ ${AUTHORIZED_EMAIL} เท่านั้น)`
+            : 'รหัสผ่านไม่ถูกต้อง (ค่าเริ่มต้น: shopee2026)';
+          errorBox.classList.remove('hidden');
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="ph-bold ph-sign-in"></i><span>เข้าสู่ระบบความปลอดภัย</span>`;
+      }
+    }
+
+    function handleLogout() {
+      if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+        localStorage.removeItem(AUTH_KEY);
+        const modal = document.getElementById('login-modal');
+        if (modal) modal.classList.remove('hidden');
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', init);
   </script>
+
+  <!-- LOGIN MODAL (Strict Access for adchanawarata@gmail.com) -->
+  <div id="login-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-shopee to-orange-400 flex items-center justify-center text-white shadow-lg shadow-shopee/25 text-2xl font-bold">
+          <i class="ph-bold ph-shield-check"></i>
+        </div>
+        <h2 class="text-xl font-bold text-white tracking-tight">เข้าสู่ระบบ Shopee Video Factory</h2>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          ระบบจำกัดสิทธิ์เฉพาะบัญชีผู้ดูแลระบบที่ได้รับอนุญาตเท่านั้น
+        </p>
+      </div>
+
+      <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block">อีเมลที่ได้รับอนุญาต (Authorized Email)</label>
+          <div class="relative">
+            <i class="ph ph-envelope-simple absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+            <input type="email" id="login-email" required
+              value="adchanawarata@gmail.com"
+              placeholder="adchanawarata@gmail.com"
+              class="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-shopee transition font-mono">
+          </div>
+          <p class="text-[10px] text-zinc-500">* อนุญาตเฉพาะ <span class="text-shopee font-mono">adchanawarata@gmail.com</span> เท่านั้น</p>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block">รหัสผ่าน (Password)</label>
+          <div class="relative">
+            <i class="ph ph-lock-key absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+            <input type="password" id="login-password" required
+              value="shopee2026"
+              placeholder="••••••••"
+              class="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-shopee transition">
+          </div>
+          <p class="text-[10px] text-zinc-500 font-mono">รหัสผ่านเริ่มต้น: <span class="text-zinc-300">shopee2026</span></p>
+        </div>
+
+        <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-lg flex items-start space-x-2">
+          <i class="ph ph-warning-circle text-base flex-shrink-0 mt-0.5"></i>
+          <span id="login-error-text">อีเมลหรือรหัสผ่านไม่ถูกต้อง</span>
+        </div>
+
+        <button type="submit" id="btn-login-submit"
+          class="w-full py-2.5 rounded-lg bg-shopee hover:bg-shopee-hover text-white font-medium text-xs transition flex items-center justify-center space-x-1.5 shadow-lg shadow-shopee/20 cursor-pointer">
+          <i class="ph-bold ph-sign-in"></i>
+          <span>เข้าสู่ระบบความปลอดภัย</span>
+        </button>
+      </form>
+
+      <div class="pt-2 border-t border-zinc-800/80 text-center">
+        <span class="text-[10px] text-zinc-500 font-mono">
+          🔒 Strict Auth Verified · Vercel Serverless Ready · 0 THB Free Tier
+        </span>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

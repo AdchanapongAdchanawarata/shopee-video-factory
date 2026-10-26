@@ -14,4 +14,4 @@ output/**/*.webp
 output/**/*.mp3
 output/**/temp_*
 .vercel/
-
+/server.py

@@ -18,9 +18,49 @@ app.add_middleware(
 BASE_DIR = Path(__file__).resolve().parent.parent
 PRODUCTS_DB_PATH = BASE_DIR / "data" / "products_db.json"
 
+from pydantic import BaseModel
+
+AUTHORIZED_EMAIL = "adchanawarata@gmail.com"
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "shopee2026")
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+@app.post("/api/auth/login")
+def login(req: LoginRequest):
+    """Enforce access exclusively for adchanawarata@gmail.com."""
+    user_email = req.email.strip().lower()
+    if user_email != AUTHORIZED_EMAIL:
+        return JSONResponse(
+            status_code=403,
+            content={
+                "status": "forbidden",
+                "message": f"ขออภัย บัญชี '{req.email}' ไม่ได้รับอนุญาตให้ใช้งานระบบ (ระบบจำกัดสิทธิ์เฉพาะ {AUTHORIZED_EMAIL} เท่านั้น)"
+            }
+        )
+    if req.password != ADMIN_PASSWORD:
+        return JSONResponse(
+            status_code=401,
+            content={
+                "status": "unauthorized",
+                "message": "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบรหัสผ่านอีกครั้ง"
+            }
+        )
+    return {
+        "status": "authenticated",
+        "email": AUTHORIZED_EMAIL,
+        "token": "shopee_auth_token_adchanawarata_secure_session",
+        "user": {
+            "email": AUTHORIZED_EMAIL,
+            "role": "Super Admin",
+            "name": "Adchanapong"
+        }
+    }
+
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "platform": "Vercel Serverless", "cost": "0 THB"}
+    return {"status": "ok", "platform": "Vercel Serverless", "cost": "0 THB", "authorized_user": AUTHORIZED_EMAIL}
 
 @app.get("/api/products/top10")
 def get_top10():

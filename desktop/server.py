@@ -269,7 +269,12 @@ async def get_product_details(product_id: str):
         "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 6.90),
         "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 5.91),
         "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 7.50),
-        "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 1.88),
+        "spray_mop_360": ("/videos/spray_mop_360.mp4", 1.60),
+        "solar_sensor_light": ("/videos/solar_sensor_light.mp4", 5.26),
+        "air_fryer_visual": ("/videos/air_fryer_visual.mp4", 3.25),
+        "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4", 2.63),
+        "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4", 5.08),
+        "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 1.89),
     }
 
     if final_video.is_file():
@@ -280,8 +285,9 @@ async def get_product_details(product_id: str):
         v_url, v_size = AVAILABLE_VIDEOS[product_id]
         v_exists = True
     else:
-        v_url, v_size = AVAILABLE_VIDEOS["gan_charger_65w"]
-        v_exists = True
+        v_url = None
+        v_size = 0.0
+        v_exists = False
 
     return {
         "exists": True,

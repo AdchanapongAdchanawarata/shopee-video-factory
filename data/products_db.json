@@ -22,7 +22,12 @@
     "reviews_1_star": [
       "น้ำพุอันเก่าเป็นแบบเสียบปลั๊ก น้องชอบแทะสายไฟจนขาด อันนี้เป็นไร้สายแก้ปัญหาได้ตรงจุด",
       "เคยใช้แบบพลาสติกแล้วล้างยาก เป็นเมือกง่าย คางแมวดำ เลยตัดสินใจเปลี่ยนมาเป็นสแตนเลส 304"
-    ]
+    ],
+    "sales_total": 18900,
+    "growth_rate_7d": "+24.5%",
+    "trend_status": "bullish",
+    "trend_label": "ขาขึ้นแรง 🔥",
+    "stock_score": 96
   },
   "gan_charger_65w": {
     "product_id": "gan_charger_65w",
@@ -46,7 +51,12 @@
     ],
     "reviews_1_star": [
       "อันเก่าหัวใหญ่เกะกะปลั๊กไฟ ร้อนจนน่ากลัว ตัวนี้เล็กแถมระบายความร้อนดีมาก"
-    ]
+    ],
+    "sales_total": 32500,
+    "growth_rate_7d": "+31.8%",
+    "trend_status": "bullish",
+    "trend_label": "ยอดพุ่งแรง 🚀",
+    "stock_score": 99
   },
   "uv_dust_mite_vacuum": {
     "product_id": "uv_dust_mite_vacuum",
@@ -70,7 +80,12 @@
     ],
     "reviews_1_star": [
       "เครื่องดูดฝุ่นทั่วไปหัวดูดใหญ่เทอะทะ ดูดไรฝุ่นที่นอนไม่ลึกเท่าเครื่องนี้"
-    ]
+    ],
+    "sales_total": 16800,
+    "growth_rate_7d": "+18.2%",
+    "trend_status": "trending",
+    "trend_label": "โตต่อเนื่อง 📈",
+    "stock_score": 93
   },
   "tyeso_tumbler_304": {
     "product_id": "tyeso_tumbler_304",
@@ -94,7 +109,12 @@
     ],
     "reviews_1_star": [
       "แก้วพลาสติกละลายเร็ว น้ำหกเลอะโต๊ะ ตัวนี้ล็อกสนิทไม่มีรั่วซึม"
-    ]
+    ],
+    "sales_total": 64200,
+    "growth_rate_7d": "+22.4%",
+    "trend_status": "bullish",
+    "trend_label": "มหาชนฮิต 🔥",
+    "stock_score": 98
   },
   "spray_mop_360": {
     "product_id": "spray_mop_360",
@@ -118,7 +138,12 @@
     ],
     "reviews_1_star": [
       "ไม้ม็อบแบบเก่าต้องบิดน้ำจนเจ็บมือ อันนี้กดสเปรย์ถูเบาๆ พื้นสะอาดกริบ"
-    ]
+    ],
+    "sales_total": 45100,
+    "growth_rate_7d": "+15.7%",
+    "trend_status": "trending",
+    "trend_label": "ขายสม่ำเสมอ 📈",
+    "stock_score": 92
   },
   "solar_sensor_light": {
     "product_id": "solar_sensor_light",
@@ -142,7 +167,12 @@
     ],
     "reviews_1_star": [
       "ไฟรั้วเดิมต้องเปิดสวิตช์ทิ้งไว้ทั้งคืน เปลืองไฟมาก ตัวนี้เปิดเฉพาะตอนมีคนเดินผ่าน"
-    ]
+    ],
+    "sales_total": 88500,
+    "growth_rate_7d": "+27.6%",
+    "trend_status": "bullish",
+    "trend_label": "ยอดถล่มทลาย 🚀",
+    "stock_score": 97
   },
   "air_fryer_visual": {
     "product_id": "air_fryer_visual",
@@ -166,7 +196,12 @@
     ],
     "reviews_1_star": [
       "หม้อทอดรุ่นเก่าทึบ มองไม่เห็นอาหาร กะเวลายากจนไหม้ รุ่นนี้แก้ปัญหาได้เลย"
-    ]
+    ],
+    "sales_total": 14200,
+    "growth_rate_7d": "+20.1%",
+    "trend_status": "trending",
+    "trend_label": "กระแสสุขภาพ 📈",
+    "stock_score": 90
   },
   "sonic_electric_toothbrush": {
     "product_id": "sonic_electric_toothbrush",
@@ -190,7 +225,12 @@
     ],
     "reviews_1_star": [
       "แปรงสีฟันธรรมดาทำความสะอาดยาก ซอกฟันด้านในไม่ทั่วถึง"
-    ]
+    ],
+    "sales_total": 26700,
+    "growth_rate_7d": "+33.5%",
+    "trend_status": "bullish",
+    "trend_label": "พุ่งแรงสุด 🔥",
+    "stock_score": 98
   },
   "kitchen_dish_rack_stainless": {
     "product_id": "kitchen_dish_rack_stainless",
@@ -214,7 +254,12 @@
     ],
     "reviews_1_star": [
       "ที่คว่ำจานแบบเก่ากินพื้นที่เคาน์เตอร์ น้ำหยดขังจนเกิดเชื้อรา"
-    ]
+    ],
+    "sales_total": 15400,
+    "growth_rate_7d": "+14.3%",
+    "trend_status": "trending",
+    "trend_label": "ยอดคงที่แน่น 📈",
+    "stock_score": 89
   },
   "wireless_earbuds_anc": {
     "product_id": "wireless_earbuds_anc",
@@ -238,6 +283,11 @@
     ],
     "reviews_1_star": [
       "หูฟังทั่วไปเสียงภายนอกแทรก คุยสายปลายทางไม่ได้ยิน ตัวนี้ตัดเสียงลมดีมาก"
-    ]
+    ],
+    "sales_total": 39000,
+    "growth_rate_7d": "+38.4%",
+    "trend_status": "bullish",
+    "trend_label": "มาแรงอันดับ 1 🔥",
+    "stock_score": 100
   }
 }

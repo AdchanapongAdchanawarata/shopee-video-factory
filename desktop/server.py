@@ -55,6 +55,7 @@ class PipelineRunRequest(BaseModel):
     mock: bool = False
     duration: float = 20.0
     voice_engine: str = "chirp3_aoede"
+    include_ai_lifestyle: bool = True
 
 class LoginRequest(BaseModel):
     email: str
@@ -163,7 +164,9 @@ def run_pipeline_worker(job_id: str, req: PipelineRunRequest):
 @app.get("/", response_class=HTMLResponse)
 async def index_page():
     """Serve the single-page dashboard HTML."""
-    html_file = Path(__file__).resolve().parent / "web" / "index.html"
+    html_file = ROOT_DIR / "public" / "index.html"
+    if not html_file.is_file():
+        html_file = ROOT_DIR / "web" / "index.html"
     if html_file.is_file():
         return HTMLResponse(content=html_file.read_text(encoding="utf-8"))
     return HTMLResponse("<h1>Shopee AI Video Factory</h1><p>Web dashboard file not found.</p>")

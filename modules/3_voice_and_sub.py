@@ -48,10 +48,11 @@ def synthesize_google_cloud_neural2(
     try:
         import base64
         import requests
-        print(f"🎙️ Generating voice via Google Cloud Neural2 (Voice: {v}, Rate: {rate}x)...")
+        clean_text = format_conversational_thai_script(text)
+        print(f"🎙️ Generating voice via Google Cloud TTS ({v}, Rate: {rate}x)...")
         url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key={key}"
         payload = {
-            "input": {"text": text},
+            "input": {"text": clean_text},
             "voice": {
                 "languageCode": "th-TH",
                 "name": v
@@ -69,12 +70,13 @@ def synthesize_google_cloud_neural2(
             if audio_content:
                 with open(output_path, "wb") as f:
                     f.write(base64.b64decode(audio_content))
-                print(f"✅ Google Cloud Neural2 synthesis successful ({v}): {output_path.name}")
+                apply_studio_vocal_chain(output_path)
+                print(f"✅ Google Cloud TTS synthesis & studio mastering successful ({v}): {output_path.name}")
                 return True
         else:
-            print(f"ℹ️ Google Cloud Neural2 response ({res.status_code}): {res.text[:120]}")
+            print(f"ℹ️ Google Cloud TTS response ({res.status_code}): {res.text[:120]}")
     except Exception as e:
-        print(f"⚠️ Google Cloud Neural2 synthesis error: {e}")
+        print(f"⚠️ Google Cloud TTS synthesis error: {e}")
     return False
 
 
@@ -463,9 +465,22 @@ def generate_voiceover_and_subtitles(
     elif chosen_engine in ("neural2", "google_neural2"):
         voice_name = getattr(config, "GOOGLE_TTS_VOICE", "th-TH-Neural2-C")
         success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name=voice_name)
+        if not success:
+            print("ℹ️ Falling back to Edge-TTS Premwadee...")
+            success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural", rate="+0%"))
+    elif chosen_engine in ("chirp3", "chirp3_aoede"):
+        print("🎙️ Synthesizing voice via Google Cloud Chirp3-HD (Aoede)...")
+        success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name="th-TH-Chirp3-HD-Aoede")
+        if not success:
+            print("ℹ️ Falling back to Google Cloud Neural2-C...")
+            success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name="th-TH-Neural2-C")
     else:
-        # Default: Edge-TTS Premwadee at natural human speed (+0%)
-        success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural", rate="+0%"))
+        # Default: Neural2 if key is set, otherwise Edge-TTS Premwadee
+        if config.GOOGLE_CLOUD_TTS_API_KEY:
+            voice_name = getattr(config, "GOOGLE_TTS_VOICE", "th-TH-Neural2-C")
+            success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name=voice_name)
+        if not success:
+            success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural", rate="+0%"))
         if not success:
             print("ℹ️ Falling back to Google gTTS...")
             success = synthesize_google_tts(full_text, audio_path)

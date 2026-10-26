@@ -245,16 +245,25 @@
             <!-- TAB 1: NATURAL TTS SELECTOR -->
             <div id="voice-panel-tts" class="space-y-3 pt-1">
               <div>
-                <label class="block text-[11px] font-medium text-zinc-300 mb-1.5">เลือกเสียงสังเคราะห์ระบบ (ฟรี ไม่จำกัดโควตา):</label>
+                <label class="block text-[11px] font-medium text-zinc-300 mb-1.5">เลือกเสียงสังเคราะห์ระบบ (ฟรี 1 ล้านตัวอักษร/เดือน):</label>
                 <select id="select-voice-engine" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-shopee">
-                  <option value="edge_premwadee_natural">👩 เปรมวดี (ธรรมชาติ 1.0x ชัด นุ่ม ไม่เร่งสปีด) — แนะนำ</option>
-                  <option value="edge_premwadee_fast">⚡ เปรมวดี (ป้ายยากระชับ 1.05x เร้าอารมณ์)</option>
-                  <option value="edge_niwat">👨 นิวัฒน์ (เสียงชาย สุภาพ น่าเชื่อถือ รีวิวไอที/แก็ดเจ็ต)</option>
+                  <option value="neural2" selected>⭐ Google Cloud Neural2-C (เสียงคนพูดจริง 100% ธรรมชาติระดับโปร) — แนะนำ</option>
+                  <option value="chirp3_aoede">✨ Google Cloud Chirp3-HD (Generative AI Audio รุ่นใหม่ล่าสุด)</option>
+                  <option value="edge_premwadee_natural">👩 เปรมวดี Edge-TTS (ธรรมชาติ ชัด นุ่ม ไม่เร่งสปีด)</option>
+                  <option value="edge_niwat">👨 นิวัฒน์ Edge-TTS (เสียงชาย สุภาพ น่าเชื่อถือ รีวิวไอที)</option>
                   <option value="google_tts">🌐 Google Translate TTS (สำเนียงคุ้นเคย ฟังสบาย)</option>
                 </select>
               </div>
               <div class="flex flex-wrap items-center gap-1.5 pt-1">
                 <span class="text-[10px] text-zinc-400 font-mono">ทดลองกดฟัง:</span>
+                <button type="button" onclick="playSampleVoice('/assets/sample_neural2.mp3')" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded text-[11px] flex items-center space-x-1 transition">
+                  <i class="ph-bold ph-sparkle text-amber-400"></i>
+                  <span>⭐ Neural2-C</span>
+                </button>
+                <button type="button" onclick="playSampleVoice('/assets/sample_chirp.mp3')" class="px-2.5 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 rounded text-[11px] flex items-center space-x-1 transition">
+                  <i class="ph-bold ph-waveform text-purple-400"></i>
+                  <span>✨ Chirp3-HD</span>
+                </button>
                 <button type="button" onclick="playSampleVoice('/assets/sample_premwadee.mp3')" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[11px] flex items-center space-x-1 transition">
                   <i class="ph-bold ph-speaker-high text-shopee"></i>
                   <span>👩 เปรมวดี</span>
@@ -263,13 +272,9 @@
                   <i class="ph-bold ph-speaker-high text-blue-400"></i>
                   <span>👨 นิวัฒน์</span>
                 </button>
-                <button type="button" onclick="playSampleVoice('/assets/sample_google.mp3')" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[11px] flex items-center space-x-1 transition">
-                  <i class="ph-bold ph-speaker-high text-emerald-400"></i>
-                  <span>🌐 Google</span>
-                </button>
               </div>
               <p class="text-[11px] text-zinc-400 leading-relaxed pt-0.5">
-                * ปรับจูนความเร็วระดับธรรมชาติ 1.0x ไม่เร่งสปีด +15% ช่วยให้ฟังง่ายขึ้น
+                * ขับเคลื่อนด้วย Google Cloud Text-to-Speech API และชุดฟิลเตอร์ Studio Vocal Mastering
               </p>
             </div>
 

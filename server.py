@@ -52,7 +52,7 @@ class PipelineRunRequest(BaseModel):
     step: str = "all"
     mock: bool = False
     duration: float = 20.0
-    voice_engine: str = "edge_premwadee_natural"
+    voice_engine: str = "neural2"
 
 class ScriptUpdateRequest(BaseModel):
     product_id: str

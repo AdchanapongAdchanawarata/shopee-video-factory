@@ -49,6 +49,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: 🎬 Run Video Generation Pipeline
+        env:
+          GOOGLE_CLOUD_TTS_API_KEY: ${{ secrets.GOOGLE_CLOUD_TTS_API_KEY }}
+          TTS_ENGINE: chirp3
+          GOOGLE_TTS_VOICE: th-TH-Chirp3-HD-Aoede
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python main.py --product_id ${{ inputs.product_id }} --duration ${{ inputs.duration }} --mock
 

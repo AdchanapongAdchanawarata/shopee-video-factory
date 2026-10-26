@@ -37,7 +37,7 @@ def main():
     parser.add_argument("--url", type=str, default=None, help="Shopee Product URL (สำหรับดึงข้อมูลสดผ่าน Playwright)")
     parser.add_argument("--step", type=str, default="all", choices=["all", "1", "1.5", "2", "3", "4"], help="เลือกขั้นตอนที่ต้องการรัน")
     parser.add_argument("--mock", action="store_true", help="รันด้วยข้อมูลตัวอย่าง (Offline / Test Mode)")
-    parser.add_argument("--duration", type=float, default=20.0, help="ความยาววิดีโอเป้าหมาย (วินาที เช่น 20.0)")
+    parser.add_argument("--duration", type=float, default=None, help="ความยาววิดีโอเป้าหมาย (ปล่อยว่างจะปรับตามเสียงพากย์อัตโนมัติ)")
     args = parser.parse_args()
 
     print(BANNER)

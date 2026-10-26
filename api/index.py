@@ -91,16 +91,16 @@ def get_status():
 PUBLIC_VIDEOS_DIR = BASE_DIR / "public" / "videos"
 
 AVAILABLE_VIDEOS = {
-    "cat_fountain_01": ("/videos/cat_fountain_01.mp4", 5.44),
-    "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 6.90),
-    "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 5.91),
-    "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 7.50),
-    "spray_mop_360": ("/videos/spray_mop_360.mp4", 1.60),
-    "solar_sensor_light": ("/videos/solar_sensor_light.mp4", 5.26),
+    "cat_fountain_01": ("/videos/cat_fountain_01.mp4", 8.21),
+    "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 10.04),
+    "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 8.56),
+    "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 10.88),
+    "spray_mop_360": ("/videos/spray_mop_360.mp4", 1.97),
+    "solar_sensor_light": ("/videos/solar_sensor_light.mp4", 6.16),
     "air_fryer_visual": ("/videos/air_fryer_visual.mp4", 3.25),
-    "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4", 2.63),
-    "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4", 5.08),
-    "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 1.89),
+    "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4", 3.03),
+    "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4", 5.99),
+    "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 4.19),
 }
 
 @app.get("/api/product/{product_id}")

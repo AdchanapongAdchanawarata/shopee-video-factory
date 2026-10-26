@@ -310,10 +310,10 @@ PlayResY: {config.VIDEO_HEIGHT}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Kanit,82,{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,{config.SUBTITLE_BOTTOM_MARGIN},1
-Style: Highlight,Kanit,86,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,{config.SUBTITLE_BOTTOM_MARGIN},1
-Style: HookHeader,Kanit,94,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,240,1
-Style: BadgePill,Kanit,46,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,5.5,2.5,8,30,30,130,1
+Style: Default,Kanit,98,{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,9.5,4.5,2,80,150,{config.SUBTITLE_BOTTOM_MARGIN},1
+Style: Highlight,Kanit,102,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,2,80,150,{config.SUBTITLE_BOTTOM_MARGIN},1
+Style: HookHeader,Kanit,108,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&HA0000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,8,60,60,370,1
+Style: BadgePill,Kanit,54,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,6.5,3.0,8,40,40,280,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -357,7 +357,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         st = format_timestamp_ass(seg["start"])
         et = format_timestamp_ass(seg["end"])
         style = "Highlight" if idx % 2 == 0 else "Default"
-        txt = remove_emojis_and_icons(seg["text"])
+        txt = remove_emojis_and_icons(seg["text"]).strip()
+        # Auto wrap long lines to keep strictly within safe frame
+        if len(txt) >= 22 and "\\N" not in txt:
+            if " " in txt:
+                words = txt.split(" ")
+                mid = len(words) // 2
+                p1 = " ".join(words[:mid]).strip()
+                p2 = " ".join(words[mid:]).strip()
+                if p1 and p2:
+                    txt = f"{p1}\\N{p2}"
+            else:
+                mid = len(txt) // 2
+                txt = f"{txt[:mid]}\\N{txt[mid:]}"
         ass_content += f"Dialogue: 0,{st},{et},{style},,0,0,0,,{txt}\n"
 
     with open(output_ass, "w", encoding="utf-8") as f:

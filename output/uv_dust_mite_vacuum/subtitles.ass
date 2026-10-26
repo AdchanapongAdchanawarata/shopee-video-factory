@@ -9,10 +9,10 @@ PlayResY: 1920
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
-Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
-Style: HookHeader,Kanit,94,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,240,1
-Style: BadgePill,Kanit,46,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,5.5,2.5,8,30,30,130,1
+Style: Default,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,9.5,4.5,2,80,150,540,1
+Style: Highlight,Kanit,102,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,2,80,150,540,1
+Style: HookHeader,Kanit,108,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,8,60,60,370,1
+Style: BadgePill,Kanit,54,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,6.5,3.0,8,40,40,280,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -20,16 +20,16 @@ Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,ทาสที่นอน
 Dialogue: 2,0:00:00.00,0:00:04.50,BadgePill,,0,0,0,,{\c&H00D7FF&}★ 4.9/5{\c&HFFFFFF&}  |  ยอดขายพุ่ง 3,800+ ชิ้น
 Dialogue: 2,0:00:04.50,0:00:12.00,BadgePill,,0,0,0,,{\c&H00FF88&}✔ ของแท้ 100%{\c&HFFFFFF&}  |  สเปกตรงปก คุณภาพพรีเมียม
 Dialogue: 2,0:00:12.00,0:00:22.94,BadgePill,,0,0,0,,{\c&H0080FF&}🛒 จิ้มตะกร้าส้มมุมล่างซ้ายได้เลย 👇
-Dialogue: 0,0:00:00.00,0:00:02.58,Highlight,,0,0,0,,ใครที่ตื่นมาแล้วคันตัว จาม
+Dialogue: 0,0:00:00.00,0:00:02.58,Highlight,,0,0,0,,ใครที่ตื่นมาแล้วคันตัว\Nจาม
 Dialogue: 0,0:00:02.58,0:00:04.07,Default,,0,0,0,,หรือเป็นภูมิแพ้
 Dialogue: 0,0:00:04.07,0:00:05.66,Highlight,,0,0,0,,ฟังทางนี้ด่วนเลย
 Dialogue: 0,0:00:05.66,0:00:06.65,Default,,0,0,0,,ตัวนี้เป็น
 Dialogue: 0,0:00:06.65,0:00:07.55,Highlight,,0,0,0,,เดียร์ม่า
 Dialogue: 0,0:00:07.55,0:00:09.14,Default,,0,0,0,,เครื่องดูดไรฝุ่น
-Dialogue: 0,0:00:09.14,0:00:11.32,Highlight,,0,0,0,,มีแสงยูวีฆ่าเชื้อในตัว
+Dialogue: 0,0:00:09.14,0:00:11.32,Highlight,,0,0,0,,มีแสงยูวีฆ่\Nาเชื้อในตัว
 Dialogue: 0,0:00:11.32,0:00:12.61,Default,,0,0,0,,แรงดูดสะใจมาก
 Dialogue: 0,0:00:12.61,0:00:14.20,Highlight,,0,0,0,,ดูดที่นอนทีเดียว
 Dialogue: 0,0:00:14.20,0:00:14.99,Default,,0,0,0,,ฝุ่นขาวๆ
-Dialogue: 0,0:00:14.99,0:00:17.28,Highlight,,0,0,0,,ฝังแน่นออกมาเพียบเลยค่ะ
+Dialogue: 0,0:00:14.99,0:00:17.28,Highlight,,0,0,0,,ฝังแน่นออกม\Nาเพียบเลยค่ะ
 Dialogue: 0,0:00:17.28,0:00:18.97,Default,,0,0,0,,เพื่อสุขภาพการนอน
-Dialogue: 0,0:00:18.97,0:00:22.94,Highlight,,0,0,0,,รีบจิ้มที่ตะกร้าส้มด้านล่างสั่งได้เลยน้า
+Dialogue: 0,0:00:18.97,0:00:22.94,Highlight,,0,0,0,,รีบจิ้มที่ตะกร้าส้มด\N้านล่างสั่งได้เลยน้า

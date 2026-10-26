@@ -9,10 +9,10 @@ PlayResY: 1920
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
-Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
-Style: HookHeader,Kanit,94,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,240,1
-Style: BadgePill,Kanit,46,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,5.5,2.5,8,30,30,130,1
+Style: Default,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,9.5,4.5,2,80,150,540,1
+Style: Highlight,Kanit,102,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,2,80,150,540,1
+Style: HookHeader,Kanit,108,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,8,60,60,370,1
+Style: BadgePill,Kanit,54,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,6.5,3.0,8,40,40,280,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -20,15 +20,15 @@ Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,แก้วเก็บค
 Dialogue: 2,0:00:00.00,0:00:04.50,BadgePill,,0,0,0,,{\c&H00D7FF&}★ 4.9/5{\c&HFFFFFF&}  |  ยอดขายพุ่ง 3,800+ ชิ้น
 Dialogue: 2,0:00:04.50,0:00:12.00,BadgePill,,0,0,0,,{\c&H00FF88&}✔ ของแท้ 100%{\c&HFFFFFF&}  |  สเปกตรงปก คุณภาพพรีเมียม
 Dialogue: 2,0:00:12.00,0:00:17.66,BadgePill,,0,0,0,,{\c&H0080FF&}🛒 จิ้มตะกร้าส้มมุมล่างซ้ายได้เลย 👇
-Dialogue: 0,0:00:00.00,0:00:02.49,Highlight,,0,0,0,,แก้วเก็บความเย็นที่ฮิตที่สุดใน
+Dialogue: 0,0:00:00.00,0:00:02.49,Highlight,,0,0,0,,แก้วเก็บความเย็\Nนที่ฮิตที่สุดใน
 Dialogue: 0,0:00:02.49,0:00:02.98,Default,,0,0,0,,ตอนนี้
 Dialogue: 0,0:00:02.98,0:00:04.73,Highlight,,0,0,0,,ต้องยกให้ตัวนี้เลยค่ะ
 Dialogue: 0,0:00:04.73,0:00:05.14,Default,,0,0,0,,ไทโซ่
 Dialogue: 0,0:00:05.14,0:00:06.88,Highlight,,0,0,0,,สแตนเลสสามศูนย์สี่แท้
-Dialogue: 0,0:00:06.88,0:00:09.04,Default,,0,0,0,,ใส่น้ำแข็งข้ามคืนก็ยังอยู่
+Dialogue: 0,0:00:06.88,0:00:09.04,Default,,0,0,0,,ใส่น้ำแข็งข้า\Nมคืนก็ยังอยู่
 Dialogue: 0,0:00:09.04,0:00:09.70,Highlight,,0,0,0,,ไม่ละลาย
-Dialogue: 0,0:00:09.70,0:00:11.52,Default,,0,0,0,,มีหูหิ้วพร้อมหลอดในตัว
+Dialogue: 0,0:00:09.70,0:00:11.52,Default,,0,0,0,,มีหูหิ้วพร้\Nอมหลอดในตัว
 Dialogue: 0,0:00:11.52,0:00:12.19,Highlight,,0,0,0,,พกพาง่าย
 Dialogue: 0,0:00:12.19,0:00:13.76,Default,,0,0,0,,ไม่หกเลอะเทอะแน่นอน
 Dialogue: 0,0:00:13.76,0:00:14.68,Highlight,,0,0,0,,ของแท้ตรงปก
-Dialogue: 0,0:00:14.68,0:00:17.66,Default,,0,0,0,,รีบจิ้มตะกร้าส้มมุมล่างซ้ายจัดเลยค่ะ
+Dialogue: 0,0:00:14.68,0:00:17.66,Default,,0,0,0,,รีบจิ้มตะกร้าส้มมุ\Nมล่างซ้ายจัดเลยค่ะ

@@ -9,10 +9,10 @@ PlayResY: 1920
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Kanit,82,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.0,4.0,2,40,40,480,1
-Style: Highlight,Kanit,86,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,8.5,4.5,2,40,40,480,1
-Style: HookHeader,Kanit,94,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,9.0,4.5,8,40,40,240,1
-Style: BadgePill,Kanit,46,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,5.5,2.5,8,30,30,130,1
+Style: Default,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,9.5,4.5,2,80,150,540,1
+Style: Highlight,Kanit,102,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,2,80,150,540,1
+Style: HookHeader,Kanit,108,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,8,60,60,370,1
+Style: BadgePill,Kanit,54,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,6.5,3.0,8,40,40,280,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -20,15 +20,15 @@ Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,ทาสแมวต้อ
 Dialogue: 2,0:00:00.00,0:00:04.50,BadgePill,,0,0,0,,{\c&H00D7FF&}★ 4.9/5{\c&HFFFFFF&}  |  ยอดขายพุ่ง 3,800+ ชิ้น
 Dialogue: 2,0:00:04.50,0:00:12.00,BadgePill,,0,0,0,,{\c&H00FF88&}✔ ของแท้ 100%{\c&HFFFFFF&}  |  สเปกตรงปก คุณภาพพรีเมียม
 Dialogue: 2,0:00:12.00,0:00:21.07,BadgePill,,0,0,0,,{\c&H0080FF&}🛒 จิ้มตะกร้าส้มมุมล่างซ้ายได้เลย 👇
-Dialogue: 0,0:00:00.00,0:00:02.12,Highlight,,0,0,0,,ใครที่น้องแมวดื่มน้ำน้อย
-Dialogue: 0,0:00:02.12,0:00:04.16,Default,,0,0,0,,หรือกลัวเรื่องสายไฟช็อต
+Dialogue: 0,0:00:00.00,0:00:02.12,Highlight,,0,0,0,,ใครที่น้องแม\Nวดื่มน้ำน้อย
+Dialogue: 0,0:00:02.12,0:00:04.16,Default,,0,0,0,,หรือกลัวเรื\N่องสายไฟช็อต
 Dialogue: 0,0:00:04.16,0:00:05.58,Highlight,,0,0,0,,ฟังทางนี้ด่วนเลย
-Dialogue: 0,0:00:05.58,0:00:07.70,Default,,0,0,0,,ตัวนี้เป็นน้ำพุแมวไร้สาย
+Dialogue: 0,0:00:05.58,0:00:07.70,Default,,0,0,0,,ตัวนี้เป็นน้\Nำพุแมวไร้สาย
 Dialogue: 0,0:00:07.70,0:00:09.56,Highlight,,0,0,0,,สแตนเลสสามศูนย์สี่แท้
-Dialogue: 0,0:00:09.56,0:00:11.60,Default,,0,0,0,,เซนเซอร์ตรวจจับอัจฉริยะ
+Dialogue: 0,0:00:09.56,0:00:11.60,Default,,0,0,0,,เซนเซอร์ตรว\Nจจับอัจฉริยะ
 Dialogue: 0,0:00:11.60,0:00:12.75,Highlight,,0,0,0,,น้องแมวเดินมา
 Dialogue: 0,0:00:12.75,0:00:13.72,Default,,0,0,0,,น้ำถึงจะไหล
 Dialogue: 0,0:00:13.72,0:00:15.05,Highlight,,0,0,0,,แบตอึดเป็นเดือน
-Dialogue: 0,0:00:15.05,0:00:16.99,Default,,0,0,0,,ล้างทำความสะอาดง่ายมาก
+Dialogue: 0,0:00:15.05,0:00:16.99,Default,,0,0,0,,ล้างทำความส\Nะอาดง่ายมาก
 Dialogue: 0,0:00:16.99,0:00:18.06,Highlight,,0,0,0,,ทาสแมวต้องมี
-Dialogue: 0,0:00:18.06,0:00:21.07,Default,,0,0,0,,รีบกดที่ตะกร้าส้มซ้ายมือด่วนเลยค่ะ
+Dialogue: 0,0:00:18.06,0:00:21.07,Default,,0,0,0,,รีบกดที่ตะกร้าส้ม\Nซ้ายมือด่วนเลยค่ะ

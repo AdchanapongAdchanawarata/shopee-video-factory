@@ -1,0 +1,9 @@
+# Files to ignore on Vercel deployment (handled locally or via GitHub Actions)
+server.py
+main.py
+modules/
+bin/
+scratch/
+workspace_data/
+temp_assembly/
+*.log

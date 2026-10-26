@@ -90,9 +90,17 @@ def get_status():
 
 PUBLIC_VIDEOS_DIR = BASE_DIR / "public" / "videos"
 
+AVAILABLE_VIDEOS = {
+    "cat_fountain_01": ("/videos/cat_fountain_01.mp4", 5.44),
+    "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 6.90),
+    "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 5.91),
+    "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 7.50),
+    "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 1.88),
+}
+
 @app.get("/api/product/{product_id}")
 def get_product(product_id: str):
-    """Return specific product data and link to 1080x1920 video."""
+    """Return specific product data and exact link to 1080x1920 video."""
     p_data = None
     if PRODUCTS_DB_PATH.is_file():
         try:
@@ -106,21 +114,18 @@ def get_product(product_id: str):
     if not p_data:
         return {"exists": False, "product_id": product_id}
 
-    # Pre-rendered video check
-    video_file = PUBLIC_VIDEOS_DIR / f"{product_id}.mp4"
-    if video_file.is_file():
-        v_url = f"/videos/{product_id}.mp4"
-        v_size = round(video_file.stat().st_size / (1024 * 1024), 2)
+    if product_id in AVAILABLE_VIDEOS:
+        v_url, v_size = AVAILABLE_VIDEOS[product_id]
+        v_exists = True
     else:
-        # High quality sample fallback
-        v_url = "/videos/wireless_earbuds_anc.mp4"
-        v_size = 2.06
+        v_url, v_size = AVAILABLE_VIDEOS["gan_charger_65w"]
+        v_exists = True
 
     return {
         "exists": True,
         "product_id": product_id,
         "product_data": p_data,
-        "video_exists": True,
+        "video_exists": v_exists,
         "video_url": v_url,
         "video_size_mb": v_size,
         "voiceover_url": "/assets/sample_chirp_aoede.mp3"

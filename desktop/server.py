@@ -261,20 +261,24 @@ async def get_product_details(product_id: str):
     final_video = p_dir / f"final_shopee_{product_id}.mp4"
     voiceover = p_dir / "voiceover.mp3"
 
+    AVAILABLE_VIDEOS = {
+        "cat_fountain_01": ("/videos/cat_fountain_01.mp4", 5.44),
+        "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 6.90),
+        "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 5.91),
+        "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 7.50),
+        "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 1.88),
+    }
+
     if final_video.is_file():
         v_url = f"/output/{product_id}/{final_video.name}"
         v_size = round(final_video.stat().st_size / (1024 * 1024), 2)
         v_exists = True
+    elif product_id in AVAILABLE_VIDEOS:
+        v_url, v_size = AVAILABLE_VIDEOS[product_id]
+        v_exists = True
     else:
-        sample_v = ROOT_DIR / "public" / "videos" / f"{product_id}.mp4"
-        if sample_v.is_file():
-            v_url = f"/videos/{product_id}.mp4"
-            v_size = round(sample_v.stat().st_size / (1024 * 1024), 2)
-            v_exists = True
-        else:
-            v_url = "/videos/wireless_earbuds_anc.mp4"
-            v_size = 2.06
-            v_exists = True
+        v_url, v_size = AVAILABLE_VIDEOS["gan_charger_65w"]
+        v_exists = True
 
     return {
         "exists": True,

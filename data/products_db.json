@@ -239,18 +239,5 @@
     "reviews_1_star": [
       "หูฟังทั่วไปเสียงภายนอกแทรก คุยสายปลายทางไม่ได้ยิน ตัวนี้ตัดเสียงลมดีมาก"
     ]
-  },
-  "prod_z92mun": {
-    "title": "Shopee Thailand",
-    "price": 0.0,
-    "rating": 5.0,
-    "sales_30d": 0,
-    "ams_commission_rate": 10.5,
-    "product_videos": [],
-    "review_videos": [],
-    "reviews_5_star": [],
-    "reviews_1_star": [],
-    "product_id": "prod_z92mun",
-    "scraped_at": "2026-10-22 09:22:19"
   }
 }

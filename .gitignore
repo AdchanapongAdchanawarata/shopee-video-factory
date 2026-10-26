@@ -15,3 +15,5 @@ output/**/*.mp3
 output/**/temp_*
 .vercel/
 /server.py
+web/videos/
+output/

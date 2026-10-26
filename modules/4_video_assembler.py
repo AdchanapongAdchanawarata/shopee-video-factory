@@ -369,11 +369,11 @@ def assemble_curated_video(
     # Audio mixing
     audio_map = ""
     if has_voice and has_bgm:
-        # [1:a] is voiceover, [2:a] is BGM
-        # Loop BGM, set volume to 10%, mix together
+        # Loop BGM, subtle volume (8%), boost voice (1.25x), normalize=0 (prevents voice attenuation)
         filter_complex_parts.append(
-            f"[2:a]volume={config.BGM_VOLUME},aloop=loop=-1:size=2e+09[bgm];"
-            f"[1:a][bgm]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+            f"[2:a]volume=0.08,aloop=loop=-1:size=2e+09[bgm];"
+            f"[1:a]volume=1.25[vce];"
+            f"[vce][bgm]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[aout]"
         )
         audio_map = "[aout]"
     elif has_voice:

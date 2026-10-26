@@ -118,18 +118,26 @@ def synthesize_google_tts(text: str, output_path: Path, lang: str = None, speed:
 def format_conversational_thai_script(text: str) -> str:
     """
     Makes Thai script flow naturally for speech synthesis:
-    - Adds natural pauses at clause ends
-    - Normalizes brand names for natural Thai pronunciation
+    - Normalizes technical terms to colloquial Thai spoken words
+    - Prevents robot spelling of acronyms or symbols
     """
     t = remove_emojis_and_icons(text)
     subs = [
         (r"\bUGREEN\b", "ยูกรีน"),
         (r"\bugreen\b", "ยูกรีน"),
-        (r"\bGaN\b", "แกลเลียมไนไตรด์ GaN"),
+        (r"\bGaN 65W\b", "หกสิบห้าวัตต์"),
+        (r"\b65W\b", "หกสิบห้าวัตต์"),
+        (r"\bGaN\b", "แกน"),
         (r"\bType-C\b", "ไทป์ซี"),
-        (r"\bMacBook Pro\b", "แมคบุ๊กโปร"),
+        (r"\bMacBook Pro\b", "แมคบุ๊ก"),
+        (r"\bMacBook\b", "แมคบุ๊ก"),
         (r"\bDeerma\b", "เดียร์ม่า"),
         (r"\bTYESO\b", "ไทโซ่"),
+        (r"\b1200ml\b", "หนึ่งพันสองร้อยมิลลิลิตร"),
+        (r"\b304\b", "สามศูนย์สี่"),
+        (r"\b13kPa\b", "สิบสามกิโลปาสคาล"),
+        (r"\b\+\b", " และ "),
+        (r"3 พอร์ต", "สามช่อง"),
     ]
     for pat, rep in subs:
         t = re.sub(pat, rep, t, flags=re.IGNORECASE)
@@ -140,18 +148,17 @@ def format_conversational_thai_script(text: str) -> str:
 
 def apply_studio_vocal_chain(input_audio: Path, output_audio: Path = None) -> Path:
     """
-    Applies creator studio vocal chain via FFmpeg:
-    1. Highpass filter at 80Hz (cuts mic rumble)
-    2. Equalizer presence boost (+3.2dB at 3.5kHz)
-    3. Dynamic compression (threshold=-16dB, ratio=3, attack=5ms, release=50ms)
-    4. Loudness normalization to -16 LUFS (broadcast mobile creator standard)
+    Applies transparent voice enhancement via FFmpeg:
+    1. Highpass at 70Hz (removes low-end rumble)
+    2. Subtle presence boost (+1.5dB at 3.2kHz for vocal clarity)
+    3. Transparent limiter (soft threshold, preserves natural human dynamic)
     """
     target = output_audio or input_audio
     temp_master = input_audio.parent / f"temp_master_{input_audio.stem}.mp3"
     cmd = [
         config.FFMPEG_PATH, "-y",
         "-i", str(input_audio),
-        "-af", "highpass=f=80,equalizer=f=3500:t=q:w=1.2:g=3.2,acompressor=threshold=-16dB:ratio=3:attack=5:release=50,loudnorm=I=-16:TP=-1.5:LRA=11",
+        "-af", "highpass=f=70,equalizer=f=3200:t=q:w=1.0:g=1.8,alimiter=limit=0.95:attack=5:release=50",
         "-c:a", "libmp3lame",
         "-b:a", "192k",
         str(temp_master)

@@ -222,20 +222,21 @@ def assemble_curated_video(
         # Prioritize action, unboxing, and detail clips over static desk/environment shots
         def source_priority(k: str) -> int:
             k_lower = k.lower()
-            if "action" in k_lower or "hook" in k_lower:
+            if "desk" in k_lower or "background" in k_lower:
+                return 3  # static context/desk
+            if any(w in k_lower for w in ["action", "hook", "spray", "light", "sensor", "cook", "water", "clean", "brush", "fry"]):
                 return 0
-            if "unboxing" in k_lower or "hands" in k_lower:
+            if any(w in k_lower for w in ["unboxing", "hands", "assembly"]):
                 return 1
-            if "detail" in k_lower or "straw" in k_lower or "filter" in k_lower:
-                return 2
-            return 3  # static context/desk
+            return 2
 
+        has_dynamic_sources = any(source_priority(k) < 3 for k in by_source.keys())
         source_keys = sorted(list(by_source.keys()), key=source_priority)
         source_ptrs = {k: 0 for k in source_keys}
         source_usage_counts = {k: 0 for k in source_keys}
         
         src_turn = 0
-        max_attempts = len(segments) + 20
+        max_attempts = max(150, len(segments) * 10)
         attempts = 0
 
         while accumulated_dur < total_target_dur and attempts < max_attempts:
@@ -243,59 +244,59 @@ def assemble_curated_video(
             cur_src = source_keys[src_turn % len(source_keys)]
             src_turn += 1
 
-            # Cap static desk/context shots to at most 1 single cut in the whole video
+            # Cap static desk shots to at most 1 single cut ONLY if we have other dynamic sources
             is_static_context = source_priority(cur_src) == 3
-            if is_static_context and source_usage_counts[cur_src] >= 1:
+            if is_static_context and has_dynamic_sources and source_usage_counts[cur_src] >= 1:
                 continue
 
-            ptr = source_ptrs[cur_src]
             src_segs = by_source[cur_src]
+            ptr = source_ptrs[cur_src]
 
             if ptr < len(src_segs):
                 seg = src_segs[ptr]
-                source_ptrs[cur_src] += 1
-                source_usage_counts[cur_src] += 1
-
-                clip_target = min(2.1, total_target_dur - accumulated_dur)
-                if clip_target < 0.8:
-                    clip_target = total_target_dur - accumulated_dur
-
-                trimmed = prepare_trimmed_segment(seg, seg_counter, temp_dir, clip_target)
-                if trimmed:
-                    processed_clips.append(trimmed)
-                    accumulated_dur += clip_target
-                    seg_counter += 1
             else:
-                # If all primary action clips have been exhausted, break
-                all_exhausted = all(source_ptrs[k] >= len(by_source[k]) for k in source_keys if source_priority(k) < 3)
-                if all_exhausted:
-                    break
+                # Cycle through segments of real footage so 100% real video fills the whole duration
+                seg = src_segs[ptr % len(src_segs)]
 
-    # Check for real product images in raw_media if visual clips are insufficient
-    raw_media_dir = out_dir / "raw_media"
-    image_exts = ("*.png", "*.jpg", "*.jpeg", "*.webp")
-    image_files = []
-    if raw_media_dir.is_dir():
-        for ext in image_exts:
-            image_files.extend(sorted(raw_media_dir.glob(ext)))
+            source_ptrs[cur_src] += 1
+            source_usage_counts[cur_src] += 1
 
-    if accumulated_dur < total_target_dur and image_files:
-        print(f"📸 Generating Ken-Burns 9:16 cuts from {len(image_files)} real product image(s)...")
-        img_idx = 0
-        while accumulated_dur < total_target_dur:
-            cur_img = image_files[img_idx % len(image_files)]
-            clip_dur = min(2.5, total_target_dur - accumulated_dur)
-            if clip_dur < 0.8:
-                clip_dur = total_target_dur - accumulated_dur
-            clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
-            ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
-            if ok:
-                processed_clips.append(clip_p)
-                accumulated_dur += clip_dur
+            clip_target = min(2.1, total_target_dur - accumulated_dur)
+            if clip_target < 0.8:
+                clip_target = total_target_dur - accumulated_dur
+
+            trimmed = prepare_trimmed_segment(seg, seg_counter, temp_dir, clip_target)
+            if trimmed:
+                processed_clips.append(trimmed)
+                accumulated_dur += clip_target
                 seg_counter += 1
-            img_idx += 1
-            if img_idx > 30:  # Safety circuit breaker
-                break
+
+    # Check for real product images ONLY IF NO VIDEO CLIPS WERE AVAILABLE
+    if not processed_clips:
+        raw_media_dir = out_dir / "raw_media"
+        image_exts = ("*.png", "*.jpg", "*.jpeg", "*.webp")
+        image_files = []
+        if raw_media_dir.is_dir():
+            for ext in image_exts:
+                image_files.extend(sorted(raw_media_dir.glob(ext)))
+
+        if image_files:
+            print(f"📸 Generating Ken-Burns 9:16 cuts from {len(image_files)} real product image(s)...")
+            img_idx = 0
+            while accumulated_dur < total_target_dur:
+                cur_img = image_files[img_idx % len(image_files)]
+                clip_dur = min(2.5, total_target_dur - accumulated_dur)
+                if clip_dur < 0.8:
+                    clip_dur = total_target_dur - accumulated_dur
+                clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
+                ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
+                if ok:
+                    processed_clips.append(clip_p)
+                    accumulated_dur += clip_dur
+                    seg_counter += 1
+                img_idx += 1
+                if img_idx > 30:  # Safety circuit breaker
+                    break
 
     # Fallback: if no video reviews AND no product images were available
     if not processed_clips:

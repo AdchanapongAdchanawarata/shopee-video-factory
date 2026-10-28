@@ -189,15 +189,6 @@
     "reason": "Demonstration of practical real-world result"
   },
   {
-    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
-    "start_sec": 25.2,
-    "end_sec": 27.2,
-    "duration": 2.0,
-    "shot_type": "lifestyle_context",
-    "visual_score": 8,
-    "reason": "Demonstration of practical real-world result"
-  },
-  {
     "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_2_detail.mp4",
     "start_sec": 6.1,
     "end_sec": 8.3,

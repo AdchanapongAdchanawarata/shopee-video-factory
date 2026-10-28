@@ -376,28 +376,7 @@ Style: BadgePill,Kanit,58,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,1
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-    # 1. Add punchy hook headline for first 4.5 seconds (STRICTLY NO ICONS / EMOJIS, word-safe wrap)
-    if headline:
-        h_clean = remove_emojis_and_icons(headline)
-        headline_formatted = wrap_thai_line_safely(h_clean, max_chars_per_line=16)
-        hook_dur = min(4.5, total_duration)
-        ass_content += f"Dialogue: 1,{format_timestamp_ass(0.0)},{format_timestamp_ass(hook_dur)},HookHeader,,0,0,0,,{headline_formatted}\n"
-
-    # 2. Add Pro Proof Badges (TikTok / Shopee Influencer style)
-    # Badge 1 (0.0s - 4.5s): Shopee Verified Star Rating & Sales
-    b1_end = min(4.5, total_duration)
-    ass_content += f"Dialogue: 2,{format_timestamp_ass(0.0)},{format_timestamp_ass(b1_end)},BadgePill,,0,0,0,,{{\\c&H00D7FF&}}★ 4.9/5{{\\c&HFFFFFF&}}  |  ยอดขายพุ่ง 3,800+ ชิ้น\n"
-
-    # Badge 2 (4.5s - 12.0s): Authentic Guarantee Pill
-    if total_duration > 5.0:
-        b2_end = min(12.0, total_duration)
-        ass_content += f"Dialogue: 2,{format_timestamp_ass(4.5)},{format_timestamp_ass(b2_end)},BadgePill,,0,0,0,,{{\\c&H00FF88&}}✔ ของแท้ 100%{{\\c&HFFFFFF&}}  |  สเปกตรงปก คุณภาพพรีเมียม\n"
-
-    # Badge 3 (12.0s - End): Call to action pointer
-    if total_duration > 12.0:
-        ass_content += f"Dialogue: 2,{format_timestamp_ass(12.0)},{format_timestamp_ass(total_duration)},BadgePill,,0,0,0,,{{\\c&H0080FF&}}🛒 จิ้มตะกร้าส้มมุมล่างซ้ายได้เลย 👇\n"
-
-    # 3. Add subtitle dialogue lines (Word-safe segmented wrapping)
+    # 1. Clean Subtitle Events: Pure Dialogue Captions (No excess badges or cluttered headers)
     for idx, seg in enumerate(segments):
         st = format_timestamp_ass(seg["start"])
         et = format_timestamp_ass(seg["end"])
@@ -405,6 +384,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         txt = remove_emojis_and_icons(seg["text"]).strip()
         txt = wrap_thai_line_safely(txt, max_chars_per_line=18)
         ass_content += f"Dialogue: 0,{st},{et},{style},,0,0,0,,{txt}\n"
+
 
 
     with open(output_ass, "w", encoding="utf-8") as f:

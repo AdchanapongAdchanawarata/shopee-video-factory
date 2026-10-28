@@ -9,28 +9,28 @@ PlayResY: 1920
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Kanit,98,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,9.5,4.5,2,80,150,540,1
-Style: Highlight,Kanit,102,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,2,80,150,540,1
-Style: HookHeader,Kanit,108,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,8,60,60,370,1
-Style: BadgePill,Kanit,54,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,6.5,3.0,8,40,40,280,1
+Style: Default,Kanit,112,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,11.0,5.0,2,70,140,540,1
+Style: Highlight,Kanit,118,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,11.5,5.5,2,70,140,540,1
+Style: HookHeader,Kanit,120,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,12.0,6.0,8,50,50,370,1
+Style: BadgePill,Kanit,58,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,7.0,3.5,8,40,40,280,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,พกตัวเดียวจบ!\Nหัวชาร์จเร็ว 65W ชาร์จครบทุกเครื่อง
+Dialogue: 1,0:00:00.00,0:00:04.50,HookHeader,,0,0,0,,พกตัวเดียวจบ! หัวชาร์จเร็ว\N65W ชาร์จครบทุกเครื่อง
 Dialogue: 2,0:00:00.00,0:00:04.50,BadgePill,,0,0,0,,{\c&H00D7FF&}★ 4.9/5{\c&HFFFFFF&}  |  ยอดขายพุ่ง 3,800+ ชิ้น
 Dialogue: 2,0:00:04.50,0:00:12.00,BadgePill,,0,0,0,,{\c&H00FF88&}✔ ของแท้ 100%{\c&HFFFFFF&}  |  สเปกตรงปก คุณภาพพรีเมียม
 Dialogue: 2,0:00:12.00,0:00:21.89,BadgePill,,0,0,0,,{\c&H0080FF&}🛒 จิ้มตะกร้าส้มมุมล่างซ้ายได้เลย 👇
 Dialogue: 0,0:00:00.00,0:00:03.43,Highlight,,0,0,0,,ใครที่ต้องพกหัวชาร์จ\Nหลายอันให้หนักกระเป๋า
-Dialogue: 0,0:00:03.43,0:00:05.01,Default,,0,0,0,,ฟังทางนี้ด่วนเลยค่ะ
+Dialogue: 0,0:00:03.43,0:00:05.01,Default,,0,0,0,,ฟังทางนี้\Nด่วนเลยค่ะ
 Dialogue: 0,0:00:05.01,0:00:05.85,Highlight,,0,0,0,,ตัวนี้เป็น
 Dialogue: 0,0:00:05.85,0:00:06.35,Default,,0,0,0,,ยูกรีน
 Dialogue: 0,0:00:06.35,0:00:07.44,Highlight,,0,0,0,,หกสิบห้าวัตต์
 Dialogue: 0,0:00:07.44,0:00:08.69,Default,,0,0,0,,ตัวเดียวเอาอยู่
-Dialogue: 0,0:00:08.69,0:00:11.70,Highlight,,0,0,0,,ชาร์จโน้ตบุ๊กกับมื\Nอถือพร้อมกันได้เลย
+Dialogue: 0,0:00:08.69,0:00:11.70,Highlight,,0,0,0,,ชาร์จโน้ตบุ๊กกับ\Nมือถือพร้อมกันได้เลย
 Dialogue: 0,0:00:11.70,0:00:12.11,Default,,0,0,0,,ไวมาก
 Dialogue: 0,0:00:12.11,0:00:12.70,Highlight,,0,0,0,,ไม่ร้อน
 Dialogue: 0,0:00:12.70,0:00:14.62,Default,,0,0,0,,เล็กกว่าหัว\Nเดิมครึ่งนึง
 Dialogue: 0,0:00:14.62,0:00:15.71,Highlight,,0,0,0,,พกพาสะดวกสุดๆ
 Dialogue: 0,0:00:15.71,0:00:16.54,Default,,0,0,0,,ใครอยากได้
-Dialogue: 0,0:00:16.54,0:00:19.63,Highlight,,0,0,0,,รีบจิ้มตะกร้าส้มมุ\Nมล่างซ้ายด่วนเลยค่ะ
+Dialogue: 0,0:00:16.54,0:00:19.63,Highlight,,0,0,0,,รีบจิ้มตะกร้าส้มมุม\Nล่างซ้ายด่วนเลยค่ะ
 Dialogue: 0,0:00:19.63,0:00:21.89,Default,,0,0,0,,ตอนนี้มีคูปอง\Nลดเพิ่มด้วยน้า

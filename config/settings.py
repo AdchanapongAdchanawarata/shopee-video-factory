@@ -130,11 +130,11 @@ ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "")
 
 # Subtitle safe margin: keep bottom clear for Shopee orange basket UI zone (MarginV = 540px)
 SUBTITLE_BOTTOM_MARGIN = 540
-SUBTITLE_FONT_SIZE = 98
+SUBTITLE_FONT_SIZE = 114
 SUBTITLE_PRIMARY_COLOR = "&H002257FF"   # Shopee Vivid Orange (BGR: R=FF, G=57, B=22)
 SUBTITLE_HIGHLIGHT_COLOR = "&H002257FF" # Shopee Vivid Orange
 SUBTITLE_OUTLINE_COLOR = "&H00FFFFFF"   # Pure White Stroke / Outline
-SUBTITLE_OUTLINE_WIDTH = 9.5
+SUBTITLE_OUTLINE_WIDTH = 11.0
 
 # ==========================================
 # Video Specifications (Hybrid 9:16)

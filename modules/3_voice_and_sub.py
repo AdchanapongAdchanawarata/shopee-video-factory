@@ -196,34 +196,49 @@ async def synthesize_edge_tts(text: str, output_path: Path, voice: str = None, r
     return False
 
 
-def synthesize_elevenlabs(text: str, output_path: Path) -> bool:
-    """Optional ElevenLabs TTS integration if API key is provided."""
-    api_key = config.ELEVENLABS_API_KEY
-    voice_id = config.ELEVENLABS_VOICE_ID or "21m00Tcm4TlvDq8ikWAM"
-    if not api_key:
-        return False
+def synthesize_elevenlabs(
+    text: str,
+    output_path: Path,
+    voice_id: str = None,
+    model_id: str = "eleven_multilingual_v2"
+) -> bool:
+    """Synthesize studio-grade Thai speech via ElevenLabs SDK (Voice: Mali / Thai natural)."""
     try:
-        print("🎙️ Generating Thai voiceover via ElevenLabs API...")
-        url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
-        headers = {
-            "Accept": "audio/mpeg",
-            "Content-Type": "application/json",
-            "xi-api-key": api_key
-        }
-        data = {
-            "text": text,
-            "model_id": "eleven_multilingual_v2",
-            "voice_settings": {"stability": 0.5, "similarity_boost": 0.8}
-        }
-        res = requests.post(url, json=data, headers=headers, timeout=30)
-        if res.status_code == 200:
-            with open(output_path, "wb") as f:
-                f.write(res.content)
+        from dotenv import load_dotenv
+        from elevenlabs import ElevenLabs, VoiceSettings
+        
+        load_dotenv(dotenv_path=config.BASE_DIR / ".env")
+        
+        # The SDK reads ELEVENLABS_API_KEY from environment automatically
+        client = ElevenLabs()
+        
+        v_id = voice_id or getattr(config, "ELEVENLABS_VOICE_ID", "") or "EXAVITQu4vr4xnSDxMaL"
+        clean_text = format_conversational_thai_script(text)
+        print(f"🎙️ Generating natural Thai voiceover via ElevenLabs SDK (voice_id: {v_id}, model: {model_id})...")
+        
+        audio = client.text_to_speech.convert(
+            text=clean_text,
+            voice_id=v_id,
+            model_id=model_id,
+            voice_settings=VoiceSettings(
+                stability=0.5,
+                similarity_boost=0.8
+            )
+        )
+        
+        temp_raw = output_path.parent / f"temp_{output_path.stem}_elevenlabs.mp3"
+        with open(temp_raw, "wb") as f:
+            for chunk in audio:
+                f.write(chunk)
+        
+        if temp_raw.is_file() and temp_raw.stat().st_size > 1000:
+            apply_studio_vocal_chain(temp_raw, output_audio=output_path)
+            if temp_raw != output_path and temp_raw.is_file():
+                temp_raw.unlink()
+            print(f"✅ ElevenLabs synthesis & studio mastering successful: {output_path.name}")
             return True
-        else:
-            print(f"⚠️ ElevenLabs error {res.status_code}: {res.text}")
     except Exception as e:
-        print(f"⚠️ ElevenLabs request failed: {e}")
+        print(f"⚠️ ElevenLabs SDK synthesis error: {e}")
     return False
 
 def format_timestamp_ass(seconds: float) -> str:
@@ -260,6 +275,49 @@ def remove_emojis_and_icons(text: str) -> str:
     cleaned = emoji_pattern.sub("", text)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
     return cleaned
+
+def wrap_thai_line_safely(text: str, max_chars_per_line: int = 18) -> str:
+    """
+    Intelligently wrap Thai text at natural word boundaries using pythainlp newmm tokenizer.
+    Ensures words (like 'แมว', 'ชาร์จเร็ว', 'ไร้สาย') are NEVER broken across lines.
+    """
+    if not text or "\\N" in text or "\n" in text:
+        return text
+
+    # If fits on one line cleanly, keep it intact
+    if len(text) <= max_chars_per_line:
+        return text
+
+    try:
+        from pythainlp import word_tokenize
+        tokens = word_tokenize(text, engine="newmm")
+    except Exception:
+        tokens = text.split(" ") if " " in text else [text]
+
+    if len(tokens) <= 1:
+        return text
+
+    # Balance the split point closest to half character length
+    total_len = sum(len(t) for t in tokens)
+    target_half = total_len / 2.0
+
+    best_idx = 1
+    best_diff = float("inf")
+    current_len = 0
+
+    for i in range(len(tokens) - 1):
+        current_len += len(tokens[i])
+        diff = abs(current_len - target_half)
+        if diff < best_diff:
+            best_diff = diff
+            best_idx = i + 1
+
+    line1 = "".join(tokens[:best_idx]).strip()
+    line2 = "".join(tokens[best_idx:]).strip()
+
+    if line1 and line2:
+        return f"{line1}\\N{line2}"
+    return text
 
 def generate_subtitles_from_phrases(
     phrases: List[str],
@@ -298,7 +356,7 @@ def generate_subtitles_from_phrases(
     if segments:
         segments[-1]["end"] = max(segments[-1]["end"], total_duration)
 
-    # 1. Write ASS Subtitles
+    # 1. Write ASS Subtitles (Bigger, bolder viral font sizing + crisp outline)
     ass_content = f"""[Script Info]
 Title: Shopee Thai Dynamic Captions
 ScriptType: v4.00+
@@ -310,31 +368,18 @@ PlayResY: {config.VIDEO_HEIGHT}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Kanit,98,{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,9.5,4.5,2,80,150,{config.SUBTITLE_BOTTOM_MARGIN},1
-Style: Highlight,Kanit,102,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,2,80,150,{config.SUBTITLE_BOTTOM_MARGIN},1
-Style: HookHeader,Kanit,108,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&HA0000000,-1,0,0,0,100,100,0,0,1,10.0,5.0,8,60,60,370,1
-Style: BadgePill,Kanit,54,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,6.5,3.0,8,40,40,280,1
+Style: Default,Kanit,112,{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,11.0,5.0,2,70,140,{config.SUBTITLE_BOTTOM_MARGIN},1
+Style: Highlight,Kanit,118,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,11.5,5.5,2,70,140,{config.SUBTITLE_BOTTOM_MARGIN},1
+Style: HookHeader,Kanit,120,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&HA0000000,-1,0,0,0,100,100,0,0,1,12.0,6.0,8,50,50,370,1
+Style: BadgePill,Kanit,58,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,7.0,3.5,8,40,40,280,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-    # 1. Add punchy hook headline for first 4.5 seconds (STRICTLY NO ICONS / EMOJIS)
+    # 1. Add punchy hook headline for first 4.5 seconds (STRICTLY NO ICONS / EMOJIS, word-safe wrap)
     if headline:
         h_clean = remove_emojis_and_icons(headline)
-        if "!" in h_clean and len(h_clean) > 16:
-            parts = h_clean.split("!", 1)
-            p1 = parts[0].strip() + "!"
-            p2 = parts[1].strip()
-            headline_formatted = f"{p1}\\N{p2}" if p2 else p1
-        elif " " in h_clean and len(h_clean) > 20:
-            words = h_clean.split(" ")
-            mid = len(words) // 2
-            p1 = " ".join(words[:mid]).strip()
-            p2 = " ".join(words[mid:]).strip()
-            headline_formatted = f"{p1}\\N{p2}"
-        else:
-            headline_formatted = h_clean
-
+        headline_formatted = wrap_thai_line_safely(h_clean, max_chars_per_line=16)
         hook_dur = min(4.5, total_duration)
         ass_content += f"Dialogue: 1,{format_timestamp_ass(0.0)},{format_timestamp_ass(hook_dur)},HookHeader,,0,0,0,,{headline_formatted}\n"
 
@@ -352,25 +397,15 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     if total_duration > 12.0:
         ass_content += f"Dialogue: 2,{format_timestamp_ass(12.0)},{format_timestamp_ass(total_duration)},BadgePill,,0,0,0,,{{\\c&H0080FF&}}🛒 จิ้มตะกร้าส้มมุมล่างซ้ายได้เลย 👇\n"
 
-    # 3. Add subtitle dialogue lines
+    # 3. Add subtitle dialogue lines (Word-safe segmented wrapping)
     for idx, seg in enumerate(segments):
         st = format_timestamp_ass(seg["start"])
         et = format_timestamp_ass(seg["end"])
         style = "Highlight" if idx % 2 == 0 else "Default"
         txt = remove_emojis_and_icons(seg["text"]).strip()
-        # Auto wrap long lines to keep strictly within safe frame
-        if len(txt) >= 22 and "\\N" not in txt:
-            if " " in txt:
-                words = txt.split(" ")
-                mid = len(words) // 2
-                p1 = " ".join(words[:mid]).strip()
-                p2 = " ".join(words[mid:]).strip()
-                if p1 and p2:
-                    txt = f"{p1}\\N{p2}"
-            else:
-                mid = len(txt) // 2
-                txt = f"{txt[:mid]}\\N{txt[mid:]}"
+        txt = wrap_thai_line_safely(txt, max_chars_per_line=18)
         ass_content += f"Dialogue: 0,{st},{et},{style},,0,0,0,,{txt}\n"
+
 
     with open(output_ass, "w", encoding="utf-8") as f:
         f.write(ass_content)
@@ -482,6 +517,12 @@ def generate_voiceover_and_subtitles(
     if chosen_engine == "custom" and audio_path.is_file():
         print(f"🎙️ Using existing user recorded / uploaded audio: {audio_path.name}")
         success = True
+    elif chosen_engine == "elevenlabs_mali" or chosen_engine.startswith("elevenlabs"):
+        print(f"🎙️ Synthesizing voice via ElevenLabs (Mali / Thai Natural AI Voice)...")
+        success = synthesize_elevenlabs(full_text, audio_path)
+        if not success:
+            print(f"⚠️ ElevenLabs fallback -> switching to Google Cloud Chirp3-HD (Aoede)...")
+            success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name="th-TH-Chirp3-HD-Aoede")
     elif chosen_engine in CHIRP3_MAP:
         v_name = CHIRP3_MAP[chosen_engine]
         print(f"🎙️ Synthesizing premium voice via Google Cloud Chirp3-HD ({v_name})...")
@@ -492,6 +533,7 @@ def generate_voiceover_and_subtitles(
         success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name="th-TH-Chirp3-HD-Aoede")
         if not success:
             success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name="th-TH-Chirp3-HD-Callirrhoe")
+
 
 
 

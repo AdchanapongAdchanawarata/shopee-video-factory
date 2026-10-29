@@ -180,11 +180,10 @@ async def synthesize_edge_tts(text: str, output_path: Path, voice: str = None, r
     try:
         import edge_tts
         v = voice or getattr(config, "EDGE_TTS_VOICE", "th-TH-PremwadeeNeural")
-        r = rate or getattr(config, "EDGE_TTS_RATE", "+2%")
-        p = pitch or "+1Hz"
-        print(f"🎙️ Generating natural Thai voiceover via edge-tts ({v}, rate {r}, pitch {p})...")
+        r = rate or getattr(config, "EDGE_TTS_RATE", "+0%")
+        print(f"🎙️ Generating natural Thai voiceover via edge-tts ({v}, rate {r})...")
         clean_text = format_conversational_thai_script(text)
-        communicate = edge_tts.Communicate(clean_text, v, rate=r, pitch=p)
+        communicate = edge_tts.Communicate(clean_text, v, rate=r)
         await communicate.save(str(output_path))
         if output_path.is_file() and output_path.stat().st_size > 1000:
             # Apply vocal mastering chain to remove synthetic flat sound
@@ -263,11 +262,17 @@ def synthesize_elevenlabs(
             err_str = str(api_err).lower()
             if "paid_plan_required" in err_str or "402" in err_str:
                 print(f"⚠️ เสียง {target_vid} ใน ElevenLabs ต้องการแพ็กเกจ Starter ($1-$5) ขึ้นไปสำหรับเรียกผ่าน API")
-                print("🎙️ กำลังสลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100% (เปรมวดี Studio) ชัดใสเป็นธรรมชาติ ไม่ติดสำเนียงฝรั่ง...")
+                print("🎙️ กำลังสลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100% (Neural2 / Premwadee Studio) ชัดใสเป็นธรรมชาติ ไม่ติดสำเนียงฝรั่ง...")
+                ok = synthesize_google_cloud_neural2(clean_text, output_path, voice_name="th-TH-Neural2-C")
+                if ok:
+                    return True
                 import asyncio
                 return asyncio.run(synthesize_edge_tts(clean_text, output_path, voice="th-TH-PremwadeeNeural"))
             else:
-                print(f"⚠️ ElevenLabs API error ({api_err}), สลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100% (เปรมวดี)...")
+                print(f"⚠️ ElevenLabs API error ({api_err}), สลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100%...")
+                ok = synthesize_google_cloud_neural2(clean_text, output_path, voice_name="th-TH-Neural2-C")
+                if ok:
+                    return True
                 import asyncio
                 return asyncio.run(synthesize_edge_tts(clean_text, output_path, voice="th-TH-PremwadeeNeural"))
         

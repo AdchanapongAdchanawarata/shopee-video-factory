@@ -92,7 +92,7 @@ PUBLIC_VIDEOS_DIR = BASE_DIR / "public" / "videos"
 
 AVAILABLE_VIDEOS = {
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4", 16.57),
-    "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 9.65),
+    "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 8.91),
     "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 8.49),
     "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 10.84),
     "spray_mop_360": ("/videos/spray_mop_360.mp4", 8.32),

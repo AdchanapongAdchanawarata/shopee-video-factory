@@ -54,7 +54,7 @@ class PipelineRunRequest(BaseModel):
     step: str = "all"
     mock: bool = False
     duration: float = 20.0
-    voice_engine: str = "chirp3_aoede"
+    voice_engine: str = "elevenlabs_jessica"
     include_ai_lifestyle: bool = True
 
 class LoginRequest(BaseModel):

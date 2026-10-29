@@ -113,7 +113,8 @@ TARGET_VIDEO_DURATION = (15.0, 25.0)
 
 # ==========================================
 # Audio & Subtitle Styling
-TTS_ENGINE = os.getenv("TTS_ENGINE", "edge")  # "edge" (100% Free Studio Thai Voice), "google", or "elevenlabs"
+TTS_ENGINE = os.getenv("TTS_ENGINE", "elevenlabs_jessica")  # "elevenlabs_jessica", "elevenlabs_lily", etc.
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "cgSgspJ2msm6clMCkdW9")
 GOOGLE_TTS_LANG = os.getenv("GOOGLE_TTS_LANG", "th")
 GOOGLE_TTS_SPEED = float(os.getenv("GOOGLE_TTS_SPEED", "1.15"))
 

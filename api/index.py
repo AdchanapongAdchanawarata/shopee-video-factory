@@ -134,7 +134,7 @@ def get_product(product_id: str):
         "video_exists": v_exists,
         "video_url": v_url,
         "video_size_mb": v_size,
-        "voiceover_url": "/assets/sample_chirp_aoede.mp3"
+        "voiceover_url": "/assets/sample_elevenlabs_jessica.mp3"
     }
 
 @app.post("/api/pipeline/start")
@@ -156,7 +156,7 @@ async def stream_cloud_pipeline_logs(job_id: str):
             ("🎥 [Step 1.5] กรองวิดีโอรีวิวด้วย OpenCV และคัดช็อตเด็ดด้วย Gemini Vision (Hook Action / Closeup)...", 50, "Step 1.5: Smart Vision Curator"),
             ("✍️ [Step 2] Gemini 2.5 Flash กำลังสร้างสคริปต์ป้ายยา 20 วินาที ภาษาพูดธรรมชาติ...", 68, "Step 2: Script Writer"),
             ("🎯 สคริปต์พร้อมแล้ว: Hook ดึงดูด 0-3 วินาทีแรก + จุดเด่นสินค้าชัดเจน", 78, "Step 2: Script Writer"),
-            ("🎙️ [Step 3] Google Cloud Chirp3-HD (Aoede) สังเคราะห์เสียงพากย์สดระดับ Studio Mastering...", 88, "Step 3: Voice & Subtitles"),
+            ("🎙️ [Step 3] ElevenLabs Multilingual v2 สังเคราะห์เสียงพากย์สดระดับ Studio Mastering...", 88, "Step 3: Voice & Subtitles"),
             ("🎬 [Step 4] FFmpeg กำลังตัดต่อ 1080x1920 (9:16) ซูม Ken-Burns มิกซ์เสียงเพลง และฝังซับขอบขาว...", 96, "Step 4: Video Assembler"),
             ("🏁 กระบวนการทั้งหมดเสร็จสมบูรณ์ 100%! วิดีโอพร้อมโพสต์ทันที", 100, "Completed")
         ]

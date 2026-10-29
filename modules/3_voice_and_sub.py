@@ -196,35 +196,68 @@ async def synthesize_edge_tts(text: str, output_path: Path, voice: str = None, r
     return False
 
 
+ELEVENLABS_VOICE_MAP = {
+    "elevenlabs_jessica": "cgSgspJ2msm6clMCkdW9",
+    "elevenlabs_lily": "pFZP5JQG7iQjIQuC4Bku",
+    "elevenlabs_laura": "FGY2WhTYpPnrIDTdsKH5",
+    "elevenlabs_liam": "TX3LPaxmHKxFdv7VOQHJ",
+    "elevenlabs_george": "JBFqnCBsd6RMkjVDRZzb",
+    "elevenlabs_will": "bIHbv24MWmeRgasZH58o",
+    "elevenlabs_brian": "nPczCjzI2devNBz1zQrb",
+    "elevenlabs_mali": "7XW5JhaNn90bnFojQ5DA",
+    "jessica": "cgSgspJ2msm6clMCkdW9",
+    "lily": "pFZP5JQG7iQjIQuC4Bku",
+    "laura": "FGY2WhTYpPnrIDTdsKH5",
+    "liam": "TX3LPaxmHKxFdv7VOQHJ",
+    "george": "JBFqnCBsd6RMkjVDRZzb",
+    "will": "bIHbv24MWmeRgasZH58o",
+    "brian": "nPczCjzI2devNBz1zQrb",
+    "mali": "7XW5JhaNn90bnFojQ5DA",
+}
+
 def synthesize_elevenlabs(
     text: str,
     output_path: Path,
     voice_id: str = None,
     model_id: str = "eleven_multilingual_v2"
 ) -> bool:
-    """Synthesize studio-grade Thai speech via ElevenLabs SDK (Voice: Mali / Thai natural)."""
+    """Synthesize studio-grade Thai speech via ElevenLabs SDK."""
     try:
         from dotenv import load_dotenv
         from elevenlabs import ElevenLabs, VoiceSettings
         
         load_dotenv(dotenv_path=config.BASE_DIR / ".env")
-        
-        # The SDK reads ELEVENLABS_API_KEY from environment automatically
         client = ElevenLabs()
         
-        v_id = voice_id or getattr(config, "ELEVENLABS_VOICE_ID", "") or "EXAVITQu4vr4xnSDxMaL"
+        # Resolve voice id
+        target_vid = voice_id or getattr(config, "ELEVENLABS_VOICE_ID", "") or "cgSgspJ2msm6clMCkdW9"
+        if target_vid in ELEVENLABS_VOICE_MAP:
+            target_vid = ELEVENLABS_VOICE_MAP[target_vid]
+
         clean_text = format_conversational_thai_script(text)
-        print(f"🎙️ Generating natural Thai voiceover via ElevenLabs SDK (voice_id: {v_id}, model: {model_id})...")
+        print(f"🎙️ Generating natural Thai voiceover via ElevenLabs SDK (voice_id: {target_vid}, model: {model_id})...")
         
-        audio = client.text_to_speech.convert(
-            text=clean_text,
-            voice_id=v_id,
-            model_id=model_id,
-            voice_settings=VoiceSettings(
-                stability=0.5,
-                similarity_boost=0.8
+        def _call_convert(v_id):
+            return client.text_to_speech.convert(
+                text=clean_text,
+                voice_id=v_id,
+                model_id=model_id,
+                voice_settings=VoiceSettings(
+                    stability=0.5,
+                    similarity_boost=0.8
+                )
             )
-        )
+
+        try:
+            audio = _call_convert(target_vid)
+        except Exception as api_err:
+            # If library voice requires paid plan, fallback to verified ElevenLabs Premade voice (Jessica)
+            if "paid_plan_required" in str(api_err) or "402" in str(api_err):
+                fallback_vid = "cgSgspJ2msm6clMCkdW9"
+                print(f"ℹ️ ElevenLabs voice requires paid plan. Automatically switching to ElevenLabs Jessica ({fallback_vid})...")
+                audio = _call_convert(fallback_vid)
+            else:
+                raise api_err
         
         temp_raw = output_path.parent / f"temp_{output_path.stem}_elevenlabs.mp3"
         with open(temp_raw, "wb") as f:
@@ -480,39 +513,19 @@ def generate_voiceover_and_subtitles(
     full_text = script_data.get("full_script") or f"{script_data.get('hook_text', '')} {script_data.get('body_text', '')} {script_data.get('cta_text', '')}"
     headline = script_data.get("on_screen_headline", "สินค้ายอดฮิต ป้ายยาของดี!")
 
-    # 1. Synthesize or preserve audio
+    # 1. Synthesize voice exclusively via ElevenLabs
     success = False
-    chosen_engine = (voice_choice or getattr(config, "TTS_ENGINE", "edge")).lower()
-
-    CHIRP3_MAP = {
-        "chirp3_aoede": "th-TH-Chirp3-HD-Aoede",
-        "chirp3": "th-TH-Chirp3-HD-Aoede",
-        "chirp3_callirrhoe": "th-TH-Chirp3-HD-Callirrhoe",
-        "chirp3_despina": "th-TH-Chirp3-HD-Despina",
-        "chirp3_achernar": "th-TH-Chirp3-HD-Achernar",
-        "chirp3_achird": "th-TH-Chirp3-HD-Achird",
-        "chirp3_fenrir": "th-TH-Chirp3-HD-Fenrir",
-    }
+    chosen_engine = (voice_choice or getattr(config, "TTS_ENGINE", "elevenlabs_jessica")).lower()
 
     if chosen_engine == "custom" and audio_path.is_file():
         print(f"🎙️ Using existing user recorded / uploaded audio: {audio_path.name}")
         success = True
-    elif chosen_engine == "elevenlabs_mali" or chosen_engine.startswith("elevenlabs"):
-        print(f"🎙️ Synthesizing voice via ElevenLabs (Mali / Thai Natural AI Voice)...")
-        success = synthesize_elevenlabs(full_text, audio_path)
-        if not success:
-            print(f"⚠️ ElevenLabs fallback -> switching to Google Cloud Chirp3-HD (Aoede)...")
-            success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name="th-TH-Chirp3-HD-Aoede")
-    elif chosen_engine in CHIRP3_MAP:
-        v_name = CHIRP3_MAP[chosen_engine]
-        print(f"🎙️ Synthesizing premium voice via Google Cloud Chirp3-HD ({v_name})...")
-        success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name=v_name)
     else:
-        # Default to Chirp3-HD Aoede
-        print("🎙️ Synthesizing voice via Google Cloud Chirp3-HD (Aoede)...")
-        success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name="th-TH-Chirp3-HD-Aoede")
+        print(f"🎙️ Synthesizing voice via ElevenLabs AI ({chosen_engine})...")
+        success = synthesize_elevenlabs(full_text, audio_path, voice_id=chosen_engine)
         if not success:
-            success = synthesize_google_cloud_neural2(full_text, audio_path, voice_name="th-TH-Chirp3-HD-Callirrhoe")
+            print("⚠️ Retrying with default ElevenLabs Jessica...")
+            success = synthesize_elevenlabs(full_text, audio_path, voice_id="cgSgspJ2msm6clMCkdW9")
 
 
 

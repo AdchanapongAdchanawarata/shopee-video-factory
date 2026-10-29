@@ -271,63 +271,53 @@
                         <!-- TAB 1: NATURAL TTS SELECTOR -->
             <div id="voice-panel-tts" class="space-y-3 pt-1">
               <div>
-                <label class="block text-[11px] font-medium text-amber-400 mb-1.5 flex items-center space-x-1.5">
-                  <i class="ph-fill ph-sparkle text-amber-400"></i>
-                  <span>เลือกเสียงพากย์ AI Studio (เสียงไทยคมชัด / ElevenLabs AI):</span>
-                </label>
-                <select id="select-voice-engine" onchange="onVoiceEngineChange(this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-shopee">
-                  <optgroup label="🌟 เสียงไทยแท้ & ยอดนิยม (ชัดเจน ไม่ติดสำเนียงฝรั่ง)">
-                    <option value="elevenlabs_mali" selected>🌟 มาลี (Mali / ElevenLabs AI) — หญิงเสียงไทยยอดนิยม คมชัดสมจริง เป็นธรรมชาติ [ยอดนิยม]</option>
-                    <option value="thai_premwadee">🌸 เปรมวดี (Premwadee Studio) — หญิงเสียงไทยแท้ 100% ชัดใส เป็นธรรมชาติ สไตล์รีวิว Shopee (สำเนียงไทยแท้ ไม่ติดฝรั่ง) [แนะนำฟรี]</option>
-                    <option value="thai_niwat">⚡ นิวัฒน์ (Niwat Studio) — ชายเสียงไทยแท้ 100% นุ่มลึก คมชัด สไตล์รีวิวแกดเจ็ตเทค (สำเนียงไทยแท้)</option>
-                  </optgroup>
-                  <optgroup label="✨ เสียงสากล ElevenLabs AI (Multilingual v2)">
-                    <option value="elevenlabs_jessica">✨ เจสสิก้า (Jessica / ElevenLabs AI) — หญิงเสียงสดใส น่ารัก สไตล์รีวิวป้ายยา</option>
-                    <option value="elevenlabs_lily">🌸 ลิลลี่ (Lily / ElevenLabs AI) — หญิงเสียงหวาน นุ่มนวล อบอุ่น ฟังสบาย</option>
-                    <option value="elevenlabs_laura">⚡ ลอร่า (Laura / ElevenLabs AI) — หญิงเสียงมั่นใจ เอเนอร์จี้สูง สไตล์อินฟลูเอนเซอร์</option>
-                    <option value="elevenlabs_liam">🚀 เลียม (Liam / ElevenLabs AI) — ชายเสียงกระฉับกระเฉง พลังบวก สไตล์วัยรุ่นป้ายยา</option>
-                    <option value="elevenlabs_george">🎙️ จอร์จ (George / ElevenLabs AI) — ชายเสียงทุ้มนุ่ม อบอุ่น น่าเชื่อถือ สไตล์ผู้เชี่ยวชาญ</option>
-                    <option value="elevenlabs_will">🧢 วิลล์ (Will / ElevenLabs AI) — ชายเสียงสบายๆ เป็นกันเอง สไตล์เพื่อนบอกต่อ</option>
-                  </optgroup>
-                </select>
-              </div>
-              <div class="space-y-1.5 pt-1">
-                <span class="text-[10px] text-zinc-400 font-mono block">ทดลองกดฟังเสียงตัวอย่างจริง (กดเพื่อฟัง & สลับเสียง):</span>
-                <div class="flex flex-wrap items-center gap-1.5">
-                  <button type="button" onclick="playSampleVoice('/assets/sample_elevenlabs_mali.mp3', 'elevenlabs_mali')" class="px-2.5 py-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 rounded text-[11px] flex items-center space-x-1 transition cursor-pointer font-medium">
-                    <i class="ph-bold ph-waveform text-amber-400"></i>
-                    <span>🌟 มาลี (ElevenLabs)</span>
-                  </button>
-                  <button type="button" onclick="playSampleVoice('/assets/sample_premwadee.mp3', 'thai_premwadee')" class="px-2.5 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 rounded text-[11px] flex items-center space-x-1 transition cursor-pointer font-medium">
-                    <i class="ph-bold ph-waveform text-emerald-400"></i>
-                    <span>🌸 เปรมวดี (ไทยแท้ 100%)</span>
-                  </button>
-                  <button type="button" onclick="playSampleVoice('/assets/sample_niwat.mp3', 'thai_niwat')" class="px-2.5 py-1 bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/40 rounded text-[11px] flex items-center space-x-1 transition cursor-pointer font-medium">
-                    <i class="ph-bold ph-waveform text-blue-400"></i>
-                    <span>⚡ นิวัฒน์ (ไทยแท้ ชาย)</span>
-                  </button>
-                  <button type="button" onclick="playSampleVoice('/assets/sample_elevenlabs_jessica.mp3', 'elevenlabs_jessica')" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 rounded text-[11px] flex items-center space-x-1 transition cursor-pointer">
-                    <i class="ph ph-waveform text-zinc-400"></i>
-                    <span>✨ เจสสิก้า</span>
-                  </button>
-                  <button type="button" onclick="playSampleVoice('/assets/sample_elevenlabs_lily.mp3', 'elevenlabs_lily')" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 rounded text-[11px] flex items-center space-x-1 transition cursor-pointer">
-                    <i class="ph ph-waveform text-zinc-400"></i>
-                    <span>🌸 ลิลลี่</span>
-                  </button>
-                  <button type="button" onclick="playSampleVoice('/assets/sample_elevenlabs_liam.mp3', 'elevenlabs_liam')" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 rounded text-[11px] flex items-center space-x-1 transition cursor-pointer">
-                    <i class="ph ph-waveform text-zinc-400"></i>
-                    <span>🚀 เลียม</span>
-                  </button>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-[11px] font-medium text-amber-400 flex items-center space-x-1.5">
+                    <i class="ph-fill ph-lock-key text-amber-400"></i>
+                    <span>ระบบบังคับใช้งานเสียงพากย์:</span>
+                  </label>
+                  <span class="text-[10px] font-mono text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded flex items-center space-x-1">
+                    <i class="ph-bold ph-check-circle text-amber-400"></i>
+                    <span>ล็อกเสียงมาลี 100%</span>
+                  </span>
+                </div>
+                <div class="p-3 bg-zinc-900 border border-amber-500/40 rounded-xl space-y-2.5 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5">
+                      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-zinc-950 font-bold text-sm shadow">
+                        ม
+                      </div>
+                      <div>
+                        <div class="text-xs font-semibold text-white flex items-center space-x-1.5">
+                          <span>มาลี (Mali - Natural & Clear Thai)</span>
+                          <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono font-normal">ElevenLabs AI</span>
+                        </div>
+                        <div class="text-[10.5px] text-zinc-400 mt-0.5">
+                          หญิงเสียงไทยยอดนิยมอันดับ 1 คมชัดสมจริง สำเนียงไทยธรรมชาติ
+                        </div>
+                      </div>
+                    </div>
+                    <button type="button" onclick="playSampleVoice('/assets/sample_elevenlabs_mali.mp3', 'elevenlabs_mali')" class="py-1.5 px-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold rounded-lg text-xs flex items-center space-x-1.5 transition shadow cursor-pointer">
+                      <i class="ph-bold ph-play text-xs"></i>
+                      <span>ฟังเสียงมาลี</span>
+                    </button>
+                  </div>
+                  <!-- Hidden selector to ensure form payload always sends elevenlabs_mali -->
+                  <select id="select-voice-engine" class="hidden">
+                    <option value="elevenlabs_mali" selected>elevenlabs_mali</option>
+                  </select>
                 </div>
               </div>
+
               <div class="p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/20 text-[11px] space-y-1 text-zinc-300">
-                <div class="flex items-center space-x-1.5 text-amber-400 font-medium">
+                <div class="flex items-center space-x-1.5 text-amber-400 font-medium text-[11px]">
                   <i class="ph-bold ph-info"></i>
-                  <span>แนะนำเรื่องสำเนียงเสียงภาษาไทย:</span>
+                  <span>สถานะเสียงพากย์: บังคับใช้เสียงมาลี อย่างเดียว (Voice ID: 7XW5JhaNn90bnFojQ5DA)</span>
                 </div>
                 <p class="leading-relaxed text-[10.5px] text-zinc-400">
-                  • <b>เสียงมาลี (Mali):</b> เสียงไทยอันดับ 1 ของ ElevenLabs คมชัด เป็นธรรมชาติสุดๆ *(หมายเหตุ: การเรียกผ่าน ElevenLabs API สำหรับเสียง Library ต้องการแพ็กเกจ Starter $1 ขึ้นไป หากใช้ฟรีระบบจะสลับเป็นเสียงเปรมวดีให้อัตโนมัติทันที)*
-                  <br>• <b>เสียงเปรมวดี (Premwadee):</b> เสียงหญิงไทยแท้ 100% สำเนียงชัดเจน ไม่มีสำเนียงฝรั่ง ใช้งานได้ฟรีทันที
+                  ระบบจะตัดต่อและลงเสียงพากย์ทุกคลิปด้วยเสียง <b>มาลี</b> เท่านั้น ไม่มีเสียงสำเนียงฝรั่งปะปน
+                  <br>• ตัวอย่างเสียงจริงพร้อมเล่นทันทีทางปุ่มสีส้มด้านบน
+                  <br>• ระบบเชื่อมต่อ ElevenLabs Multilingual v2 สังเคราะห์เสียงระดับสตูดิโอ 100%
                 </p>
               </div>
             </div>

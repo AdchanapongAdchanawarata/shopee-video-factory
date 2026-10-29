@@ -55,7 +55,7 @@ class PipelineRunRequest(BaseModel):
     step: str = "all"
     mock: bool = False
     duration: float = 20.0
-    voice_engine: str = "elevenlabs_jessica"
+    voice_engine: str = "elevenlabs_mali"
     include_ai_lifestyle: bool = True
 
 class LoginRequest(BaseModel):
@@ -134,7 +134,7 @@ def run_pipeline_worker(job_id: str, req: PipelineRunRequest):
         if req.step in ("all", "3"):
             ACTIVE_JOBS[job_id]["step_label"] = "Step 3: Voice & Subtitles"
             ACTIVE_JOBS[job_id]["progress"] = 80
-            emit_log(job_id, f"\n[Step 3] กำลังจัดการเสียงพากย์ ({req.voice_engine}) และสร้างซับไตเติลภาษาไทย (.ass)...")
+            emit_log(job_id, f"\n[Step 3] บังคับใช้เสียงพากย์มาลี (ElevenLabs Mali AI) คมชัดสมจริง และสร้างซับไตเติลภาษาไทย (.ass)...")
             if not script_data:
                 s_file = config.OUTPUT_DIR / pid / "script.json"
                 if s_file.is_file():

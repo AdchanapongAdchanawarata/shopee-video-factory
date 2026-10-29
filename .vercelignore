@@ -1,9 +1,15 @@
 # Files to ignore on Vercel deployment (handled locally or via GitHub Actions)
+requirements-local.txt
 server.py
 main.py
 modules/
 bin/
 scratch/
+output/
+web/
+desktop/
 workspace_data/
 temp_assembly/
 *.log
+.env
+.env.*

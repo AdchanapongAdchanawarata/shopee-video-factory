@@ -17,3 +17,6 @@ output/**/temp_*
 /server.py
 web/videos/
 output/
+
+.vercel
+.env*

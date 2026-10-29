@@ -91,16 +91,16 @@ def get_status():
 PUBLIC_VIDEOS_DIR = BASE_DIR / "public" / "videos"
 
 AVAILABLE_VIDEOS = {
-    "cat_fountain_01": ("/videos/cat_fountain_01.mp4", 8.21),
-    "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 10.04),
-    "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 8.56),
-    "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 10.88),
-    "spray_mop_360": ("/videos/spray_mop_360.mp4", 1.97),
-    "solar_sensor_light": ("/videos/solar_sensor_light.mp4", 6.16),
-    "air_fryer_visual": ("/videos/air_fryer_visual.mp4", 3.25),
-    "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4", 3.03),
-    "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4", 5.99),
-    "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 4.19),
+    "cat_fountain_01": ("/videos/cat_fountain_01.mp4", 16.57),
+    "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 9.65),
+    "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 8.49),
+    "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 10.84),
+    "spray_mop_360": ("/videos/spray_mop_360.mp4", 8.32),
+    "solar_sensor_light": ("/videos/solar_sensor_light.mp4", 20.84),
+    "air_fryer_visual": ("/videos/air_fryer_visual.mp4", 14.52),
+    "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4", 12.36),
+    "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4", 17.67),
+    "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 10.99),
 }
 
 @app.get("/api/product/{product_id}")
@@ -173,5 +173,18 @@ async def stream_cloud_pipeline_logs(job_id: str):
 @app.post("/api/script/save")
 def update_script_cloud():
     return {"status": "saved", "message": "บันทึกสคริปต์บน Dashboard สำเร็จ"}
+
+class VoiceoverUploadRequest(BaseModel):
+    product_id: str
+    audio_base64: str
+
+@app.post("/api/voiceover/upload")
+def upload_voiceover_cloud(req: VoiceoverUploadRequest):
+    return {
+        "status": "success",
+        "duration": 20.0,
+        "message": "อัปโหลดเสียงพากย์เรียบร้อยแล้ว",
+        "audio_url": "/assets/sample_chirp_aoede.mp3"
+    }
 
 

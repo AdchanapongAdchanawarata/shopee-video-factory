@@ -40,7 +40,8 @@ app.add_middleware(
 
 # Mount outputs and static assets
 app.mount("/output", StaticFiles(directory=str(config.OUTPUT_DIR)), name="output")
-app.mount("/assets", StaticFiles(directory=str(config.ASSETS_DIR)), name="assets")
+assets_path = ROOT_DIR / "public" / "assets" if (ROOT_DIR / "public" / "assets").is_dir() else config.ASSETS_DIR
+app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
 app.mount("/videos", StaticFiles(directory=str(ROOT_DIR / "public" / "videos")), name="videos")
 
 # Global in-memory log bus for SSE streaming
@@ -297,7 +298,7 @@ async def get_product_details(product_id: str):
         "script": load_json("script.json"),
         "audio_sub_meta": load_json("audio_sub_meta.json"),
         "video_url": v_url,
-        "voiceover_url": f"/output/{product_id}/{voiceover.name}" if voiceover.is_file() else "/assets/sample_chirp_aoede.mp3",
+        "voiceover_url": f"/output/{product_id}/{voiceover.name}" if voiceover.is_file() else "/assets/sample_elevenlabs_mali.mp3",
         "video_exists": v_exists,
         "video_size_mb": v_size,
     }

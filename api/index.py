@@ -134,7 +134,7 @@ def get_product(product_id: str):
         "video_exists": v_exists,
         "video_url": v_url,
         "video_size_mb": v_size,
-        "voiceover_url": "/assets/sample_elevenlabs_jessica.mp3"
+        "voiceover_url": "/assets/sample_elevenlabs_mali.mp3"
     }
 
 @app.post("/api/pipeline/start")

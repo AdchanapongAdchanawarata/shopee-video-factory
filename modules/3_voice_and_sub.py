@@ -248,21 +248,28 @@ def synthesize_elevenlabs(
                 )
             )
 
+        temp_raw = output_path.parent / f"temp_{output_path.stem}_elevenlabs.mp3"
         try:
             audio = _call_convert(target_vid)
+            with open(temp_raw, "wb") as f:
+                for chunk in audio:
+                    f.write(chunk)
         except Exception as api_err:
-            # If library voice requires paid plan, fallback to verified ElevenLabs Premade voice (Jessica)
-            if "paid_plan_required" in str(api_err) or "402" in str(api_err):
-                fallback_vid = "cgSgspJ2msm6clMCkdW9"
-                print(f"ℹ️ ElevenLabs voice requires paid plan. Automatically switching to ElevenLabs Jessica ({fallback_vid})...")
-                audio = _call_convert(fallback_vid)
+            if temp_raw.is_file():
+                try:
+                    temp_raw.unlink()
+                except Exception:
+                    pass
+            err_str = str(api_err).lower()
+            if "paid_plan_required" in err_str or "402" in err_str:
+                print(f"⚠️ เสียง {target_vid} ใน ElevenLabs ต้องการแพ็กเกจ Starter ($1-$5) ขึ้นไปสำหรับเรียกผ่าน API")
+                print("🎙️ กำลังสลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100% (เปรมวดี Studio) ชัดใสเป็นธรรมชาติ ไม่ติดสำเนียงฝรั่ง...")
+                import asyncio
+                return asyncio.run(synthesize_edge_tts(clean_text, output_path, voice="th-TH-PremwadeeNeural"))
             else:
-                raise api_err
-        
-        temp_raw = output_path.parent / f"temp_{output_path.stem}_elevenlabs.mp3"
-        with open(temp_raw, "wb") as f:
-            for chunk in audio:
-                f.write(chunk)
+                print(f"⚠️ ElevenLabs API error ({api_err}), สลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100% (เปรมวดี)...")
+                import asyncio
+                return asyncio.run(synthesize_edge_tts(clean_text, output_path, voice="th-TH-PremwadeeNeural"))
         
         if temp_raw.is_file() and temp_raw.stat().st_size > 1000:
             apply_studio_vocal_chain(temp_raw, output_audio=output_path)
@@ -513,19 +520,31 @@ def generate_voiceover_and_subtitles(
     full_text = script_data.get("full_script") or f"{script_data.get('hook_text', '')} {script_data.get('body_text', '')} {script_data.get('cta_text', '')}"
     headline = script_data.get("on_screen_headline", "สินค้ายอดฮิต ป้ายยาของดี!")
 
-    # 1. Synthesize voice exclusively via ElevenLabs
+    # 1. Synthesize voice (ElevenLabs or Native Thai Studio)
     success = False
-    chosen_engine = (voice_choice or getattr(config, "TTS_ENGINE", "elevenlabs_jessica")).lower()
+    chosen_engine = (voice_choice or getattr(config, "TTS_ENGINE", "elevenlabs_mali")).lower()
 
     if chosen_engine == "custom" and audio_path.is_file():
         print(f"🎙️ Using existing user recorded / uploaded audio: {audio_path.name}")
         success = True
+    elif chosen_engine in ("thai_premwadee", "premwadee", "edge", "edge_premwadee"):
+        print("🎙️ Synthesizing voice via Premwadee (Native Thai 100%)...")
+        import asyncio
+        success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural"))
+    elif chosen_engine in ("thai_niwat", "niwat", "edge_niwat"):
+        print("🎙️ Synthesizing voice via Niwat (Native Thai Male 100%)...")
+        import asyncio
+        success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-NiwatNeural"))
+    elif chosen_engine in ("elevenlabs_mali", "mali"):
+        print("🎙️ Synthesizing voice via ElevenLabs Mali (7XW5JhaNn90bnFojQ5DA)...")
+        success = synthesize_elevenlabs(full_text, audio_path, voice_id="7XW5JhaNn90bnFojQ5DA")
     else:
-        print(f"🎙️ Synthesizing voice via ElevenLabs AI ({chosen_engine})...")
+        print(f"🎙️ Synthesizing voice via ElevenLabs ({chosen_engine})...")
         success = synthesize_elevenlabs(full_text, audio_path, voice_id=chosen_engine)
         if not success:
-            print("⚠️ Retrying with default ElevenLabs Jessica...")
-            success = synthesize_elevenlabs(full_text, audio_path, voice_id="cgSgspJ2msm6clMCkdW9")
+            print("⚠️ Retrying with native Thai Premwadee...")
+            import asyncio
+            success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural"))
 
 
 

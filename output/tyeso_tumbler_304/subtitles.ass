@@ -9,22 +9,21 @@ PlayResY: 1920
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Kanit,112,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,11.0,5.0,2,70,140,540,1
-Style: Highlight,Kanit,118,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,11.5,5.5,2,70,140,540,1
+Style: Default,Kanit,110,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,11.0,5.0,8,70,70,280,1
+Style: Highlight,Kanit,114,&H002257FF,&H002257FF,&H00FFFFFF,&H90000000,-1,0,0,0,100,100,0,0,1,11.5,5.5,8,70,70,280,1
 Style: HookHeader,Kanit,120,&H002257FF,&H002257FF,&H00FFFFFF,&HA0000000,-1,0,0,0,100,100,0,0,1,12.0,6.0,8,50,50,370,1
 Style: BadgePill,Kanit,58,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,7.0,3.5,8,40,40,280,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:00.00,0:00:02.56,Highlight,,0,0,0,,แก้วเก็บความเย็น\Nที่ฮิตที่สุดใน
-Dialogue: 0,0:00:02.56,0:00:03.08,Default,,0,0,0,,ตอนนี้
-Dialogue: 0,0:00:03.08,0:00:04.87,Highlight,,0,0,0,,ต้องยกให้\Nตัวนี้เลยค่ะ
-Dialogue: 0,0:00:04.87,0:00:05.30,Default,,0,0,0,,ไทโซ่
-Dialogue: 0,0:00:05.30,0:00:07.10,Highlight,,0,0,0,,สแตนเลสสาม\Nศูนย์สี่แท้
-Dialogue: 0,0:00:07.10,0:00:09.32,Default,,0,0,0,,ใส่น้ำแข็ง\Nข้ามคืนก็ยังอยู่
-Dialogue: 0,0:00:09.32,0:00:10.00,Highlight,,0,0,0,,ไม่ละลาย
-Dialogue: 0,0:00:10.00,0:00:11.88,Default,,0,0,0,,มีหูหิ้วพร้อม\Nหลอดในตัว
-Dialogue: 0,0:00:11.88,0:00:12.57,Highlight,,0,0,0,,พกพาง่าย
-Dialogue: 0,0:00:12.57,0:00:14.19,Default,,0,0,0,,ไม่หกเลอะเทอะ\Nแน่นอน
-Dialogue: 0,0:00:14.19,0:00:15.13,Highlight,,0,0,0,,ของแท้ตรงปก
-Dialogue: 0,0:00:15.13,0:00:18.21,Default,,0,0,0,,รีบจิ้มตะกร้าส้มมุม\Nล่างซ้ายจัดเลยค่ะ
+Dialogue: 0,0:00:00.00,0:00:02.34,Highlight,,0,0,0,,ใครที่มองหาแก้ว\Nเก็บความเย็น
+Dialogue: 0,0:00:02.34,0:00:03.04,Default,,0,0,0,,คุณภาพดี
+Dialogue: 0,0:00:03.04,0:00:04.60,Highlight,,0,0,0,,แนะนำรุ่นนี้เลยค่ะ
+Dialogue: 0,0:00:04.60,0:00:06.42,Default,,0,0,0,,แก้วเก็บความ\Nเย็นไทโซ่
+Dialogue: 0,0:00:06.42,0:00:08.24,Highlight,,0,0,0,,สแตนเลสสาม\Nศูนย์สี่แท้
+Dialogue: 0,0:00:08.24,0:00:10.32,Default,,0,0,0,,เก็บน้ำแข็ง\Nได้นานข้ามวัน
+Dialogue: 0,0:00:10.32,0:00:12.23,Highlight,,0,0,0,,ไม่มีไอน้ำ\Nเกาะข้างแก้ว
+Dialogue: 0,0:00:12.23,0:00:14.40,Default,,0,0,0,,มาพร้อมหูหิ้ว\Nและหลอดในตัว
+Dialogue: 0,0:00:14.40,0:00:15.70,Highlight,,0,0,0,,พกพาสะดวกมากค่ะ
+Dialogue: 0,0:00:15.70,0:00:17.78,Default,,0,0,0,,สนใจกดสั่งที่\Nตะกร้าสีส้ม
+Dialogue: 0,0:00:17.78,0:00:19.60,Highlight,,0,0,0,,มุมซ้ายล่าง\Nได้เลยนะคะ

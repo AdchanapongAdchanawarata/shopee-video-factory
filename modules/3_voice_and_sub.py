@@ -153,7 +153,8 @@ def format_conversational_thai_script(text: str) -> str:
     for pat, rep in subs:
         t = re.sub(pat, rep, t, flags=re.IGNORECASE)
     
-    t = re.sub(r"([!?.,])", r"\1 ", t)
+    t = re.sub(r"[!]+", " ", t)
+    t = re.sub(r"([?.,])", r"\1 ", t)
     t = re.sub(r"\s+", " ", t).strip()
     return t
 
@@ -161,7 +162,7 @@ def apply_studio_vocal_chain(input_audio: Path, output_audio: Path = None) -> Pa
     """
     Applies transparent voice enhancement via FFmpeg:
     1. Highpass at 70Hz (removes low-end rumble)
-    2. Subtle presence boost (+1.5dB at 3.2kHz for vocal clarity)
+    2. Preserves natural warm vocal timbre without artificial treble boost
     3. Transparent limiter (soft threshold, preserves natural human dynamic)
     """
     target = output_audio or input_audio
@@ -169,7 +170,7 @@ def apply_studio_vocal_chain(input_audio: Path, output_audio: Path = None) -> Pa
     cmd = [
         config.FFMPEG_PATH, "-y",
         "-i", str(input_audio),
-        "-af", "highpass=f=70,equalizer=f=3200:t=q:w=1.0:g=1.8,alimiter=limit=0.95:attack=5:release=50",
+        "-af", "highpass=f=70,alimiter=limit=0.95:attack=5:release=50",
         "-c:a", "libmp3lame",
         "-b:a", "192k",
         str(temp_master)
@@ -257,8 +258,9 @@ def synthesize_elevenlabs(
                     "model_id": model_id,
                     "language_code": "th",
                     "voice_settings": {
-                        "stability": 0.5,
-                        "similarity_boost": 0.85
+                        "stability": 1.0,
+                        "similarity_boost": 1.0,
+                        "style": 0.0
                     }
                 },
                 timeout=60
@@ -538,13 +540,26 @@ def generate_voiceover_and_subtitles(
         print(f"🎙️ Using existing user recorded / uploaded audio: {audio_path.name}")
         success = True
     else:
-        # Enforce Mali exclusively
-        print("🎙️ บังคับใช้เสียงมาลีอย่างเดียว (Mali / ElevenLabs AI - Voice ID: OB8jPhZsR8bpZJnVSkvQ)...")
-        success = synthesize_elevenlabs(full_text, audio_path, voice_id="OB8jPhZsR8bpZJnVSkvQ")
-        if not success:
-            print("⚠️ Smart fallback generating native Thai...")
-            import asyncio
-            success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural"))
+        # Check cache to avoid spending ElevenLabs credits if voiceover for this exact script already exists
+        meta_file = out_dir / "audio_sub_meta.json"
+        cached_ok = False
+        if audio_path.is_file() and audio_path.stat().st_size > 5000 and meta_file.is_file():
+            try:
+                old_meta = json.loads(meta_file.read_text(encoding="utf-8"))
+                if old_meta.get("script_text") in (full_text, None):
+                    print(f"♻️ ใช้ไฟล์เสียงมาลีที่สร้างไว้แล้ว (ประหยัดเครดิต ElevenLabs 0 เครดิต): {audio_path.name}")
+                    cached_ok = True
+                    success = True
+            except Exception:
+                pass
+        if not cached_ok:
+            # Enforce Mali exclusively
+            print("🎙️ บังคับใช้เสียงมาลีอย่างเดียว (Mali / ElevenLabs AI - Voice ID: OB8jPhZsR8bpZJnVSkvQ)...")
+            success = synthesize_elevenlabs(full_text, audio_path, voice_id="OB8jPhZsR8bpZJnVSkvQ")
+            if not success:
+                print("⚠️ Smart fallback generating native Thai...")
+                import asyncio
+                success = asyncio.run(synthesize_edge_tts(full_text, audio_path, voice="th-TH-PremwadeeNeural"))
 
 
 
@@ -561,7 +576,8 @@ def generate_voiceover_and_subtitles(
         "duration": duration,
         "ass_path": str(ass_path),
         "srt_path": str(srt_path),
-        "phrases_count": len(phrases)
+        "phrases_count": len(phrases),
+        "script_text": full_text
     }
     with open(out_dir / "audio_sub_meta.json", "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)

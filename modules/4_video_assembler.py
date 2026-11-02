@@ -194,8 +194,47 @@ def assemble_curated_video(
         if m:
             voice_dur = int(m.group(1))*3600 + int(m.group(2))*60 + float(m.group(3))
 
-    total_target_dur = max(float(target_duration or 20.0), voice_dur + 0.4)
-    print(f"🎬 Assembling Pro Video: Target Duration {total_target_dur:.2f}s (Voiceover: {voice_dur:.2f}s)")
+    total_target_dur = float(target_duration or 20.0)
+    active_voiceover_path = voiceover_path
+
+    # If voiceover exceeds target duration, time-fit via pitch-preserving WSOLA atempo (0 credits used)
+    if voiceover_path.is_file() and voice_dur > (total_target_dur - 0.3):
+        desired_voice_dur = max(10.0, total_target_dur - 0.4)
+        tempo_factor = min(1.95, max(1.01, voice_dur / desired_voice_dur))
+        fitted_voice = temp_dir / "voiceover_fitted.mp3"
+        fit_cmd = [
+            config.FFMPEG_PATH, "-y",
+            "-i", str(voiceover_path),
+            "-filter:a", f"atempo={tempo_factor:.4f}",
+            "-c:a", "libmp3lame",
+            "-b:a", "192k",
+            str(fitted_voice)
+        ]
+        res_fit = subprocess.run(fit_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+        if res_fit.returncode == 0 and fitted_voice.is_file():
+            active_voiceover_path = fitted_voice
+            voice_dur = desired_voice_dur
+            # Re-sync subtitles to the fitted 19.6s voice duration
+            script_file = out_dir / "script.json"
+            if script_file.is_file():
+                try:
+                    import importlib.util
+                    spec_m3 = importlib.util.spec_from_file_location("m3", str(Path(__file__).resolve().parent / "3_voice_and_sub.py"))
+                    m3 = importlib.util.module_from_spec(spec_m3)
+                    spec_m3.loader.exec_module(m3)
+                    s_data = json.loads(script_file.read_text(encoding="utf-8"))
+                    phrases = m3.split_thai_script_into_phrases(s_data)
+                    m3.generate_subtitles_from_phrases(
+                        phrases,
+                        voice_dur,
+                        s_data.get("on_screen_headline", ""),
+                        subtitles_ass,
+                        out_dir / "subtitles.srt"
+                    )
+                except Exception as sub_e:
+                    print(f"⚠️ Subtitle resync note: {sub_e}")
+
+    print(f"🎬 Assembling Pro Video: Strict Target Duration {total_target_dur:.2f}s (Voiceover fitted: {voice_dur:.2f}s)")
 
     # 1. Load curated segments
     segments = []
@@ -349,9 +388,9 @@ def assemble_curated_video(
     filter_complex_parts = []
 
     # Voiceover input
-    has_voice = voiceover_path.is_file()
+    has_voice = active_voiceover_path.is_file()
     if has_voice:
-        ffmpeg_inputs.extend(["-i", str(voiceover_path)])
+        ffmpeg_inputs.extend(["-i", str(active_voiceover_path)])
 
     # BGM input
     if has_bgm:

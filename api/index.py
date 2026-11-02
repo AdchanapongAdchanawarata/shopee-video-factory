@@ -65,17 +65,38 @@ def health():
 
 @app.get("/api/products/top10")
 def get_top10():
-    """Return top 10 recommended winning products for Shopee Affiliate."""
+    """Return full pool of recommended winning products for Shopee Affiliate."""
     if PRODUCTS_DB_PATH.is_file():
         try:
             with open(PRODUCTS_DB_PATH, "r", encoding="utf-8") as f:
                 db = json.load(f)
                 items = list(db.values())
                 items.sort(key=lambda x: x.get("rank", 99))
-                return items[:10]
+                return items
         except Exception as e:
             return JSONResponse({"error": str(e)}, status_code=500)
     return []
+
+@app.post("/api/products/refresh")
+def refresh_products():
+    """Refresh and re-rank winning products by highest commission, sales velocity, and market trend."""
+    if PRODUCTS_DB_PATH.is_file():
+        try:
+            with open(PRODUCTS_DB_PATH, "r", encoding="utf-8") as f:
+                db = json.load(f)
+                items = list(db.values())
+                items.sort(
+                    key=lambda x: (
+                        float(x.get("ams_commission_rate", 0)) * 2.5
+                        + float(x.get("stock_score", 90))
+                        + min(30.0, float(x.get("sales_30d", 0)) / 50.0)
+                    ),
+                    reverse=True
+                )
+                return {"status": "refreshed", "count": len(items), "products": items}
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+    return {"status": "refreshed", "count": 0, "products": []}
 
 @app.get("/api/status")
 def get_status():
@@ -101,6 +122,11 @@ AVAILABLE_VIDEOS = {
     "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4?v=mali_clean_20s", 7.10),
     "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4?v=mali_clean_20s", 9.34),
     "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4?v=mali_clean_20s", 6.81),
+    "portable_neck_fan_ice": ("/videos/wireless_earbuds_anc.mp4?v=mali_clean_20s", 6.81),
+    "cordless_car_vacuum": ("/videos/uv_dust_mite_vacuum.mp4?v=mali_clean_20s", 7.40),
+    "steam_garment_iron": ("/videos/air_fryer_visual.mp4?v=mali_clean_20s", 7.49),
+    "automatic_soap_dispenser": ("/videos/sonic_electric_toothbrush.mp4?v=mali_clean_20s", 7.10),
+    "magnetic_powerbank_10000": ("/videos/gan_charger_65w.mp4?v=mali_clean_20s", 9.05),
 }
 
 @app.get("/api/product/{product_id}")

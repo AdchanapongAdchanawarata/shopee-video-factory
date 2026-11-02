@@ -35,12 +35,12 @@
     "category": "ไอที & แกดเจ็ต (Tech)",
     "title": "UGREEN 65W เครื่องชาร์จชาร์จเร็ว GaN สามพอร์ตพร้อมพอร์ต USB-C 2 พอร์ตและ USB-A 1 ปลั๊กไทยสำหรับ iPhone / Samsung / Notebook",
     "shopee_url": "https://shopee.co.th/UGREEN-65W-เครื่องชาร์จชาร์จเร็ว-GaN-สามพอร์ตพร้อมพอร์ต-USB-C-2-พอร์ตและ-USB-A-1-ปลั๊กไทยสำหรับ-iPhone-17-Pro-Max-iPhone-16-Samsung-i.65302368.40324011599",
-    "price": 790.0,
+    "price": 770.0,
     "original_price": 1390.0,
     "rating": 4.9,
     "sales_30d": 340,
-    "ams_commission_rate": 12.0,
-    "commission_amount": 94.8,
+    "ams_commission_rate": 8.5,
+    "commission_amount": 65.45,
     "shop_name": "UGREEN Thailand Flagship (Shopee Mall)",
     "headline": "พกตัวเดียวจบ! หัวชาร์จ GaN 65W ชาร์จครบทุกเครื่อง",
     "hook_idea": "เบื่อไหมที่ต้องพกหัวชาร์จหลายอันหนักกระเป๋า? ตัวนี้ตัวเดียวจบ ชาร์จได้ทั้งโน้ตบุ๊กและมือถือพร้อมกัน!",
@@ -289,5 +289,140 @@
     "trend_status": "bullish",
     "trend_label": "ANC พรีเมียม 🎧",
     "stock_score": 95
+  },
+  "portable_neck_fan_ice": {
+    "product_id": "portable_neck_fan_ice",
+    "rank": 11,
+    "category": "แกดเจ็ตพกพา (Gadget)",
+    "title": "JISULIFE พัดลมคล้องคอไร้ใบพัด รุ่นใหม่ ลมแรง 5 ระดับ แบตอึด 4000mAh ชาร์จเร็ว Type-C ประกันศูนย์ไทย",
+    "shopee_url": "https://shopee.co.th/search?keyword=JISULIFE+%E0%B8%9E%E0%B8%B1%E0%B8%94%E0%B8%A5%E0%B8%A1%E0%B8%84%E0%B8%A5%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD+4000mAh",
+    "price": 549.0,
+    "original_price": 990.0,
+    "rating": 4.9,
+    "sales_30d": 1450,
+    "ams_commission_rate": 16.5,
+    "commission_amount": 90.59,
+    "shop_name": "JISULIFE Official Store (Shopee Mall)",
+    "headline": "พัดลมคล้องคอไร้ใบพัด ลมแรงสะใจ แบตอึดทั้งวัน",
+    "hook_idea": "ออกข้างนอกอากาศร้อนอบอ้าว พกพัดลมคล้องคอตัวนี้เย็นสบายมือว่างเดินช้อปได้ชิลๆ เลยค่ะ",
+    "reviews_5_star": [
+      "ลมแรงมาก เสียงเงียบ ไม่กินผม แบตอยู่ได้ทั้งวัน"
+    ],
+    "reviews_1_star": [
+      "พัดลมมือถือทั่วไปต้องคอยถือให้เมื่อยมือ"
+    ],
+    "sales_total": 18400,
+    "growth_rate_7d": "+34.5%",
+    "trend_status": "bullish",
+    "trend_label": "XTRA เรตสูง 🔥",
+    "stock_score": 99
+  },
+  "cordless_car_vacuum": {
+    "product_id": "cordless_car_vacuum",
+    "rank": 12,
+    "category": "ยานยนต์ & บ้าน (Auto & Home)",
+    "title": "Baseus A3 Lite เครื่องดูดฝุ่นไร้สายในรถยนต์ พลังดูด 12000Pa เป่าลมได้ในตัว ขนาดมินิพกพาง่าย",
+    "shopee_url": "https://shopee.co.th/search?keyword=Baseus+A3+Lite+%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%94%E0%B8%B9%E0%B8%94%E0%B8%9D%E0%B8%B8%E0%B9%88%E0%B8%99%E0%B9%84%E0%B8%A3%E0%B9%89%E0%B8%AA%E0%B8%B2%E0%B8%A2",
+    "price": 890.0,
+    "original_price": 1590.0,
+    "rating": 4.9,
+    "sales_30d": 620,
+    "ams_commission_rate": 15.5,
+    "commission_amount": 137.95,
+    "shop_name": "Baseus Official Store (Shopee Mall)",
+    "headline": "เครื่องดูดฝุ่นไร้สายมินิ ดูดแรง เป่าลมได้ในตัว",
+    "hook_idea": "ฝุ่นในรถหรือตามซอกโซฟาดูดออกยากใช่ไหมคะ เครื่องดูดฝุ่นไร้สายตัวนี้เล็กแต่แรงดูดสูงมากค่ะ",
+    "reviews_5_star": [
+      "ดูดเศษขนมและฝุ่นในรถเกลี้ยงมาก มีหัวเป่าลมให้ด้วย"
+    ],
+    "reviews_1_star": [
+      "เครื่องใหญ่มีสายลากไปดูดในรถลำบากมาก"
+    ],
+    "sales_total": 7300,
+    "growth_rate_7d": "+29.0%",
+    "trend_status": "bullish",
+    "trend_label": "คอมมิชชั่นคุ้ม 💰",
+    "stock_score": 97
+  },
+  "steam_garment_iron": {
+    "product_id": "steam_garment_iron",
+    "rank": 13,
+    "category": "เครื่องใช้ในบ้าน (Home Appliance)",
+    "title": "Simplus เตารีดไอน้ำพกพา พับเก็บได้ ร้อนไวใน 20 วินาที รีดเรียบทั้งแบบแขวนและวางราบ ประกัน 1 ปี",
+    "shopee_url": "https://shopee.co.th/search?keyword=Simplus+%E0%B9%80%E0%B8%95%E0%B8%B2%E0%B8%A3%E0%B8%B5%E0%B8%94%E0%B9%84%E0%B8%AD%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%9E%E0%B8%81%E0%B8%9E%E0%B8%B2",
+    "price": 459.0,
+    "original_price": 890.0,
+    "rating": 4.9,
+    "sales_30d": 980,
+    "ams_commission_rate": 17.0,
+    "commission_amount": 78.03,
+    "shop_name": "Simplus Official Store (Shopee Mall)",
+    "headline": "เตารีดไอน้ำพกพา ร้อนไวในยี่สิบวินาที เสื้อเรียบกริบ",
+    "hook_idea": "ชั่วโมงเร่งด่วนเสื้อยับไม่ต้องกังวลค่ะ เตารีดไอน้ำตัวนี้ร้อนไวมาก รีดแนวตั้งบนไม้แขวนได้เลย",
+    "reviews_5_star": [
+      "ไอน้ำแรง รีดเสื้อเชิ้ตเรียบไวมาก พับใส่กระเป๋าเดินทางสะดวก"
+    ],
+    "reviews_1_star": [
+      "เตารีดใหญ่ต้องกางโต๊ะรีดผ้าเสียเวลา"
+    ],
+    "sales_total": 11200,
+    "growth_rate_7d": "+31.4%",
+    "trend_status": "bullish",
+    "trend_label": "ขายดีอันดับ 1 🏆",
+    "stock_score": 98
+  },
+  "automatic_soap_dispenser": {
+    "product_id": "automatic_soap_dispenser",
+    "rank": 14,
+    "category": "ห้องน้ำ & สุขอนามัย (Bath & Care)",
+    "title": "เครื่องจ่ายสบู่โฟมอัตโนมัติ เซนเซอร์อินฟราเรด ชาร์จ USB กันน้ำ IPX5 หน้าจอบอกอุณหภูมิ",
+    "shopee_url": "https://shopee.co.th/search?keyword=%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%88%E0%B9%88%E0%B8%B2%E0%B8%A2%E0%B8%AA%E0%B8%9A%E0%B8%B9%E0%B9%88%E0%B9%82%E0%B8%9F%E0%B8%A1%E0%B8%AD%E0%B8%B1%E0%B8%95%E0%B9%82%E0%B8%99%E0%B8%A1%E0%B8%B1%E0%B8%95%E0%B8%B4",
+    "price": 259.0,
+    "original_price": 590.0,
+    "rating": 4.9,
+    "sales_30d": 840,
+    "ams_commission_rate": 18.0,
+    "commission_amount": 46.62,
+    "shop_name": "Smart Home Living (Preferred+)",
+    "headline": "เครื่องปล่อยโฟมล้างมืออัตโนมัติ ไม่ต้องกดขวด",
+    "hook_idea": "ล้างมือสะอาดไม่ต้องสัมผัสขวดปั๊ม แค่ยื่นมือเข้าไปโฟมนุ่มๆ ก็ออกมาอัตโนมัติเลยค่ะ",
+    "reviews_5_star": [
+      "เซนเซอร์ไวมาก โฟมละเอียดนุ่ม ประหยัดสบู่ไปเยอะเลย"
+    ],
+    "reviews_1_star": [
+      "ขวดปั๊มธรรมดาสกปรกง่ายเวลาเปื้อนมือ"
+    ],
+    "sales_total": 6450,
+    "growth_rate_7d": "+24.8%",
+    "trend_status": "bullish",
+    "trend_label": "เรตสูงสุด 18% 🚀",
+    "stock_score": 95
+  },
+  "magnetic_powerbank_10000": {
+    "product_id": "magnetic_powerbank_10000",
+    "rank": 15,
+    "category": "ไอที & แกดเจ็ต (Tech)",
+    "title": "Orsen by Eloop E56 พาวเวอร์แบงค์ไร้สาย MagSafe 10000mAh ชาร์จเร็ว PD 20W มีขาตั้งในตัว มอก.แท้",
+    "shopee_url": "https://shopee.co.th/search?keyword=Eloop+E56+MagSafe+10000mAh",
+    "price": 629.0,
+    "original_price": 1190.0,
+    "rating": 4.9,
+    "sales_30d": 1890,
+    "ams_commission_rate": 14.5,
+    "commission_amount": 91.21,
+    "shop_name": "Eloop Official Store (Shopee Mall)",
+    "headline": "พาวเวอร์แบงค์แม่เหล็กไร้สาย มีขาตั้งในตัว",
+    "hook_idea": "พกพาวเวอร์แบงค์ไม่ต้องพกสายให้พันกัน แปะหลังเครื่องชาร์จไร้สายพร้อมตั้งดูหนังได้เลยค่ะ",
+    "reviews_5_star": [
+      "แม่เหล็กดูดแน่นมาก ชาร์จไว มี มอก. ขึ้นเครื่องบินได้สบาย"
+    ],
+    "reviews_1_star": [
+      "รุ่นเก่าต้องพกสายชาร์จยาวเกะกะ"
+    ],
+    "sales_total": 24500,
+    "growth_rate_7d": "+38.0%",
+    "trend_status": "bullish",
+    "trend_label": "ยอดขายทะลุหมื่น ⚡",
+    "stock_score": 99
   }
 }

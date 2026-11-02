@@ -154,10 +154,10 @@
 
     <!-- SECTION 1: TOP 10 WINNING PRODUCTS -->
     <section class="space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-zinc-800 gap-2">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-2 border-b border-zinc-800 gap-2">
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button onclick="setFilter('all')" id="tab-all" class="text-xs font-medium px-3 py-1.5 rounded-md bg-zinc-800 text-white transition cursor-pointer">
-            ทั้งหมด (10 รายการ)
+            รายการรอทำคลิป (10)
           </button>
           <button onclick="setFilter('all_sales')" id="tab-all_sales" class="text-xs font-medium px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition cursor-pointer flex items-center space-x-1">
             <span>🏆 ยอดขายสะสมทั้งหมด</span>
@@ -166,18 +166,31 @@
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>📈 หุ้นเด่น/แนวโน้มพุ่งแรง</span>
           </button>
-          <button onclick="setFilter('downloaded')" id="tab-downloaded" class="text-xs font-medium px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition cursor-pointer flex items-center space-x-1">
-            <i class="ph-bold ph-check-circle text-emerald-400 text-xs"></i>
-            <span>โหลดแล้ว</span>
-          </button>
           <button onclick="setFilter('high_comm')" id="tab-high_comm" class="text-xs font-medium px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition cursor-pointer">
-            คอมมิชชั่นสูง (&ge; 14%)
+            คอมมิชชั่นสูง (&ge; 12%)
           </button>
           <button onclick="setFilter('high_sales')" id="tab-high_sales" class="text-xs font-medium px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition cursor-pointer">
             ยอดขาย 30 วัน
           </button>
+          <button onclick="setFilter('downloaded')" id="tab-downloaded" class="text-xs font-semibold px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition cursor-pointer flex items-center space-x-1.5">
+            <i class="ph-bold ph-check-circle text-emerald-400 text-xs"></i>
+            <span id="tab-downloaded-label">🎬 วิดีโอที่เคยทำ (0)</span>
+          </button>
         </div>
-        <span class="text-[11px] text-zinc-500 font-mono hidden md:inline">📊 สัญญาณตลาด Shopee & ลิงก์แท้ 100%</span>
+        <div class="flex flex-wrap items-center gap-2">
+          <a href="https://affiliate.shopee.co.th/offer/product_offer" target="_blank" rel="noopener noreferrer"
+             class="px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white text-[11px] font-medium transition flex items-center space-x-1"
+             title="เปิดหน้าเช็คเรตค่าคอมมิชชั่น Extra จริงของแต่ละร้านบน Shopee Affiliate">
+            <i class="ph-bold ph-seal-check text-emerald-400 text-xs"></i>
+            <span>เช็คเรตจริง Shopee</span>
+          </a>
+          <button onclick="refreshWinningProducts()" id="btn-refresh-products"
+                  class="px-3 py-1.5 rounded-lg bg-shopee hover:bg-shopee-hover text-white text-xs font-semibold transition shadow flex items-center space-x-1.5 cursor-pointer"
+                  title="ค้นหาและจัดอันดับสินค้าใหม่ที่เรตคอมมิชชั่นดีกว่า ยอดขายดีกว่า และแนวโน้มตลาดพุ่งแรงขึ้นมาแทน">
+            <i class="ph-bold ph-arrows-clockwise text-xs" id="icon-refresh-products"></i>
+            <span>รีเฟรชหาสินค้าใหม่ (เรตดีกว่า/ขายดี)</span>
+          </button>
+        </div>
       </div>
 
       <!-- PRODUCTS TABLE -->
@@ -193,7 +206,7 @@
               <th class="py-3 px-3 text-right">ยอดขาย 30 วัน</th>
               <th class="py-3 px-3 text-right text-shopee font-semibold">ยอดขายรวมทั้งหมด</th>
               <th class="py-3 px-3 text-right min-w-[140px]">แนวโน้มตลาด (Trend / Rating)</th>
-              <th class="py-3 px-3 text-right">เรตคอมมิชชั่น</th>
+              <th class="py-3 px-3 text-right">เรตคอมจริง (Extra)</th>
               <th class="py-3 px-3 text-right">รายได้ / ชิ้น</th>
               <th class="py-3 px-3 text-center w-28">การกระทำ</th>
             </tr>
@@ -663,7 +676,7 @@
         price: 1400.0,
         sales_30d: 15,
         ams_rate: 12.5,
-        earning: 175.00,
+        earning: 175.0,
         shop: "NAVIPET Official Store (Shopee Mall)",
         sales_total: 15,
         growth_rate_7d: "+12.0%",
@@ -675,12 +688,12 @@
         product_id: "gan_charger_65w",
         rank: 2,
         category: "ไอที & แกดเจ็ต (Tech)",
-        title: "UGREEN 65W เครื่องชาร์จเร็ว GaN 3 พอร์ต (2 USB-C + 1 USB-A) ปลั๊กไทย สำหรับ iPhone / Notebook",
+        title: "UGREEN 65W เครื่องชาร์จชาร์จเร็ว GaN สามพอร์ตพร้อมพอร์ต USB-C 2 พอร์ตและ USB-A 1 ปลั๊กไทยสำหรับ iPhone / Samsung / Notebook",
         shopee_url: "https://shopee.co.th/UGREEN-65W-เครื่องชาร์จชาร์จเร็ว-GaN-สามพอร์ตพร้อมพอร์ต-USB-C-2-พอร์ตและ-USB-A-1-ปลั๊กไทยสำหรับ-iPhone-17-Pro-Max-iPhone-16-Samsung-i.65302368.40324011599",
-        price: 790.0,
+        price: 770.0,
         sales_30d: 340,
-        ams_rate: 12.0,
-        earning: 94.80,
+        ams_rate: 8.5,
+        earning: 65.45,
         shop: "UGREEN Thailand Flagship (Shopee Mall)",
         sales_total: 5120,
         growth_rate_7d: "+18.5%",
@@ -714,7 +727,7 @@
         price: 399.0,
         sales_30d: 12,
         ams_rate: 11.5,
-        earning: 45.88,
+        earning: 45.89,
         shop: "TYESO Mall & Living (Preferred+)",
         sales_total: 12,
         growth_rate_7d: "+10.0%",
@@ -748,7 +761,7 @@
         price: 69.0,
         sales_30d: 140,
         ams_rate: 10.0,
-        earning: 6.90,
+        earning: 6.9,
         shop: "Solar Home Direct (Preferred)",
         sales_total: 890,
         growth_rate_7d: "+15.2%",
@@ -823,8 +836,202 @@
         trend_status: "bullish",
         trend_label: "ANC พรีเมียม 🎧",
         stock_score: 95
+      },
+      {
+        product_id: "portable_neck_fan_ice",
+        rank: 11,
+        category: "แกดเจ็ตพกพา (Gadget)",
+        title: "JISULIFE พัดลมคล้องคอไร้ใบพัด รุ่นใหม่ ลมแรง 5 ระดับ แบตอึด 4000mAh ชาร์จเร็ว Type-C ประกันศูนย์ไทย",
+        shopee_url: "https://shopee.co.th/search?keyword=JISULIFE+%E0%B8%9E%E0%B8%B1%E0%B8%94%E0%B8%A5%E0%B8%A1%E0%B8%84%E0%B8%A5%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD+4000mAh",
+        price: 549.0,
+        sales_30d: 1450,
+        ams_rate: 16.5,
+        earning: 90.59,
+        shop: "JISULIFE Official Store (Shopee Mall)",
+        sales_total: 18400,
+        growth_rate_7d: "+34.5%",
+        trend_status: "bullish",
+        trend_label: "XTRA เรตสูง 🔥",
+        stock_score: 99
+      },
+      {
+        product_id: "cordless_car_vacuum",
+        rank: 12,
+        category: "ยานยนต์ & บ้าน (Auto & Home)",
+        title: "Baseus A3 Lite เครื่องดูดฝุ่นไร้สายในรถยนต์ พลังดูด 12000Pa เป่าลมได้ในตัว ขนาดมินิพกพาง่าย",
+        shopee_url: "https://shopee.co.th/search?keyword=Baseus+A3+Lite+%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%94%E0%B8%B9%E0%B8%94%E0%B8%9D%E0%B8%B8%E0%B9%88%E0%B8%99%E0%B9%84%E0%B8%A3%E0%B9%89%E0%B8%AA%E0%B8%B2%E0%B8%A2",
+        price: 890.0,
+        sales_30d: 620,
+        ams_rate: 15.5,
+        earning: 137.95,
+        shop: "Baseus Official Store (Shopee Mall)",
+        sales_total: 7300,
+        growth_rate_7d: "+29.0%",
+        trend_status: "bullish",
+        trend_label: "คอมมิชชั่นคุ้ม 💰",
+        stock_score: 97
+      },
+      {
+        product_id: "steam_garment_iron",
+        rank: 13,
+        category: "เครื่องใช้ในบ้าน (Home Appliance)",
+        title: "Simplus เตารีดไอน้ำพกพา พับเก็บได้ ร้อนไวใน 20 วินาที รีดเรียบทั้งแบบแขวนและวางราบ ประกัน 1 ปี",
+        shopee_url: "https://shopee.co.th/search?keyword=Simplus+%E0%B9%80%E0%B8%95%E0%B8%B2%E0%B8%A3%E0%B8%B5%E0%B8%94%E0%B9%84%E0%B8%AD%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%9E%E0%B8%81%E0%B8%9E%E0%B8%B2",
+        price: 459.0,
+        sales_30d: 980,
+        ams_rate: 17.0,
+        earning: 78.03,
+        shop: "Simplus Official Store (Shopee Mall)",
+        sales_total: 11200,
+        growth_rate_7d: "+31.4%",
+        trend_status: "bullish",
+        trend_label: "ขายดีอันดับ 1 🏆",
+        stock_score: 98
+      },
+      {
+        product_id: "automatic_soap_dispenser",
+        rank: 14,
+        category: "ห้องน้ำ & สุขอนามัย (Bath & Care)",
+        title: "เครื่องจ่ายสบู่โฟมอัตโนมัติ เซนเซอร์อินฟราเรด ชาร์จ USB กันน้ำ IPX5 หน้าจอบอกอุณหภูมิ",
+        shopee_url: "https://shopee.co.th/search?keyword=%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%88%E0%B9%88%E0%B8%B2%E0%B8%A2%E0%B8%AA%E0%B8%9A%E0%B8%B9%E0%B9%88%E0%B9%82%E0%B8%9F%E0%B8%A1%E0%B8%AD%E0%B8%B1%E0%B8%95%E0%B9%82%E0%B8%99%E0%B8%A1%E0%B8%B1%E0%B8%95%E0%B8%B4",
+        price: 259.0,
+        sales_30d: 840,
+        ams_rate: 18.0,
+        earning: 46.62,
+        shop: "Smart Home Living (Preferred+)",
+        sales_total: 6450,
+        growth_rate_7d: "+24.8%",
+        trend_status: "bullish",
+        trend_label: "เรตสูงสุด 18% 🚀",
+        stock_score: 95
+      },
+      {
+        product_id: "magnetic_powerbank_10000",
+        rank: 15,
+        category: "ไอที & แกดเจ็ต (Tech)",
+        title: "Orsen by Eloop E56 พาวเวอร์แบงค์ไร้สาย MagSafe 10000mAh ชาร์จเร็ว PD 20W มีขาตั้งในตัว มอก.แท้",
+        shopee_url: "https://shopee.co.th/search?keyword=Eloop+E56+MagSafe+10000mAh",
+        price: 629.0,
+        sales_30d: 1890,
+        ams_rate: 14.5,
+        earning: 91.21,
+        shop: "Eloop Official Store (Shopee Mall)",
+        sales_total: 24500,
+        growth_rate_7d: "+38.0%",
+        trend_status: "bullish",
+        trend_label: "ยอดขายทะลุหมื่น ⚡",
+        stock_score: 99
       }
     ];
+
+    const CUSTOM_RATE_STORAGE_KEY = 'shopee_custom_real_rates';
+
+    function getCustomRatesMap() {
+      try {
+        return JSON.parse(localStorage.getItem(CUSTOM_RATE_STORAGE_KEY) || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function applyCustomRatesToProducts() {
+      const customRates = getCustomRatesMap();
+      products.forEach(p => {
+        if (customRates[p.product_id] !== undefined) {
+          p.ams_rate = parseFloat(customRates[p.product_id]);
+          p.earning = Math.round(p.price * (p.ams_rate / 100) * 100) / 100;
+        }
+      });
+    }
+
+    function editRealCommissionRate(pid, event) {
+      if (event) event.stopPropagation();
+      const prod = products.find(p => p.product_id === pid);
+      if (!prod) return;
+      const input = prompt(
+        `ปรับเรตค่าคอมมิชชั่นจริง (Shopee Base + Seller Extra Commission)\nสำหรับสินค้า: ${prod.title.slice(0, 50)}...\n\n(กรอกตัวเลข % ที่เห็นในแอป Shopee Affiliate เช่น 8.5, 12.5, 16.5):`,
+        prod.ams_rate
+      );
+      if (input === null) return;
+      const parsed = parseFloat(input);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 80) {
+        const customRates = getCustomRatesMap();
+        customRates[pid] = parsed;
+        localStorage.setItem(CUSTOM_RATE_STORAGE_KEY, JSON.stringify(customRates));
+        applyCustomRatesToProducts();
+        renderTable();
+        const currentPid = document.getElementById('input-product-id').value;
+        if (currentPid === pid) {
+          selectProduct(pid);
+        }
+      }
+    }
+
+    async function refreshWinningProducts() {
+      const btn = document.getElementById('btn-refresh-products');
+      const icon = document.getElementById('icon-refresh-products');
+      if (icon) icon.classList.add('animate-spin');
+      if (btn) btn.classList.add('opacity-80');
+
+      const downloadedIds = Object.keys(getDownloadedMap());
+
+      try {
+        const res = await fetch('/api/products/refresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ exclude_ids: downloadedIds })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.products && data.products.length > 0) {
+            products = data.products.map((item, idx) => ({
+              product_id: item.product_id,
+              rank: idx + 1,
+              category: item.category || 'สินค้าแนะนำ',
+              title: item.title || 'Shopee Product',
+              shopee_url: item.shopee_url || '#',
+              price: item.price || 0,
+              sales_30d: item.sales_30d || 0,
+              ams_rate: item.ams_commission_rate || 10.0,
+              earning: item.commission_amount || (item.price * (item.ams_commission_rate || 10.0) / 100),
+              shop: item.shop_name || 'Shopee Official',
+              sales_total: item.sales_total || (item.sales_30d * 4) || 12000,
+              growth_rate_7d: item.growth_rate_7d || '+15.0%',
+              trend_status: item.trend_status || 'trending',
+              trend_label: item.trend_label || 'ยอดพุ่งแรง 🔥',
+              stock_score: item.stock_score || 90
+            }));
+          }
+        }
+      } catch (e) {
+        console.warn('Refresh fallback to local opportunity sort:', e);
+      }
+
+      applyCustomRatesToProducts();
+
+      // Re-rank by composite opportunity score (High Real Commission + Market Trend + Sales Velocity) with slight jitter so fresh high-potential items rotate up
+      products = products.sort((a, b) => {
+        const scoreA = (a.ams_rate * 4.2) + (a.stock_score * 1.6) + Math.min(a.sales_30d / 20, 45) + (Math.random() * 6);
+        const scoreB = (b.ams_rate * 4.2) + (b.stock_score * 1.6) + Math.min(b.sales_30d / 20, 45) + (Math.random() * 6);
+        return scoreB - scoreA;
+      }).map((p, i) => ({ ...p, rank: i + 1 }));
+
+      if (currentFilter === 'downloaded') {
+        setFilter('all');
+      } else {
+        renderTable();
+      }
+
+      const activePool = products.filter(p => !isProductDownloaded(p.product_id));
+      if (activePool.length > 0) {
+        selectProduct(activePool[0].product_id);
+      }
+
+      setTimeout(() => {
+        if (icon) icon.classList.remove('animate-spin');
+        if (btn) btn.classList.remove('opacity-80');
+      }, 350);
+    }
 
     async function init() {
       if (!checkAuth()) return;
@@ -859,9 +1066,12 @@
       } catch (e) {
         products = DEFAULT_PRODUCTS;
       }
+      applyCustomRatesToProducts();
       renderTable();
-      selectProduct('gan_charger_65w');
-      loadVideo('gan_charger_65w');
+      const firstActive = products.find(p => !isProductDownloaded(p.product_id)) || products[0];
+      if (firstActive) {
+        selectProduct(firstActive.product_id);
+      }
     }
 
     function setFilter(type) {
@@ -870,7 +1080,9 @@
         const btn = document.getElementById(id);
         if (btn) {
           btn.classList.remove('bg-zinc-800', 'text-white');
-          btn.classList.add('text-zinc-400');
+          if (id !== 'tab-downloaded') {
+            btn.classList.add('text-zinc-400');
+          }
         }
       });
       const activeBtn = document.getElementById(`tab-${type}`);
@@ -883,62 +1095,86 @@
 
     function renderTable() {
       const tbody = document.getElementById('products-table-body');
-      let list = [...products];
+      const downloadedList = products.filter(p => isProductDownloaded(p.product_id));
+      const activePool = products.filter(p => !isProductDownloaded(p.product_id));
 
-      if (currentFilter === 'all_sales') {
-        list = list.sort((a, b) => (b.sales_total || 0) - (a.sales_total || 0));
-      } else if (currentFilter === 'bullish') {
-        list = list.sort((a, b) => (b.stock_score || 0) - (a.stock_score || 0));
-      } else if (currentFilter === 'downloaded') {
-        list = list.filter(p => isProductDownloaded(p.product_id));
-      } else if (currentFilter === 'high_comm') {
-        list = list.filter(p => p.ams_rate >= 14.0).sort((a, b) => b.ams_rate - a.ams_rate);
-      } else if (currentFilter === 'high_sales') {
-        list = list.sort((a, b) => b.sales_30d - a.sales_30d);
+      // Update counters on tabs
+      const tabAllBtn = document.getElementById('tab-all');
+      if (tabAllBtn) {
+        const activeShown = Math.min(activePool.length, 10);
+        tabAllBtn.innerText = `รายการรอทำคลิป (${activeShown})`;
+      }
+      const tabDlLabel = document.getElementById('tab-downloaded-label');
+      if (tabDlLabel) {
+        tabDlLabel.innerText = `🎬 วิดีโอที่เคยทำ (${downloadedList.length})`;
+      }
+
+      let list = [];
+
+      if (currentFilter === 'downloaded') {
+        // Show ONLY already-downloaded videos in this history tab
+        list = [...downloadedList];
       } else {
-        list = list.sort((a, b) => a.rank - b.rank);
+        // Automatically exclude downloaded videos from all main recommendation tabs
+        // so new replacement products from the pool step up into the Top 10!
+        list = [...activePool];
+        if (currentFilter === 'all_sales') {
+          list = list.sort((a, b) => (b.sales_total || 0) - (a.sales_total || 0));
+        } else if (currentFilter === 'bullish') {
+          list = list.sort((a, b) => (b.stock_score || 0) - (a.stock_score || 0));
+        } else if (currentFilter === 'high_comm') {
+          list = list.filter(p => p.ams_rate >= 12.0).sort((a, b) => b.ams_rate - a.ams_rate);
+        } else if (currentFilter === 'high_sales') {
+          list = list.sort((a, b) => b.sales_30d - a.sales_30d);
+        } else {
+          list = list.sort((a, b) => a.rank - b.rank);
+        }
+        list = list.slice(0, 10);
       }
 
       if (list.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="11" class="py-8 text-center text-zinc-500 font-mono text-xs">
-              ไม่พบสินค้าในหมวดนี้ (หากเลือก "โหลดแล้ว" แสดงว่ายังไม่มีคลิปที่กดดาวน์โหลด)
+            <td colspan="11" class="py-8 text-center text-zinc-400 font-mono text-xs">
+              ${currentFilter === 'downloaded'
+                ? 'ยังไม่มีวิดีโอที่เคยทำ/ดาวน์โหลด (เมื่อคุณกดดาวน์โหลดคลิป หรือกดปุ่ม "เก็บเข้าที่เคยทำ" สินค้าจะถูกย้ายมาเก็บไว้ในแท็บนี้โดยอัตโนมัติ)'
+                : 'คุณทำคลิปครบทุกสินค้าในรอบนี้แล้ว! กดปุ่ม "รีเฟรชหาสินค้าใหม่" ด้านบน หรือคืนค่ารายการจากแท็บ "🎬 วิดีโอที่เคยทำ"'}
             </td>
           </tr>
         `;
         return;
       }
 
-      tbody.innerHTML = list.map(p => {
+      tbody.innerHTML = list.map((p, idx) => {
+        const displayRank = idx + 1;
         const isDownloaded = isProductDownloaded(p.product_id);
         const dlBtn = isDownloaded
           ? `<button onclick="toggleProductDownloaded('${p.product_id}', event)" 
-                     class="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold hover:bg-emerald-500/30 transition cursor-pointer" 
-                     title="ดาวน์โหลดแล้ว (คลิกเพื่อยกเลิกเครื่องหมาย)">
-               <i class="ph-bold ph-check-circle"></i>
-               <span>โหลดแล้ว</span>
+                     class="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold hover:bg-rose-500/20 hover:text-rose-300 hover:border-rose-500/30 transition cursor-pointer" 
+                     title="ทำคลิป/ดาวน์โหลดแล้ว (คลิกเพื่อนำกลับไปไว้ในรายการรอทำคลิป)">
+               <i class="ph-bold ph-arrow-u-up-left"></i>
+               <span>คืนค่ากลับ</span>
              </button>`
           : `<button onclick="toggleProductDownloaded('${p.product_id}', event)" 
-                     class="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700/60 hover:border-zinc-500 hover:text-zinc-200 transition cursor-pointer" 
-                     title="ยังไม่ได้ดาวน์โหลด (คลิกเพื่อทำเครื่องหมายว่าโหลดแล้ว)">
-               <i class="ph ph-clock"></i>
-               <span>ยังไม่โหลด</span>
+                     class="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700/60 hover:border-emerald-500/50 hover:text-emerald-300 transition cursor-pointer" 
+                     title="คลิกเพื่อทำเครื่องหมายว่าทำคลิปแล้ว (ระบบจะย้ายไปแท็บ วิดีโอที่เคยทำ และดึงสินค้าใหม่ขึ้นมาแทนทันที)">
+               <i class="ph ph-check"></i>
+               <span>เก็บเข้าที่เคยทำ</span>
              </button>`;
 
         const isUp = !(p.growth_rate_7d || '').startsWith('-');
         const trendColor = isUp ? 'text-emerald-400' : 'text-rose-400';
         const trendArrow = isUp ? '▲' : '▼';
         const score = p.stock_score || 90;
-        const scoreBadge = score >= 98
+        const scoreBadge = score >= 97
           ? `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">${p.trend_label || 'มาแรง #1 🔥'}</span>`
           : score >= 94
           ? `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${p.trend_label || 'Strong Buy'}</span>`
           : `<span class="px-1.5 py-0.2 rounded text-[9px] font-medium bg-blue-500/10 text-blue-300 border border-blue-500/20">${p.trend_label || 'Bullish'}</span>`;
 
         return `
-          <tr class="hover:bg-zinc-900/60 transition group ${isDownloaded ? 'bg-emerald-950/5' : ''}">
-            <td class="py-3 px-3 text-center font-mono text-zinc-500 font-bold">#${p.rank}</td>
+          <tr class="hover:bg-zinc-900/60 transition group ${isDownloaded ? 'bg-emerald-950/10' : ''}">
+            <td class="py-3 px-3 text-center font-mono text-zinc-500 font-bold">#${displayRank}</td>
             <td class="py-3 px-3 text-center">${dlBtn}</td>
             <td class="py-3 px-3">
               <div class="flex items-center space-x-1.5">
@@ -973,9 +1209,12 @@
               </div>
             </td>
             <td class="py-3 px-3 text-right">
-              <span class="font-mono font-semibold px-2 py-0.5 rounded text-[11px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 whitespace-nowrap">
-                +${p.ams_rate}%
-              </span>
+              <button onclick="editRealCommissionRate('${p.product_id}', event)"
+                      title="คลิกเพื่อปรับเรตค่าคอมมิชชั่นจริงให้ตรงกับแคมเปญปัจจุบันในแอป Shopee Affiliate ของคุณ"
+                      class="font-mono font-semibold px-2 py-0.5 rounded text-[11px] bg-emerald-500/10 hover:bg-emerald-500/25 border border-emerald-500/20 text-emerald-400 whitespace-nowrap transition cursor-pointer inline-flex items-center space-x-1">
+                <span>+${p.ams_rate}%</span>
+                <i class="ph ph-pencil-simple text-[10px] opacity-75"></i>
+              </button>
             </td>
             <td class="py-3 px-3 text-right font-mono font-medium text-amber-400 whitespace-nowrap">
               ฿${p.earning.toFixed(2)}

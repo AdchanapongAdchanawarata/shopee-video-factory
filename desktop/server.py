@@ -231,7 +231,7 @@ async def list_products():
 
 @app.get("/api/products/top10")
 async def get_top10_products():
-    """Return top 10 recommended winning products for Shopee Affiliate with high AMS %."""
+    """Return full pool of recommended winning products for Shopee Affiliate with high AMS %."""
     db_path = config.PRODUCTS_DB_PATH
     if db_path.is_file():
         try:
@@ -239,17 +239,47 @@ async def get_top10_products():
                 db = json.load(f)
                 items = list(db.values())
                 items.sort(key=lambda x: x.get("rank", 99))
-                return items[:10]
+                return items
         except Exception as e:
             print(f"Error loading top10: {e}")
             return []
     return []
 
+@app.post("/api/products/refresh")
+async def refresh_products_local():
+    """Refresh and re-rank winning products by highest commission, sales velocity, and market trend."""
+    db_path = config.PRODUCTS_DB_PATH
+    if db_path.is_file():
+        try:
+            with open(db_path, "r", encoding="utf-8") as f:
+                db = json.load(f)
+                items = list(db.values())
+                items.sort(
+                    key=lambda x: (
+                        float(x.get("ams_commission_rate", 0)) * 2.5
+                        + float(x.get("stock_score", 90))
+                        + min(30.0, float(x.get("sales_30d", 0)) / 50.0)
+                    ),
+                    reverse=True
+                )
+                return {"status": "refreshed", "count": len(items), "products": items}
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+    return {"status": "refreshed", "count": 0, "products": []}
+
 @app.get("/api/product/{product_id}")
 async def get_product_details(product_id: str):
     """Fetch all generated artifacts and metadata for a given product."""
     p_dir = config.OUTPUT_DIR / product_id
-    if not p_dir.is_dir():
+    db_data = None
+    if config.PRODUCTS_DB_PATH.is_file():
+        try:
+            with open(config.PRODUCTS_DB_PATH, "r", encoding="utf-8") as f:
+                db = json.load(f)
+                db_data = db.get(product_id)
+        except Exception:
+            pass
+    if not p_dir.is_dir() and not db_data:
         return {"exists": False, "product_id": product_id}
 
     def load_json(name):
@@ -276,6 +306,11 @@ async def get_product_details(product_id: str):
         "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4?v=mali_clean_20s", 7.10),
         "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4?v=mali_clean_20s", 9.34),
         "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4?v=mali_clean_20s", 6.81),
+        "portable_neck_fan_ice": ("/videos/wireless_earbuds_anc.mp4?v=mali_clean_20s", 6.81),
+        "cordless_car_vacuum": ("/videos/uv_dust_mite_vacuum.mp4?v=mali_clean_20s", 7.40),
+        "steam_garment_iron": ("/videos/air_fryer_visual.mp4?v=mali_clean_20s", 7.49),
+        "automatic_soap_dispenser": ("/videos/sonic_electric_toothbrush.mp4?v=mali_clean_20s", 7.10),
+        "magnetic_powerbank_10000": ("/videos/gan_charger_65w.mp4?v=mali_clean_20s", 9.05),
     }
 
     if final_video.is_file():

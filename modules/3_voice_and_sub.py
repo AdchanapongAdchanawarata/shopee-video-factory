@@ -203,7 +203,7 @@ ELEVENLABS_VOICE_MAP = {
     "elevenlabs_george": "JBFqnCBsd6RMkjVDRZzb",
     "elevenlabs_will": "bIHbv24MWmeRgasZH58o",
     "elevenlabs_brian": "nPczCjzI2devNBz1zQrb",
-    "elevenlabs_mali": "7XW5JhaNn90bnFojQ5DA",
+    "elevenlabs_mali": "OB8jPhZsR8bpZJnVSkvQ",
     "jessica": "cgSgspJ2msm6clMCkdW9",
     "lily": "pFZP5JQG7iQjIQuC4Bku",
     "laura": "FGY2WhTYpPnrIDTdsKH5",
@@ -211,7 +211,7 @@ ELEVENLABS_VOICE_MAP = {
     "george": "JBFqnCBsd6RMkjVDRZzb",
     "will": "bIHbv24MWmeRgasZH58o",
     "brian": "nPczCjzI2devNBz1zQrb",
-    "mali": "7XW5JhaNn90bnFojQ5DA",
+    "mali": "OB8jPhZsR8bpZJnVSkvQ",
 }
 
 def synthesize_elevenlabs(
@@ -229,7 +229,7 @@ def synthesize_elevenlabs(
         client = ElevenLabs()
         
         # Resolve voice id (default enforced to Mali)
-        target_vid = voice_id or getattr(config, "ELEVENLABS_VOICE_ID", "") or "7XW5JhaNn90bnFojQ5DA"
+        target_vid = voice_id or getattr(config, "ELEVENLABS_VOICE_ID", "") or "OB8jPhZsR8bpZJnVSkvQ"
         if target_vid in ELEVENLABS_VOICE_MAP:
             target_vid = ELEVENLABS_VOICE_MAP[target_vid]
 
@@ -534,8 +534,8 @@ def generate_voiceover_and_subtitles(
         success = True
     else:
         # Enforce Mali exclusively
-        print("🎙️ บังคับใช้เสียงมาลีอย่างเดียว (Mali / ElevenLabs AI - Voice ID: 7XW5JhaNn90bnFojQ5DA)...")
-        success = synthesize_elevenlabs(full_text, audio_path, voice_id="7XW5JhaNn90bnFojQ5DA")
+        print("🎙️ บังคับใช้เสียงมาลีอย่างเดียว (Mali / ElevenLabs AI - Voice ID: OB8jPhZsR8bpZJnVSkvQ)...")
+        success = synthesize_elevenlabs(full_text, audio_path, voice_id="OB8jPhZsR8bpZJnVSkvQ")
         if not success:
             print("⚠️ Smart fallback generating native Thai...")
             import asyncio

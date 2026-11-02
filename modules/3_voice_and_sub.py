@@ -418,8 +418,8 @@ PlayResY: {config.VIDEO_HEIGHT}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Kanit,112,{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,11.0,5.0,2,70,140,{config.SUBTITLE_BOTTOM_MARGIN},1
-Style: Highlight,Kanit,118,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,11.5,5.5,2,70,140,{config.SUBTITLE_BOTTOM_MARGIN},1
+Style: Default,Kanit,110,{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,11.0,5.0,8,70,70,{getattr(config, 'SUBTITLE_TOP_MARGIN', 280)},1
+Style: Highlight,Kanit,114,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&H90000000,-1,0,0,0,100,100,0,0,1,11.5,5.5,8,70,70,{getattr(config, 'SUBTITLE_TOP_MARGIN', 280)},1
 Style: HookHeader,Kanit,120,{config.SUBTITLE_HIGHLIGHT_COLOR},{config.SUBTITLE_PRIMARY_COLOR},{config.SUBTITLE_OUTLINE_COLOR},&HA0000000,-1,0,0,0,100,100,0,0,1,12.0,6.0,8,50,50,370,1
 Style: BadgePill,Kanit,58,&H00FFFFFF,&H000000FF,&H00181818,&HA0000000,-1,0,0,0,100,100,0,0,1,7.0,3.5,8,40,40,280,1
 

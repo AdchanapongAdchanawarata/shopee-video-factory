@@ -129,8 +129,9 @@ EDGE_TTS_RATE = os.getenv("EDGE_TTS_RATE", "+0%")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "OB8jPhZsR8bpZJnVSkvQ")
 
-# Subtitle safe margin: keep bottom clear for Shopee orange basket UI zone (MarginV = 540px)
-SUBTITLE_BOTTOM_MARGIN = 540
+# Subtitle safe margin: Top-Center safe zone below Shopee search bar (Alignment=8, MarginV = 280px from top)
+SUBTITLE_TOP_MARGIN = 280
+SUBTITLE_BOTTOM_MARGIN = 280
 SUBTITLE_FONT_SIZE = 114
 SUBTITLE_PRIMARY_COLOR = "&H002257FF"   # Shopee Vivid Orange (BGR: R=FF, G=57, B=22)
 SUBTITLE_HIGHLIGHT_COLOR = "&H002257FF" # Shopee Vivid Orange

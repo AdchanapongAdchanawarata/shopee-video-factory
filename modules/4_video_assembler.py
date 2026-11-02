@@ -194,7 +194,7 @@ def assemble_curated_video(
         if m:
             voice_dur = int(m.group(1))*3600 + int(m.group(2))*60 + float(m.group(3))
 
-    total_target_dur = target_duration or max(15.0, min(25.0, voice_dur + 0.5))
+    total_target_dur = max(float(target_duration or 20.0), voice_dur + 0.4)
     print(f"🎬 Assembling Pro Video: Target Duration {total_target_dur:.2f}s (Voiceover: {voice_dur:.2f}s)")
 
     # 1. Load curated segments

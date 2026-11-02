@@ -128,6 +128,15 @@ def generate_shopee_script(product_id: str, product_name: str, use_mock: bool = 
 
     api_key = config.GEMINI_API_KEY
     if not api_key or use_mock:
+        if script_output_file.is_file():
+            try:
+                with open(script_output_file, "r", encoding="utf-8") as f:
+                    existing = json.load(f)
+                if existing.get("full_script"):
+                    print(f"✅ Using curated Thai script from {script_output_file}")
+                    return existing
+            except Exception:
+                pass
         print("ℹ️ Running script generator with curated Thai 'ป้ายยา' template (mock/offline mode)")
         result_obj = generate_mock_script(product_id, product_name, price)
     else:

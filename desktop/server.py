@@ -266,20 +266,20 @@ async def get_product_details(product_id: str):
     voiceover = p_dir / "voiceover.mp3"
 
     AVAILABLE_VIDEOS = {
-        "cat_fountain_01": ("/videos/cat_fountain_01.mp4", 8.21),
-        "gan_charger_65w": ("/videos/gan_charger_65w.mp4", 10.04),
-        "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4", 8.56),
-        "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4", 10.88),
-        "spray_mop_360": ("/videos/spray_mop_360.mp4", 1.97),
-        "solar_sensor_light": ("/videos/solar_sensor_light.mp4", 6.16),
-        "air_fryer_visual": ("/videos/air_fryer_visual.mp4", 3.25),
-        "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4", 3.03),
-        "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4", 5.99),
-        "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4", 4.19),
+        "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=mali_v3", 11.67),
+        "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=mali_v3", 9.45),
+        "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4?v=mali_v3", 7.93),
+        "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4?v=mali_v3", 12.31),
+        "spray_mop_360": ("/videos/spray_mop_360.mp4?v=mali_v3", 9.90),
+        "solar_sensor_light": ("/videos/solar_sensor_light.mp4?v=mali_v3", 17.72),
+        "air_fryer_visual": ("/videos/air_fryer_visual.mp4?v=mali_v3", 11.22),
+        "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4?v=mali_v3", 8.97),
+        "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4?v=mali_v3", 12.98),
+        "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4?v=mali_v3", 9.22),
     }
 
     if final_video.is_file():
-        v_url = f"/output/{product_id}/{final_video.name}"
+        v_url = f"/output/{product_id}/{final_video.name}?v={int(final_video.stat().st_mtime)}"
         v_size = round(final_video.stat().st_size / (1024 * 1024), 2)
         v_exists = True
     elif product_id in AVAILABLE_VIDEOS:

@@ -125,16 +125,27 @@ def format_conversational_thai_script(text: str) -> str:
     subs = [
         (r"\bUGREEN\b", "ยูกรีน"),
         (r"\bugreen\b", "ยูกรีน"),
+        (r"\bBaseus\b", "เบสอุส"),
+        (r"\bSimplus\b", "ซิมพลัส"),
+        (r"\bMeeGoo\b", "มีกู"),
+        (r"\bKANO\b", "คาโน่"),
+        (r"\bNAVIPET\b", "นาวิเพ็ท"),
         (r"\bGaN 65W\b", "หกสิบห้าวัตต์"),
         (r"\b65W\b", "หกสิบห้าวัตต์"),
         (r"\bGaN\b", "แกน"),
         (r"\bType-C\b", "ไทป์ซี"),
+        (r"\bUSB-C\b", "ยูเอสบีซี"),
         (r"\bMacBook Pro\b", "แมคบุ๊ก"),
         (r"\bMacBook\b", "แมคบุ๊ก"),
         (r"\bDeerma\b", "เดียร์ม่า"),
         (r"\bTYESO\b", "ไทโซ่"),
+        (r"\bANC\b", "ตัดเสียงรบกวน"),
+        (r"\bLED\b", "แอลอีดี"),
+        (r"\bUV\b", "ยูวี"),
+        (r"\bHD\b", "คมชัด"),
         (r"\b1200ml\b", "หนึ่งพันสองร้อยมิลลิลิตร"),
         (r"\b304\b", "สามศูนย์สี่"),
+        (r"\b360\b", "สามร้อยหกสิบ"),
         (r"\b13kPa\b", "สิบสามกิโลปาสคาล"),
         (r"\b\+\b", " และ "),
         (r"3 พอร์ต", "สามช่อง"),
@@ -218,63 +229,57 @@ def synthesize_elevenlabs(
     text: str,
     output_path: Path,
     voice_id: str = None,
-    model_id: str = "eleven_multilingual_v2"
+    model_id: str = "eleven_v3"
 ) -> bool:
-    """Synthesize studio-grade Thai speech via ElevenLabs SDK."""
+    """Synthesize studio-grade Thai speech via ElevenLabs API (eleven_v3 native Thai)."""
     try:
         from dotenv import load_dotenv
-        from elevenlabs import ElevenLabs, VoiceSettings
-        
-        load_dotenv(dotenv_path=config.BASE_DIR / ".env")
-        client = ElevenLabs()
+        load_dotenv(dotenv_path=config.BASE_DIR / ".env", override=True)
+        api_key = os.getenv("ELEVENLABS_API_KEY") or getattr(config, "ELEVENLABS_API_KEY", "")
         
         # Resolve voice id (default enforced to Mali)
         target_vid = voice_id or getattr(config, "ELEVENLABS_VOICE_ID", "") or "OB8jPhZsR8bpZJnVSkvQ"
         if target_vid in ELEVENLABS_VOICE_MAP:
             target_vid = ELEVENLABS_VOICE_MAP[target_vid]
+        if target_vid == "7XW5JhaNn90bnFojQ5DA":
+            target_vid = "OB8jPhZsR8bpZJnVSkvQ"
 
         clean_text = format_conversational_thai_script(text)
-        print(f"🎙️ Generating natural Thai voiceover via ElevenLabs SDK (voice_id: {target_vid}, model: {model_id})...")
-        
-        def _call_convert(v_id):
-            return client.text_to_speech.convert(
-                text=clean_text,
-                voice_id=v_id,
-                model_id=model_id,
-                voice_settings=VoiceSettings(
-                    stability=0.5,
-                    similarity_boost=0.8
-                )
-            )
+        print(f"🎙️ Generating natural Thai voiceover via ElevenLabs API (voice_id: {target_vid}, model: {model_id}, lang: th)...")
 
         temp_raw = output_path.parent / f"temp_{output_path.stem}_elevenlabs.mp3"
         try:
-            audio = _call_convert(target_vid)
-            with open(temp_raw, "wb") as f:
-                for chunk in audio:
-                    f.write(chunk)
+            res = requests.post(
+                f"https://api.elevenlabs.io/v1/text-to-speech/{target_vid}",
+                headers={"xi-api-key": api_key, "Content-Type": "application/json"},
+                json={
+                    "text": clean_text,
+                    "model_id": model_id,
+                    "language_code": "th",
+                    "voice_settings": {
+                        "stability": 0.5,
+                        "similarity_boost": 0.85
+                    }
+                },
+                timeout=60
+            )
+            if res.status_code == 200 and len(res.content) > 1000:
+                with open(temp_raw, "wb") as f:
+                    f.write(res.content)
+            else:
+                raise RuntimeError(f"HTTP {res.status_code}: {res.text[:200]}")
         except Exception as api_err:
             if temp_raw.is_file():
                 try:
                     temp_raw.unlink()
                 except Exception:
                     pass
-            err_str = str(api_err).lower()
-            if "paid_plan_required" in err_str or "402" in err_str:
-                print(f"⚠️ เสียง {target_vid} ใน ElevenLabs ต้องการแพ็กเกจ Starter ($1-$5) ขึ้นไปสำหรับเรียกผ่าน API")
-                print("🎙️ กำลังสลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100% (Neural2 / Premwadee Studio) ชัดใสเป็นธรรมชาติ ไม่ติดสำเนียงฝรั่ง...")
-                ok = synthesize_google_cloud_neural2(clean_text, output_path, voice_name="th-TH-Neural2-C")
-                if ok:
-                    return True
-                import asyncio
-                return asyncio.run(synthesize_edge_tts(clean_text, output_path, voice="th-TH-PremwadeeNeural"))
-            else:
-                print(f"⚠️ ElevenLabs API error ({api_err}), สลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100%...")
-                ok = synthesize_google_cloud_neural2(clean_text, output_path, voice_name="th-TH-Neural2-C")
-                if ok:
-                    return True
-                import asyncio
-                return asyncio.run(synthesize_edge_tts(clean_text, output_path, voice="th-TH-PremwadeeNeural"))
+            print(f"⚠️ ElevenLabs API error ({api_err}), สลับไปใช้เสียงพากย์สำเนียงไทยแท้ 100%...")
+            ok = synthesize_google_cloud_neural2(clean_text, output_path, voice_name="th-TH-Neural2-C")
+            if ok:
+                return True
+            import asyncio
+            return asyncio.run(synthesize_edge_tts(clean_text, output_path, voice="th-TH-PremwadeeNeural"))
         
         if temp_raw.is_file() and temp_raw.stat().st_size > 1000:
             apply_studio_vocal_chain(temp_raw, output_audio=output_path)
@@ -283,7 +288,7 @@ def synthesize_elevenlabs(
             print(f"✅ ElevenLabs synthesis & studio mastering successful: {output_path.name}")
             return True
     except Exception as e:
-        print(f"⚠️ ElevenLabs SDK synthesis error: {e}")
+        print(f"⚠️ ElevenLabs synthesis error: {e}")
     return False
 
 def format_timestamp_ass(seconds: float) -> str:

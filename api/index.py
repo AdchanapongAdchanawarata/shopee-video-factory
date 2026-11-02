@@ -91,16 +91,16 @@ def get_status():
 PUBLIC_VIDEOS_DIR = BASE_DIR / "public" / "videos"
 
 AVAILABLE_VIDEOS = {
-    "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=mali_20s", 9.19),
-    "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=mali_20s", 9.12),
-    "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4?v=mali_20s", 7.42),
-    "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4?v=mali_20s", 12.34),
-    "spray_mop_360": ("/videos/spray_mop_360.mp4?v=mali_20s", 7.44),
-    "solar_sensor_light": ("/videos/solar_sensor_light.mp4?v=mali_20s", 13.70),
-    "air_fryer_visual": ("/videos/air_fryer_visual.mp4?v=mali_20s", 7.58),
-    "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4?v=mali_20s", 7.17),
-    "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4?v=mali_20s", 9.38),
-    "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4?v=mali_20s", 6.85),
+    "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=mali_clean_20s", 9.16),
+    "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=mali_clean_20s", 9.05),
+    "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4?v=mali_clean_20s", 7.40),
+    "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4?v=mali_clean_20s", 12.28),
+    "spray_mop_360": ("/videos/spray_mop_360.mp4?v=mali_clean_20s", 7.38),
+    "solar_sensor_light": ("/videos/solar_sensor_light.mp4?v=mali_clean_20s", 13.68),
+    "air_fryer_visual": ("/videos/air_fryer_visual.mp4?v=mali_clean_20s", 7.49),
+    "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4?v=mali_clean_20s", 7.10),
+    "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4?v=mali_clean_20s", 9.34),
+    "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4?v=mali_clean_20s", 6.81),
 }
 
 @app.get("/api/product/{product_id}")

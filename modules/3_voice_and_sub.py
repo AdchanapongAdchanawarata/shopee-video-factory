@@ -149,6 +149,10 @@ def format_conversational_thai_script(text: str) -> str:
         (r"\b13kPa\b", "สิบสามกิโลปาสคาล"),
         (r"\b\+\b", " และ "),
         (r"3 พอร์ต", "สามช่อง"),
+        (r"ด้วยน้า", "ด้วยนะคะ"),
+        (r"เลยน้า", "เลยนะคะ"),
+        (r"น้า\b", "นะคะ"),
+        (r"จ้า\b", "ค่ะ"),
     ]
     for pat, rep in subs:
         t = re.sub(pat, rep, t, flags=re.IGNORECASE)
@@ -472,7 +476,7 @@ def split_thai_script_into_phrases(script_data: Dict[str, Any]) -> List[str]:
     for part in parts:
         if not part:
             continue
-        raw_chunks = re.split(r"[,!?\n]+|\s{2,}", part)
+        raw_chunks = re.split(r"[,!?\.\n]+|\s{2,}", part)
         for chunk in raw_chunks:
             chunk = chunk.strip()
             if not chunk:
@@ -546,7 +550,7 @@ def generate_voiceover_and_subtitles(
         if audio_path.is_file() and audio_path.stat().st_size > 5000 and meta_file.is_file():
             try:
                 old_meta = json.loads(meta_file.read_text(encoding="utf-8"))
-                if old_meta.get("script_text") in (full_text, None):
+                if old_meta.get("script_text") == full_text:
                     print(f"♻️ ใช้ไฟล์เสียงมาลีที่สร้างไว้แล้ว (ประหยัดเครดิต ElevenLabs 0 เครดิต): {audio_path.name}")
                     cached_ok = True
                     success = True

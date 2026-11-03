@@ -1,90 +1,62 @@
 [
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_3_thai_bed_demo.mp4",
-    "start_sec": 2.2,
-    "end_sec": 4.2,
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_3_thai_bed_demo.mp4",
+    "start_sec": 0.5,
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_1_bed_vacuuming.mp4",
-    "start_sec": 3.0,
-    "end_sec": 5.0,
-    "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
-    "hand_verified": true
-  },
-  {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_5_dust_cup_result.mp4",
-    "start_sec": 0.4,
-    "end_sec": 2.4,
-    "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
-    "hand_verified": true
-  },
-  {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_1_bed_vacuuming.mp4",
-    "start_sec": 12.2,
-    "end_sec": 14.2,
-    "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
-    "hand_verified": true
-  },
-  {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_3_thai_bed_demo.mp4",
-    "start_sec": 5.2,
-    "end_sec": 7.2,
-    "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
-    "hand_verified": true
-  },
-  {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_2_filter_detail.mp4",
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_4_uv_light_demo.mp4",
     "start_sec": 1.5,
-    "end_sec": 3.5,
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_4_uv_light_demo.mp4",
-    "start_sec": 10.2,
-    "end_sec": 12.2,
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_3_thai_bed_demo.mp4",
+    "start_sec": 3.5,
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_5_dust_cup_result.mp4",
-    "start_sec": 5.2,
-    "end_sec": 7.2,
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_2_filter_detail.mp4",
+    "start_sec": 2.5,
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_1_bed_vacuuming.mp4",
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_5_dust_cup_result.mp4",
+    "start_sec": 0.5,
+    "duration": 2.0,
+    "hand_verified": true
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_3_thai_bed_demo.mp4",
+    "start_sec": 7.0,
+    "duration": 2.0,
+    "hand_verified": true
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_3_thai_bed_demo.mp4",
+    "start_sec": 9.0,
+    "duration": 2.0,
+    "hand_verified": true
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_3_thai_bed_demo.mp4",
+    "start_sec": 11.0,
+    "duration": 2.0,
+    "hand_verified": true
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_2_filter_detail.mp4",
+    "start_sec": 12.0,
+    "duration": 2.0,
+    "hand_verified": true
+  },
+  {
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\clip_3_thai_bed_demo.mp4",
     "start_sec": 15.0,
-    "end_sec": 17.0,
-    "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
-    "hand_verified": true
-  },
-  {
-    "source_image": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\uv_dust_mite_vacuum\\raw_media\\real_1.jpg",
-    "duration": 2.0,
-    "shot_type": "product_showcase",
-    "visual_score": 10,
+    "duration": 1.7,
     "hand_verified": true
   }
 ]

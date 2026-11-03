@@ -444,20 +444,14 @@ def assemble_curated_video(
                     accumulated_dur += clip_target
                     seg_counter += 1
 
-    # Supplement with unique real product gallery images (each image used at most ONCE) if needed
+    # Supplement ONLY with whitelisted official product images (e.g. ugreen_*.png, baseus_*.jpg) if strictly needed
+    # NEVER fall back to unverified random web images to avoid brand mismatch / PDPA violations
     if accumulated_dur < total_target_dur and raw_media_dir.is_dir():
-        image_exts = ("*.png", "*.jpg", "*.jpeg", "*.webp")
+        allowed_img_patterns = ("ugreen_*.png", "baseus_*.jpg")
         image_files: List[Path] = []
-        seen_img_md5 = set()
-        for ext in image_exts:
-            for img_p in sorted(raw_media_dir.glob(ext)):
-                try:
-                    ih = hashlib.md5(img_p.read_bytes()).hexdigest()
-                    if ih not in seen_img_md5:
-                        seen_img_md5.add(ih)
-                        image_files.append(img_p)
-                except Exception:
-                    pass
+        for pat in allowed_img_patterns:
+            for img_p in sorted(raw_media_dir.glob(pat)):
+                image_files.append(img_p)
 
         for cur_img in image_files:
             if accumulated_dur >= total_target_dur:

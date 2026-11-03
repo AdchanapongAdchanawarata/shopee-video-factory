@@ -1,82 +1,59 @@
 [
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
-    "start_sec": 0.2,
-    "end_sec": 2.2,
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
+    "start_sec": 1.0,
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_image": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\ugreen_1.png",
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_7_hands_ports.mp4",
+    "start_sec": 2.0,
     "duration": 2.0,
-    "shot_type": "product_showcase",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
-    "start_sec": 4.5,
-    "end_sec": 6.5,
+    "source_image": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\ugreen_1.png",
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_image": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\ugreen_2.png",
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
+    "start_sec": 5.0,
     "duration": 2.0,
-    "shot_type": "product_showcase",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_7_hands_ports.mp4",
-    "start_sec": 0.5,
-    "end_sec": 2.5,
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_7_hands_ports.mp4",
+    "start_sec": 7.0,
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_image": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\real_1.png",
+    "source_image": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\ugreen_2.png",
     "duration": 2.0,
-    "shot_type": "product_showcase",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
-    "start_sec": 13.8,
-    "end_sec": 15.8,
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
+    "start_sec": 14.0,
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_image": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\ugreen_3.png",
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_7_hands_ports.mp4",
+    "start_sec": 13.0,
     "duration": 2.0,
-    "shot_type": "product_showcase",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_video": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_7_hands_ports.mp4",
-    "start_sec": 8.0,
-    "end_sec": 10.0,
+    "source_video": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\clip_1_action.mp4",
+    "start_sec": 19.0,
     "duration": 2.0,
-    "shot_type": "hook_action",
-    "visual_score": 10,
     "hand_verified": true
   },
   {
-    "source_image": "c:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\real_2.png",
-    "duration": 2.0,
-    "shot_type": "product_showcase",
-    "visual_score": 10,
+    "source_image": "C:\\Users\\aaadc\\OneDrive\\Desktop\\shopee_killer\\output\\gan_charger_65w\\raw_media\\ugreen_3.png",
+    "duration": 1.7,
     "hand_verified": true
   }
 ]

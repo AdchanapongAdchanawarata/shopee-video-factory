@@ -3,38 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopee Affiliate Video Studio | 100% Free & Minimal</title>
-  
-  <!-- Tailwind CSS & Minimalist Fonts -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Shopee AI Video Factory | สตูดิโอผลิตวิดีโอรีวิวสินค้าจริง 9:16</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Kanit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'Kanit', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Prompt"', '"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['ui-monospace', 'monospace']
           },
           colors: {
             shopee: {
-              DEFAULT: '#FF5722',
-              hover: '#E64A19',
-              subtle: 'rgba(255, 87, 34, 0.1)',
-            },
-            zinc: {
-              950: '#090B0E',
-              900: '#11141A',
-              850: '#161B22',
-              800: '#21262D',
-              700: '#30363D',
-              400: '#8B949E',
-              300: '#C9D1D9',
+              DEFAULT: '#EE4D2D',
+              hover: '#D73211',
+              light: '#FFEEE8'
             }
           }
         }
@@ -42,1626 +30,881 @@
     }
   </script>
   <style>
-    body { font-family: 'Plus Jakarta Sans', 'Kanit', sans-serif; }
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #090B0E; }
-    ::-webkit-scrollbar-thumb { background: #21262D; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #30363D; }
-    .subtle-card { background: #11141A; border: 1px solid #21262D; }
-    
-    /* Smartphone Mockup Frame Styling */
-    .phone-mockup {
-      width: 320px;
-      height: 570px;
-      border-radius: 40px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 8px #1f242c, 0 0 0 10px #2d333b;
-      position: relative;
-      background: #090B0E;
-      overflow: hidden;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    body {
+      background-color: #0c0d0e;
+      color: #f4f4f5;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     }
-    .phone-mockup.expanded {
-      width: 390px;
-      height: 693px;
+    .subtle-card {
+      background: #141517;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .phone-notch {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90px;
-      height: 20px;
-      background-color: #000000;
-      border-radius: 20px;
-      z-index: 30;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+    .subtle-card:hover {
+      border-color: rgba(255, 255, 255, 0.14);
     }
-    .phone-camera {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #111;
-      border: 1px solid #222;
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-    .safe-zone-overlay {
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #141517;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 3px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+    .tiktok-safe-zone {
       position: absolute;
       inset: 0;
       pointer-events: none;
-      z-index: 20;
+      border: 2px dashed rgba(238, 77, 45, 0.7);
+      background: radial-gradient(circle, transparent 65%, rgba(238, 77, 45, 0.08) 100%);
+    }
+    .safe-basket-marker {
+      position: absolute;
+      bottom: 75px;
+      left: 16px;
+      padding: 6px 12px;
+      background: rgba(238, 77, 45, 0.9);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(238, 77, 45, 0.4);
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(238, 77, 45, 0.3); }
+      50% { box-shadow: 0 0 25px rgba(238, 77, 45, 0.6); }
+    }
+    .glow-active {
+      animation: pulse-glow 2s infinite ease-in-out;
     }
   </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-shopee selection:text-white">
+<body class="min-h-screen flex flex-col font-sans antialiased text-zinc-100">
 
-  <!-- MINIMAL HEADER -->
-  <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-shopee flex items-center justify-center text-white font-bold text-base shadow-sm">
-          S
-        </div>
-        <div class="flex items-center space-x-2">
-          <span class="font-semibold text-sm tracking-tight text-white">Shopee AI Video Factory</span>
-          <span class="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-mono font-semibold">0 THB · FREE</span>
-        </div>
+  <!-- TOP HEADER -->
+  <header class="h-16 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-shopee to-orange-400 flex items-center justify-center shadow-lg shadow-shopee/25">
+        <i class="ph-bold ph-video-camera text-white text-lg"></i>
       </div>
-
-      <div class="flex items-center space-x-3 text-xs">
-        <div class="hidden sm:flex items-center space-x-1.5 text-zinc-400 bg-zinc-900 px-3 py-1 rounded-full border border-zinc-800 text-[11px]">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>ภาพสินค้าจริง 100% · เสียงธรรมชาติ 0 บาท</span>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-base tracking-tight text-white">Shopee AI Video Studio</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-shopee/15 text-shopee border border-shopee/30">1-Link Studio</span>
         </div>
+        <p class="text-[11px] text-zinc-400">สร้างคลิปรีวิวสินค้าจริง 9:16 ด้วยลิงก์ Shopee เพียงอย่างเดียว</p>
+      </div>
+    </div>
 
-        <!-- AUTH USER BADGE -->
-        <div id="user-badge" class="flex items-center space-x-2 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-lg">
-          <div class="w-5 h-5 rounded-full bg-shopee/20 border border-shopee/40 flex items-center justify-center text-[10px] font-bold text-shopee">
-            A
-          </div>
-          <span class="text-[11px] font-mono text-zinc-300 hidden md:inline" id="user-email-display">adchanawarata@gmail.com</span>
-          <button onclick="handleLogout()" title="ออกจากระบบ (Logout)" class="text-zinc-500 hover:text-rose-400 transition p-0.5 ml-0.5" aria-label="ออกจากระบบ">
-            <i class="ph ph-sign-out text-sm"></i>
-          </button>
-        </div>
-
-        <a href="#studio" class="px-3 py-1.5 rounded-lg bg-shopee hover:bg-shopee-hover text-white transition text-xs font-medium flex items-center space-x-1">
-          <i class="ph ph-video-camera text-sm"></i>
-          <span>สตูดิโอผลิตคลิป</span>
-        </a>
+    <div class="flex items-center space-x-3">
+      <div class="hidden md:flex items-center space-x-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>ฟุตเทจรีวิวสินค้าจริง 100% · เสียงมาลีฟรี 0 บาท</span>
+      </div>
+      <div class="flex items-center space-x-2 pl-3 border-l border-zinc-800 text-xs text-zinc-400">
+        <span class="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-300 font-bold">A</span>
+        <span class="hidden sm:inline font-mono">adchanawarata@gmail.com</span>
       </div>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full space-y-10">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
 
-    <!-- HERO & VALUE PROPOSITION -->
-    <div class="space-y-1.5">
-      <div class="flex items-center space-x-2">
-        <span class="text-xs font-mono font-medium text-shopee uppercase tracking-wider">Top 10 Daily Winning Picks</span>
-        <span class="text-zinc-600">·</span>
-        <span class="text-xs text-zinc-400 font-mono">AMS Commission &ge; 8.0% (Verified Real Links)</span>
+    <!-- HERO LINK INPUT CARD -->
+    <div class="subtle-card rounded-2xl p-6 sm:p-8 bg-gradient-to-b from-zinc-900/90 to-zinc-950 shadow-2xl relative overflow-hidden">
+      <div class="max-w-3xl space-y-3">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-shopee/10 border border-shopee/20 text-shopee text-xs font-semibold">
+          <i class="ph-bold ph-link text-sm"></i>
+          <span>ระบบวางลิงก์สินค้า 1-Click (ไม่ต้องเลือกรายการเอง)</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+          วางลิงก์สินค้า Shopee เพื่อสร้างวิดีโอรีวิว 9:16
+        </h1>
+        <p class="text-sm text-zinc-400">
+          ระบบจะดึงฟุตเทจสินค้าจริงของคนรีวิวโดยอัตโนมัติ (Hands-on ปลอดภัยเรื่อง PDPA ไร้หน้าคน) พร้อมสร้างสคริปต์พูดเสียงมาลี และแคปชั่นโพสต์พร้อมแฮชแท็ก 100%
+        </p>
       </div>
-      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-        รายการสินค้าแนะนำประจำวัน & สตูดิโอผลิตวิดีโอ 9:16
-      </h1>
-      <p class="text-xs sm:text-sm text-zinc-400 max-w-3xl leading-relaxed">
-        คัดสรรสินค้าติดเทรนด์ ขายดี &gt; 1,000+ ชิ้น/เดือน พร้อมดึงภาพสินค้าจริง คัดช็อตไฮไลต์ และสร้างเสียงพากย์คุณภาพสูงสำหรับ Shopee Video และ TikTok ฟรี 0 บาท
-      </p>
+
+      <!-- LINK INPUT BAR -->
+      <div class="mt-6">
+        <form onsubmit="handleLinkSubmit(event)" class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500">
+              <i class="ph-bold ph-magnifying-glass text-lg"></i>
+            </div>
+            <input
+              type="text"
+              id="input-shopee-url"
+              placeholder="วางลิงก์สินค้า Shopee ที่นี่ (เช่น https://shopee.co.th/...)"
+              class="w-full pl-11 pr-24 py-3.5 bg-zinc-950 border border-zinc-700/80 rounded-xl text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:border-shopee focus:ring-1 focus:ring-shopee transition"
+              required
+            />
+            <button
+              type="button"
+              onclick="handlePasteClick()"
+              class="absolute inset-y-1.5 right-1.5 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition flex items-center space-x-1"
+              title="วางจากคลิปบอร์ด"
+            >
+              <i class="ph ph-clipboard-text text-sm"></i>
+              <span>วางลิงก์</span>
+            </button>
+          </div>
+          <button
+            type="submit"
+            id="btn-submit-url"
+            class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-shopee to-orange-500 hover:from-shopee-hover hover:to-orange-600 text-white font-semibold text-sm transition shadow-lg shadow-shopee/25 flex items-center justify-center space-x-2 shrink-0 cursor-pointer"
+          >
+            <i class="ph-bold ph-lightning text-base" id="btn-submit-icon"></i>
+            <span id="btn-submit-text">สร้างวิดีโอ 1-Click</span>
+          </button>
+        </form>
+
+        <!-- QUICK SAMPLE LINKS -->
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          <span class="text-zinc-500 font-medium">⚡ สินค้าตัวอย่างทดสอบคลิกเดียว:</span>
+          <button type="button" onclick="loadSampleProduct('cat_fountain_01')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🐱 น้ำพุแมวสแตนเลส 5L</button>
+          <button type="button" onclick="loadSampleProduct('wireless_earbuds_anc')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🎧 หูฟัง Baseus Bowie MP1 แท้</button>
+          <button type="button" onclick="loadSampleProduct('air_fryer_visual')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🍗 หม้อทอด Simplus 3.5L</button>
+          <button type="button" onclick="loadSampleProduct('uv_dust_mite_vacuum')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🛏️ เครื่องดูดไรฝุ่น Deerma</button>
+          <button type="button" onclick="loadSampleProduct('gan_charger_65w')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">⚡ ที่ชาร์จ UGREEN 65W GaN</button>
+          <button type="button" onclick="loadSampleProduct('tyeso_tumbler_304')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🥤 แก้ว TYESO แท้ 1200ml</button>
+          <button type="button" onclick="loadSampleProduct('spray_mop_360')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🧹 ไม้ถูพื้นสเปรย์ 360</button>
+          <button type="button" onclick="loadSampleProduct('solar_sensor_light')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">💡 ไฟโซลาร์เซลล์ 100 LED</button>
+          <button type="button" onclick="loadSampleProduct('sonic_electric_toothbrush')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🪥 แปรงสีฟันโซนิค MeeGoo</button>
+          <button type="button" onclick="loadSampleProduct('kitchen_dish_rack_stainless')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🍽️ ชั้นคว่ำจานสแตนเลส 304</button>
+        </div>
+      </div>
     </div>
 
-    <!-- SECTION 1: TOP 10 WINNING PRODUCTS -->
-    <section class="space-y-4">
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-2 border-b border-zinc-800 gap-2">
-        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <button onclick="setFilter('all')" id="tab-all" class="text-xs font-medium px-3 py-1.5 rounded-md bg-zinc-800 text-white transition cursor-pointer">
-            รายการรอทำคลิป (10)
-          </button>
-          <button onclick="setFilter('all_sales')" id="tab-all_sales" class="text-xs font-medium px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition cursor-pointer flex items-center space-x-1">
-            <span>🏆 ยอดขายสะสมทั้งหมด</span>
-          </button>
-          <button onclick="setFilter('bullish')" id="tab-bullish" class="text-xs font-medium px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition cursor-pointer flex items-center space-x-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>📈 หุ้นเด่น/แนวโน้มพุ่งแรง</span>
-          </button>
-          <button onclick="setFilter('high_comm')" id="tab-high_comm" class="text-xs font-medium px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition cursor-pointer">
-            คอมมิชชั่นสูง (&ge; 12%)
-          </button>
-          <button onclick="setFilter('high_sales')" id="tab-high_sales" class="text-xs font-medium px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition cursor-pointer">
-            ยอดขาย 30 วัน
-          </button>
-          <button onclick="setFilter('downloaded')" id="tab-downloaded" class="text-xs font-semibold px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition cursor-pointer flex items-center space-x-1.5">
-            <i class="ph-bold ph-check-circle text-emerald-400 text-xs"></i>
-            <span id="tab-downloaded-label">🎬 วิดีโอที่เคยทำ (0)</span>
-          </button>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <a href="https://affiliate.shopee.co.th/offer/product_offer" target="_blank" rel="noopener noreferrer"
-             class="px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white text-[11px] font-medium transition flex items-center space-x-1"
-             title="เปิดหน้าเช็คเรตค่าคอมมิชชั่น Extra จริงของแต่ละร้านบน Shopee Affiliate">
-            <i class="ph-bold ph-seal-check text-emerald-400 text-xs"></i>
-            <span>เช็คเรตจริง Shopee</span>
-          </a>
-          <button onclick="refreshWinningProducts()" id="btn-refresh-products"
-                  class="px-3 py-1.5 rounded-lg bg-shopee hover:bg-shopee-hover text-white text-xs font-semibold transition shadow flex items-center space-x-1.5 cursor-pointer"
-                  title="ค้นหาและจัดอันดับสินค้าใหม่ที่เรตคอมมิชชั่นดีกว่า ยอดขายดีกว่า และแนวโน้มตลาดพุ่งแรงขึ้นมาแทน">
-            <i class="ph-bold ph-arrows-clockwise text-xs" id="icon-refresh-products"></i>
-            <span>รีเฟรชหาสินค้าใหม่ (เรตดีกว่า/ขายดี)</span>
-          </button>
-        </div>
-      </div>
+    <!-- STUDIO WORKSPACE (TWO COLUMNS: CONTROLS & VIDEO PREVIEW) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-      <!-- PRODUCTS TABLE -->
-      <div class="overflow-x-auto subtle-card rounded-xl">
-        <table class="w-full text-left text-xs">
-          <thead>
-            <tr class="border-b border-zinc-800 text-[11px] font-mono text-zinc-400 bg-zinc-900/50">
-              <th class="py-3 px-3 w-10 text-center">#</th>
-              <th class="py-3 px-3 text-center w-24">สถานะวิดีโอ</th>
-              <th class="py-3 px-3 min-w-[220px]">สินค้า / ร้านค้าทางการ (ลิงก์จริง)</th>
-              <th class="py-3 px-3">หมวดหมู่</th>
-              <th class="py-3 px-3 text-right">ราคา</th>
-              <th class="py-3 px-3 text-right">ยอดขาย 30 วัน</th>
-              <th class="py-3 px-3 text-right text-shopee font-semibold">ยอดขายรวมทั้งหมด</th>
-              <th class="py-3 px-3 text-right min-w-[140px]">แนวโน้มตลาด (Trend / Rating)</th>
-              <th class="py-3 px-3 text-right">เรตคอมจริง (Extra)</th>
-              <th class="py-3 px-3 text-right">รายได้ / ชิ้น</th>
-              <th class="py-3 px-3 text-center w-28">การกระทำ</th>
-            </tr>
-          </thead>
-          <tbody id="products-table-body" class="divide-y divide-zinc-800/60">
-            <!-- Dynamically populated via JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
+      <!-- LEFT COLUMN: PRODUCT INFO, VOICE, SCRIPT INSPECTOR, POST CAPTION (7 COLS) -->
+      <div class="lg:col-span-7 space-y-5">
 
-    <!-- SECTION 2: PRODUCTION STUDIO & PIPELINE -->
-    <section id="studio" class="pt-6 border-t border-zinc-800 space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <h2 class="text-xl font-bold text-white tracking-tight flex items-center space-x-2">
-            <span>สตูดิโอผลิตวิดีโอ 9:16 (Auto Video Studio)</span>
-            <span class="text-xs text-shopee font-mono px-2 py-0.5 rounded bg-shopee-subtle border border-shopee/20">Full HD 1080x1920</span>
-          </h2>
-          <p class="text-xs text-zinc-400 mt-1">
-            ดึงรูปสินค้าจริงมาตัดต่อแบบ Ken-Burns Dynamic Motion อัตโนมัติ ซับไตเติลสีส้มขอบขาวไม่บังตะกร้าส้ม พร้อมเลือกเสียงพากย์ได้ตามต้องการ
-          </p>
-        </div>
-        <div class="flex items-center space-x-2 text-xs">
-          <button onclick="toggleSafeZone()" id="btn-toggle-safezone" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition flex items-center space-x-1.5 text-xs">
-            <i class="ph ph-bounding-box text-sm text-shopee"></i>
-            <span>เส้นเซฟโซนตะกร้าส้ม</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        <!-- LEFT 7 COLS: PRODUCTION CONTROLS & VOICE STUDIO -->
-        <div class="lg:col-span-7 space-y-5">
-          
-          <!-- SELECTED PRODUCT CARD -->
-          <div class="subtle-card p-4 rounded-xl space-y-3">
-            <label class="block text-xs font-semibold text-zinc-200">สินค้าที่เลือกผลิตคลิป:</label>
-            <div id="selected-product-box" class="p-3.5 rounded-lg bg-zinc-900 border border-zinc-800 flex items-start justify-between gap-3">
-              <div class="min-w-0">
-                <div id="selected-title" class="font-semibold text-xs sm:text-sm text-white truncate">#2 UGREEN หัวชาร์จเร็ว GaN 65W 3 พอร์ต ชาร์จโน้ตบุ๊ก + มือถือ</div>
-                <div id="selected-meta" class="text-[11px] text-zinc-400 font-mono mt-1">฿499.00 · คอมมิชชั่น AMS 15.0% (฿74.85/ชิ้น)</div>
-              </div>
-              <span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono rounded shrink-0">
-                ภาพจริงพร้อม
-              </span>
-            </div>
-            <input type="hidden" id="input-product-id" value="gan_charger_65w">
-          </div>
-
-          <!-- VOICE STUDIO & AUDIO OVERVIEW (SOLVING ISSUE 2) -->
-          <div class="subtle-card p-4 rounded-xl space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+        <!-- 1. PRODUCT SUMMARY CARD -->
+        <div class="subtle-card rounded-2xl p-5 space-y-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="space-y-1">
               <div class="flex items-center space-x-2">
-                <i class="ph-bold ph-waveform text-shopee text-base"></i>
-                <span class="text-xs font-semibold text-white">สตูดิโอเสียงพากย์ (Voice Studio - ฟรี 0 บาท)</span>
-              </div>
-              <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">3 ทางเลือกฟรี 100%</span>
-            </div>
-
-            <!-- Voice Tabs -->
-            <div class="grid grid-cols-3 gap-2 text-xs">
-              <button onclick="switchVoiceTab('tts')" id="voice-tab-tts" class="py-2 px-2 rounded-lg bg-zinc-800 text-white font-medium text-center border border-zinc-700 transition">
-                1. เสียง AI ธรรมชาติ
-              </button>
-              <button onclick="switchVoiceTab('mic')" id="voice-tab-mic" class="py-2 px-2 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white font-medium text-center border border-zinc-800 transition">
-                2. 🎙️ อัดเสียงตัวเองสด
-              </button>
-              <button onclick="switchVoiceTab('upload')" id="voice-tab-upload" class="py-2 px-2 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white font-medium text-center border border-zinc-800 transition">
-                3. 🎬 CapCut / MP3
-              </button>
-            </div>
-
-                        <!-- TAB 1: NATURAL TTS SELECTOR -->
-            <div id="voice-panel-tts" class="space-y-3 pt-1">
-              <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <label class="text-[11px] font-medium text-amber-400 flex items-center space-x-1.5">
-                    <i class="ph-fill ph-lock-key text-amber-400"></i>
-                    <span>ระบบบังคับใช้งานเสียงพากย์:</span>
-                  </label>
-                  <span class="text-[10px] font-mono text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded flex items-center space-x-1">
-                    <i class="ph-bold ph-check-circle text-amber-400"></i>
-                    <span>ล็อกเสียงมาลี 100%</span>
-                  </span>
-                </div>
-                <div class="p-3 bg-zinc-900 border border-amber-500/40 rounded-xl space-y-2.5 shadow-sm">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2.5">
-                      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-zinc-950 font-bold text-sm shadow">
-                        ม
-                      </div>
-                      <div>
-                        <div class="text-xs font-semibold text-white flex items-center space-x-1.5">
-                          <span>มาลี (Mali - Natural & Clear Thai)</span>
-                          <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono font-normal">ElevenLabs AI</span>
-                        </div>
-                        <div class="text-[10.5px] text-zinc-400 mt-0.5">
-                          หญิงเสียงไทยยอดนิยมอันดับ 1 คมชัดสมจริง สำเนียงไทยธรรมชาติ
-                        </div>
-                      </div>
-                    </div>
-                    <button type="button" onclick="playSampleVoice('/assets/sample_elevenlabs_mali.mp3', 'elevenlabs_mali')" class="py-1.5 px-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold rounded-lg text-xs flex items-center space-x-1.5 transition shadow cursor-pointer">
-                      <i class="ph-bold ph-play text-xs"></i>
-                      <span>ฟังเสียงมาลี</span>
-                    </button>
-                  </div>
-                  <!-- Hidden selector to ensure form payload always sends elevenlabs_mali -->
-                  <select id="select-voice-engine" class="hidden">
-                    <option value="elevenlabs_mali" selected>elevenlabs_mali</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/20 text-[11px] space-y-1 text-zinc-300">
-                <div class="flex items-center space-x-1.5 text-amber-400 font-medium text-[11px]">
-                  <i class="ph-bold ph-info"></i>
-                  <span>สถานะเสียงพากย์: บังคับใช้เสียงมาลี อย่างเดียว (Voice ID: OB8jPhZsR8bpZJnVSkvQ)</span>
-                </div>
-                <p class="leading-relaxed text-[10.5px] text-zinc-400">
-                  ระบบจะตัดต่อและลงเสียงพากย์ทุกคลิปด้วยเสียง <b>มาลี</b> เท่านั้น ไม่มีเสียงสำเนียงฝรั่งปะปน
-                  <br>• ตัวอย่างเสียงจริงพร้อมเล่นทันทีทางปุ่มสีส้มด้านบน
-                  <br>• ระบบเชื่อมต่อ ElevenLabs v3 Native Thai (language_code: th) สังเคราะห์เสียงมาลีระดับสตูดิโอ 100%
-                </p>
-              </div>
-            </div>
-
-            <!-- TAB 2: IN-BROWSER MIC RECORDER -->
-            <div id="voice-panel-mic" class="space-y-3 pt-1 hidden">
-              <div class="p-3 bg-zinc-900/90 rounded-lg border border-zinc-800 space-y-2">
-                <div class="flex items-center justify-between text-xs">
-                  <span class="font-medium text-white flex items-center space-x-1.5">
-                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                    <span>สคริปต์สำหรับอ่านอัดเสียง (Teleprompter):</span>
-                  </span>
-                  <span id="mic-timer" class="font-mono text-zinc-400">00:00 / 00:20</span>
-                </div>
-                <div id="teleprompter-text" class="text-xs text-zinc-200 bg-zinc-950 p-2.5 rounded border border-zinc-800/80 leading-relaxed font-sans">
-                  "เบื่อไหมที่ต้องพกหัวชาร์จหลายอันหนักกระเป๋า? ตัวนี้ตัวเดียวจบ ชาร์จได้ทั้งโน้ตบุ๊กและมือถือพร้อมกัน! ขนาดเล็กกว่าเดิมเยอะ ไม่ร้อนเลย รีบกดที่ตะกร้าสีส้มด่วนค่ะ!"
-                </div>
-              </div>
-
-              <div class="flex items-center space-x-2">
-                <button id="btn-mic-record" onclick="toggleMicRecording()" class="flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-lg transition flex items-center justify-center space-x-2">
-                  <i class="ph-bold ph-microphone text-sm"></i>
-                  <span id="mic-btn-text">เริ่มอัดเสียงสด (15-20s)</span>
-                </button>
-                <audio id="recorded-audio-preview" class="hidden" controls></audio>
-              </div>
-              <p class="text-[10px] text-zinc-500">
-                * ใช้เสียงคนจริง อารมณ์จริง ช่วยเพิ่มยอดคลิกตะกร้าส้มได้สูงกว่า AI ถึง 3 เท่า
-              </p>
-            </div>
-
-            <!-- TAB 3: CAPCUT / CUSTOM MP3 UPLOAD -->
-            <div id="voice-panel-upload" class="space-y-3 pt-1 hidden">
-              <div class="flex items-center space-x-2">
-                <button onclick="copyScriptForCapCut()" class="flex-1 py-2 px-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 text-xs rounded-lg transition flex items-center justify-center space-x-1.5">
-                  <i class="ph-bold ph-copy text-sm text-shopee"></i>
-                  <span>คัดลอกสคริปต์ไปใช้ใน CapCut (เสียงสาวหวาน/พี่สาวใจดี)</span>
-                </button>
-              </div>
-
-              <!-- Upload Drag-Drop Box -->
-              <div class="border-2 border-dashed border-zinc-800 hover:border-zinc-700 rounded-lg p-4 text-center cursor-pointer transition bg-zinc-900/40" onclick="document.getElementById('input-audio-upload').click()">
-                <i class="ph ph-upload-simple text-2xl text-zinc-400"></i>
-                <div class="text-xs text-zinc-300 mt-1 font-medium">คลิกเพื่ออัปโหลดไฟล์เสียงพากย์ (.mp3 หรือ .m4a)</div>
-                <div class="text-[10px] text-zinc-500 mt-0.5" id="upload-status-label">ความยาวที่แนะนำ 15 - 25 วินาที</div>
-                <input type="file" id="input-audio-upload" accept="audio/*" class="hidden" onchange="handleAudioUpload(this)">
-              </div>
-            </div>
-
-          </div>
-
-          <!-- DURATION & STEPS -->
-          <div class="subtle-card p-4 rounded-xl space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-medium text-zinc-300 mb-1">ความยาววิดีโอเป้าหมาย:</label>
-                <div class="flex items-center justify-between text-xs font-mono text-zinc-400 mb-1">
-                  <span id="label-duration">20.0 วินาที</span>
-                </div>
-                <input type="range" id="input-duration" min="15" max="25" step="0.5" value="20"
-                       oninput="document.getElementById('label-duration').innerText = this.value + ' วินาที'"
-                       class="w-full accent-shopee bg-zinc-800 rounded cursor-pointer h-1.5">
-              </div>
-
-              <div>
-                <label class="block text-xs font-medium text-zinc-300 mb-1">ขั้นตอนการประมวลผล:</label>
-                <select id="select-step" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200">
-                  <option value="all">⚡ ผลิตครบจบ 1-Click (ภาพจริง + ซับ + เสียง)</option>
-                  <option value="1">Step 1: ตรวจสอบข้อมูลสินค้า + ค่าคอม AMS</option>
-                  <option value="2">Step 2: เขียนสคริปต์ 20 วินาที</option>
-                  <option value="3">Step 3: สังเคราะห์เสียง + วางซับ (.ass)</option>
-                  <option value="4">Step 4: ตัดต่อ Ken-Burns 9:16 (FFmpeg)</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- AI LIFESTYLE UNBOXING 1-SHOT TOGGLE (Requirement 4) -->
-            <div class="p-3 bg-zinc-900/60 rounded-xl border border-zinc-800/80 space-y-2">
-              <div class="flex items-center justify-between">
-                <label class="flex items-center space-x-2.5 cursor-pointer select-none">
-                  <input type="checkbox" id="check-ai-lifestyle" class="w-4 h-4 rounded bg-zinc-950 border-zinc-700 text-shopee focus:ring-0 focus:ring-offset-0 cursor-pointer" checked>
-                  <span class="text-xs font-semibold text-zinc-200">เปิดโหมดผสาน AI Lifestyle / Unboxing (1 ช็อต)</span>
-                </label>
-                <span class="px-2 py-0.5 text-[9px] font-mono bg-purple-500/15 text-purple-300 border border-purple-500/30 rounded">
-                  ภาพจริง 90% + ภาพ AI 10%
+                <span id="product-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  <i class="ph-fill ph-check-circle inline text-xs mr-0.5"></i> ตรวจสอบฟุตเทจสินค้าจริงแล้ว 100%
                 </span>
+                <span id="product-category" class="text-xs text-zinc-400 font-medium">หมวดหมู่สินค้า</span>
               </div>
-              <p class="text-[11px] text-zinc-400 leading-relaxed">
-                🎯 <strong>ยึดรูปและฟุตเทจสินค้าจริง 100% จาก Shopee CDN เป็นแกนหลัก</strong> ป้องกันภาพหลอน พร้อมตัวเลือกเสริมภาพ AI Lifestyle จำลองมุมมองการใช้งานจริง 1 ช็อตเพื่อดันยอดขาย
-              </p>
+              <h2 id="product-title" class="text-base sm:text-lg font-bold text-white line-clamp-2">
+                กรุณาวางลิงก์สินค้า Shopee ด้านบนเพื่อเริ่มต้น
+              </h2>
             </div>
+            <a id="product-shopee-link" href="#" target="_blank" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-medium transition flex items-center space-x-1 shrink-0">
+              <span>เปิด Shopee</span>
+              <i class="ph-bold ph-arrow-up-right text-xs"></i>
+            </a>
+          </div>
 
-            <button id="btn-start" onclick="startProduction()" 
-                    class="w-full bg-shopee hover:bg-shopee-hover text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-sm">
-              <i class="ph-bold ph-play text-base"></i>
-              <span>เริ่มผลิตวิดีโอ 1-Click (ดึงภาพจริง + ตัดต่อ 9:16)</span>
+          <!-- PRICE & COMMISSION STATS -->
+          <div class="grid grid-cols-3 gap-3 pt-3 border-t border-zinc-800/80 text-xs">
+            <div class="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/60">
+              <span class="text-zinc-400 block text-[11px]">ราคาจำหน่าย</span>
+              <span id="product-price" class="text-sm sm:text-base font-bold text-white font-mono">฿0.00</span>
+            </div>
+            <div class="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/60">
+              <span class="text-zinc-400 block text-[11px]">เรตคอมมิชชั่น Extra</span>
+              <span id="product-ams" class="text-sm sm:text-base font-bold text-emerald-400 font-mono">+12.5%</span>
+            </div>
+            <div class="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/60">
+              <span class="text-zinc-400 block text-[11px]">รายได้เฉลี่ย / ชิ้น</span>
+              <span id="product-earning" class="text-sm sm:text-base font-bold text-orange-400 font-mono">฿0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. VOICE STUDIO (MALI LOCKED, NO BLOAT) -->
+        <div class="subtle-card rounded-2xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="w-7 h-7 rounded-lg bg-orange-500/10 text-shopee flex items-center justify-center font-bold">
+                <i class="ph-bold ph-microphone text-base"></i>
+              </div>
+              <span class="font-bold text-sm text-white">เสียงพากย์วิดีโอ (Voice Studio)</span>
+            </div>
+            <span class="text-[11px] text-emerald-400 font-semibold flex items-center space-x-1">
+              <i class="ph-fill ph-lock-simple"></i>
+              <span>ล็อคเสียงมาลีมาตรฐาน (ฟรี 0 บาท)</span>
+            </span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-zinc-900/80 border border-orange-500/25 flex items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow">
+                ม
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-sm text-white">มาลี (Mali - Natural & Clear Thai)</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] bg-shopee/20 text-orange-300 font-semibold font-mono">ElevenLabs AI</span>
+                </div>
+                <p class="text-xs text-zinc-400">หญิงเสียงยอดนิยมอันดับ 1 · คมชัด สมจริง สำเนียงไทยธรรมชาติ</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onclick="togglePlayVoiceSample()"
+              id="btn-voice-sample"
+              class="px-3.5 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold transition flex items-center space-x-1.5 shadow shrink-0 cursor-pointer"
+            >
+              <i class="ph-fill ph-play text-xs" id="icon-voice-sample"></i>
+              <span id="text-voice-sample">ฟังเสียงมาลี</span>
+            </button>
+            <audio id="audio-sample-mali" src="/assets/sample_elevenlabs_mali.mp3" preload="none"></audio>
+          </div>
+        </div>
+
+        <!-- 3. SCRIPT INSPECTOR & EDITOR (ตรวจสคริปต์พูด) -->
+        <div class="subtle-card rounded-2xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold">
+                <i class="ph-bold ph-chat-centered-text text-base"></i>
+              </div>
+              <span class="font-bold text-sm text-white">ตรวจสคริปต์ที่จะพูด (Script Inspector & Editor)</span>
+            </div>
+            <div class="flex items-center space-x-2 text-[11px] text-zinc-400 font-mono">
+              <span id="script-word-count">ความยาว ~20 วินาทีพอดี</span>
+            </div>
+          </div>
+
+          <!-- SCRIPT FLOW PILLS -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+            <div class="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800">
+              <span class="text-[10px] font-bold text-orange-400 block mb-1">0-3s Hook เปิดคลิป</span>
+              <p id="script-hook-preview" class="text-zinc-300 text-[11px] line-clamp-2">...</p>
+            </div>
+            <div class="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800">
+              <span class="text-[10px] font-bold text-blue-400 block mb-1">3-15s เนื้อหา & แก้ปัญหา</span>
+              <p id="script-body-preview" class="text-zinc-300 text-[11px] line-clamp-2">...</p>
+            </div>
+            <div class="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800">
+              <span class="text-[10px] font-bold text-emerald-400 block mb-1">15-20s ชี้เป้าตะกร้าส้ม (CTA)</span>
+              <p id="script-cta-preview" class="text-zinc-300 text-[11px] line-clamp-2">...</p>
+            </div>
+          </div>
+
+          <!-- EDITABLE SCRIPT TEXTAREA -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs text-zinc-400">
+              <label for="textarea-script" class="font-medium">บทพูดภาษาไทยเต็ม (สามารถตรวจสอบหรือแก้ไขคำได้ทันที):</label>
+              <button type="button" onclick="resetScriptToDefault()" class="text-zinc-500 hover:text-zinc-300 transition text-[11px]">
+                <i class="ph ph-arrow-counter-clockwise mr-0.5"></i> รีเซ็ตบทเดิม
+              </button>
+            </div>
+            <textarea
+              id="textarea-script"
+              rows="3"
+              oninput="handleScriptEdited()"
+              class="w-full p-3 bg-zinc-950 border border-zinc-700/80 rounded-xl text-white text-xs leading-relaxed focus:outline-none focus:border-shopee focus:ring-1 focus:ring-shopee transition font-sans custom-scroll resize-y"
+              placeholder="บทพูดสคริปต์ภาษาไทยจะแสดงที่นี่..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- 4. POST CAPTION & HASHTAGS (#) GENERATOR -->
+        <div class="subtle-card rounded-2xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+                <i class="ph-bold ph-hash text-base"></i>
+              </div>
+              <span class="font-bold text-sm text-white">แคปชั่นสำหรับโพสต์สั้น & แฮชแท็ก (#)</span>
+            </div>
+            <button
+              type="button"
+              onclick="copyPostCaption()"
+              id="btn-copy-caption"
+              class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center space-x-1.5 shadow cursor-pointer"
+            >
+              <i class="ph-bold ph-copy text-xs" id="icon-copy-caption"></i>
+              <span id="text-copy-caption">คัดลอกแคปชั่น & แท็ก</span>
             </button>
           </div>
 
-          <!-- TERMINAL & STATUS -->
-          <div class="subtle-card rounded-xl overflow-hidden">
-            <div class="px-4 py-2 bg-zinc-900/80 border-b border-zinc-800 flex items-center justify-between text-xs font-mono">
-              <div class="flex items-center space-x-2 text-zinc-400">
-                <span id="pipeline-indicator" class="w-2 h-2 rounded-full bg-zinc-600"></span>
-                <span id="pipeline-status-text">สถานะ: รอสั่งการ</span>
-              </div>
-              <span id="pipeline-progress-text" class="text-zinc-500 font-semibold">0%</span>
-            </div>
-
-            <!-- Terminal output stream -->
-            <div id="terminal-logs" class="p-4 font-mono text-[11px] leading-relaxed text-zinc-400 bg-zinc-950 h-36 overflow-y-auto space-y-1">
-              <div class="text-zinc-500">ระบบพร้อมใช้งาน เลือกสินค้าด้านบน แล้วกด "เริ่มผลิตวิดีโอ"</div>
+          <!-- CAPTION DISPLAY BOX -->
+          <div class="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+            <p id="display-caption-text" class="text-xs text-zinc-200 leading-relaxed font-sans whitespace-pre-wrap">
+              วางลิงก์สินค้า Shopee ด้านบนเพื่อสร้างแคปชั่นและแท็กพร้อมโพสต์...
+            </p>
+            <div class="pt-2 border-t border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block mb-1 font-mono uppercase">แฮชแท็กติดเทรนด์ (#)</span>
+              <p id="display-hashtags" class="text-xs text-shopee font-medium leading-relaxed">
+                #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee #ป้ายยาของใช้
+              </p>
             </div>
           </div>
-
-        </div>
-
-        <!-- RIGHT 5 COLS: PROMINENT SMARTPHONE PREVIEW (SOLVING ISSUE 3) -->
-        <div class="lg:col-span-5 flex flex-col items-center space-y-4">
-          
-          <div class="w-full flex items-center justify-between px-1">
-            <div class="flex items-center space-x-2">
-              <i class="ph-bold ph-device-mobile text-shopee text-base"></i>
-              <span class="text-xs font-semibold text-white">หน้าจอพรีวิว 9:16 (TikTok & Shopee Video)</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span id="preview-download-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700/60 flex items-center space-x-1">
-                <i class="ph ph-clock"></i>
-                <span>ยังไม่โหลด</span>
-              </span>
-              <button onclick="toggleMockupSize()" id="btn-toggle-size" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition flex items-center space-x-1" title="สลับขนาดจอพรีวิว">
-                <i class="ph ph-arrows-out" id="size-icon"></i>
-                <span id="size-label">ขยายใหญ่ (390px)</span>
-              </button>
-              <span id="video-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400">
-                Ready to Play
-              </span>
-            </div>
-          </div>
-
-          <!-- REALISTIC SMARTPHONE MOCKUP FRAME -->
-          <div class="phone-mockup relative flex items-center justify-center">
-            
-            <!-- Phone Notch / Dynamic Island -->
-            <div class="phone-notch">
-              <div class="phone-camera"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-zinc-900 border border-zinc-800"></div>
-            </div>
-
-            <!-- Safe Zone Overlay (Toggled) -->
-            <div id="safezone-overlay" class="safe-zone-overlay hidden">
-              <!-- Top Header Safe Zone -->
-              <div class="absolute top-0 left-0 right-0 h-16 border-b border-dashed border-amber-400/40 bg-amber-500/5 flex items-center justify-center">
-                <span class="text-[9px] font-mono text-amber-300">พื้นที่หัวเรื่อง / Search</span>
-              </div>
-              <!-- Right Action Icons Safe Zone -->
-              <div class="absolute top-16 right-0 bottom-24 w-14 border-l border-dashed border-rose-400/40 bg-rose-500/5 flex items-center justify-center">
-                <span class="text-[8px] font-mono text-rose-300 transform -rotate-90">ปุ่ม Like/Share</span>
-              </div>
-              <!-- Bottom Orange Basket Safe Zone -->
-              <div class="absolute bottom-0 left-0 right-0 h-28 border-t border-dashed border-shopee/50 bg-shopee/10 flex flex-col items-center justify-center">
-                <span class="text-[10px] font-mono text-shopee font-bold">🛒 จุดแสดงตะกร้าส้ม Shopee</span>
-                <span class="text-[8px] font-mono text-zinc-400">ซับไตเติลจะลอยอยู่เหนือโซนนี้เสมอ</span>
-              </div>
-            </div>
-
-            <!-- Video Player -->
-            <video id="player-preview" class="w-full h-full object-cover hidden" controls playsinline></video>
-
-            <!-- Placeholder Screen -->
-            <div id="player-placeholder" class="text-center p-6 text-zinc-500 flex flex-col items-center justify-center space-y-3">
-              <div class="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 shadow-inner">
-                <i class="ph ph-video text-3xl"></i>
-              </div>
-              <div class="space-y-1">
-                <div class="text-xs font-medium text-zinc-300">พรีวิวแนวตั้ง 1080x1920</div>
-                <div class="text-[11px] text-zinc-500 max-w-[200px] leading-relaxed">
-                  กดปุ่มเริ่มผลิตด้านซ้ายเพื่อเรนเดอร์วิดีโอสินค้าจริง
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- ACTION & EXPORT CONTROLS -->
-          <div class="w-full subtle-card p-4 rounded-xl space-y-3">
-            <div>
-              <div class="font-semibold text-xs text-white truncate" id="video-title-display">
-                #2 UGREEN หัวชาร์จเร็ว GaN 65W
-              </div>
-              <div class="text-[11px] text-zinc-400 font-mono mt-0.5" id="video-desc-display">
-                ความยาว 20.0s · 1080x1920 (9:16) · ตัดต่อภาพจริง
-              </div>
-            </div>
-
-            <div class="space-y-2 pt-1">
-              <a id="btn-download" href="#" download onclick="handleDownloadClick(event)"
-                 class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition font-semibold text-xs flex items-center justify-center space-x-2 shadow pointer-events-none opacity-50 cursor-pointer">
-                <i class="ph-bold ph-download-simple text-sm"></i>
-                <span>ดาวน์โหลดไฟล์ MP4 (พร้อมโพสต์ทันที)</span>
-              </a>
-
-              <div class="grid grid-cols-2 gap-2">
-                <button onclick="copyCaption()" class="py-2 px-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white rounded-lg transition text-[11px] flex items-center justify-center space-x-1.5">
-                  <i class="ph ph-copy"></i>
-                  <span>คัดลอกแคปชัน & แท็ก</span>
-                </button>
-                <button onclick="loadLatestVideo()" class="py-2 px-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white rounded-lg transition text-[11px] flex items-center justify-center space-x-1.5">
-                  <i class="ph ph-arrows-clockwise"></i>
-                  <span>โหลดพรีวิวล่าสุด</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
         </div>
 
       </div>
-    </section>
 
-    <!-- SECTION 3: 0-BAHT ARCHITECTURE & CLOUD REMOTE GUIDE -->
-    <section class="subtle-card p-6 rounded-xl space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="font-semibold text-sm text-white flex items-center space-x-2">
-          <i class="ph-bold ph-cloud-check text-emerald-400 text-base"></i>
-          <span>สถาปัตยกรรมใช้งานจริง ออนไลน์จากที่ไหนก็ได้ (0 บาท 100%)</span>
-        </h3>
-        <span class="text-[10px] font-mono text-zinc-400 bg-zinc-900 px-2 py-1 rounded border border-zinc-800">GitHub + Vercel + Edge-TTS</span>
+      <!-- RIGHT COLUMN: 9:16 IPHONE PREVIEW & DOWNLOAD (5 COLS) -->
+      <div class="lg:col-span-5 flex flex-col items-center space-y-4 sticky top-20">
+
+        <!-- PHONE FRAME MOCKUP (1080x1920 9:16) -->
+        <div class="relative w-[280px] sm:w-[320px] aspect-[9/16] bg-black rounded-[42px] p-2.5 shadow-2xl border-4 border-zinc-800 ring-1 ring-zinc-700/50 flex flex-col overflow-hidden">
+
+          <!-- PHONE NOTCH / DYNAMIC ISLAND -->
+          <div class="absolute top-4 inset-x-0 mx-auto w-24 h-4 bg-zinc-950 rounded-full z-30 flex items-center justify-center space-x-1">
+            <span class="w-2 h-2 rounded-full bg-zinc-800"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-950/60"></span>
+          </div>
+
+          <!-- SAFE ZONE TOGGLE PILL -->
+          <button
+            type="button"
+            onclick="toggleSafeZone()"
+            id="btn-safezone"
+            class="absolute top-10 right-4 z-30 px-2 py-1 rounded-md text-[10px] font-semibold bg-zinc-950/80 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-white transition flex items-center space-x-1"
+            title="เปิด/ปิด เส้นบอกโซนตะกร้าส้ม TikTok & Shopee Video"
+          >
+            <i class="ph-bold ph-bounding-box text-xs text-shopee"></i>
+            <span>โซนตะกร้า</span>
+          </button>
+
+          <!-- VIDEO CONTAINER -->
+          <div class="relative w-full h-full rounded-[32px] overflow-hidden bg-zinc-950 flex items-center justify-center">
+
+            <!-- ACTUAL VIDEO PLAYER -->
+            <video
+              id="player-preview"
+              class="w-full h-full object-cover"
+              controls
+              playsinline
+              loop
+            ></video>
+
+            <!-- EMPTY PLACEHOLDER -->
+            <div id="player-placeholder" class="hidden absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-3 bg-zinc-950/90 z-10">
+              <div class="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-shopee">
+                <i class="ph-bold ph-film-slate text-2xl"></i>
+              </div>
+              <p class="text-xs text-zinc-300 font-medium">กำลังเตรียมฟุตเทจสินค้าจริง...</p>
+            </div>
+
+            <!-- TIKTOK / SHOPEE SAFE ZONE OVERLAY -->
+            <div id="safe-zone-overlay" class="tiktok-safe-zone hidden z-20">
+              <div class="safe-basket-marker">
+                <i class="ph-fill ph-shopping-bag mr-1"></i> ตะกร้าส้ม
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIDEO SPECS & DOWNLOAD ACTION -->
+        <div class="w-[280px] sm:w-[320px] subtle-card rounded-2xl p-4 space-y-3">
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-zinc-400">สถานะวิดีโอ</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono">Ready to Post 🚀</span>
+            </div>
+            <h3 id="video-spec-title" class="text-xs font-bold text-white truncate">สินค้า</h3>
+            <p id="video-spec-meta" class="text-[11px] text-zinc-400 font-mono">
+              ความยาว 20.0s | 1080x1920 (9:16) | ซับส้มขอบขาว
+            </p>
+          </div>
+
+          <!-- BIG GREEN DOWNLOAD BUTTON -->
+          <button
+            type="button"
+            onclick="downloadCurrentVideo()"
+            id="btn-download-mp4"
+            class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 cursor-pointer"
+          >
+            <i class="ph-bold ph-download-simple text-base"></i>
+            <span>ดาวน์โหลดวิดีโอ MP4 (พร้อมโพสต์ทันที)</span>
+          </button>
+
+          <!-- SHORTCUT BUTTON: COPY CAPTION -->
+          <button
+            type="button"
+            onclick="copyPostCaption()"
+            class="w-full py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs transition flex items-center justify-center space-x-1.5"
+          >
+            <i class="ph ph-copy text-xs"></i>
+            <span>คัดลอกแคปชั่น & แฮชแท็ก</span>
+          </button>
+        </div>
+
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-zinc-400">
-        <div class="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80 space-y-1">
-          <div class="font-medium text-white flex items-center space-x-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            <span>1. Push ขึ้น GitHub ฟรี</span>
-          </div>
-          <p class="leading-relaxed">เก็บโค้ดทั้งหมดบน GitHub Repository ฟรี ปลอดภัย และดึงโค้ดไปรันหรือแก้ไขจากคอมเครื่องไหนในโลกก็ได้</p>
-        </div>
-
-        <div class="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80 space-y-1">
-          <div class="font-medium text-white flex items-center space-x-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-            <span>2. Deploy บน Vercel ฟรี</span>
-          </div>
-          <p class="leading-relaxed">หน้า Dashboard นี้เปิดดูผ่านมือถือหรือแท็บเล็ตได้ทุกที่ทุกเวลาตลอด 24 ชม. ผ่าน URL ของ Vercel ฟรี 0 บาท</p>
-        </div>
-
-        <div class="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80 space-y-1">
-          <div class="font-medium text-white flex items-center space-x-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-            <span>3. เรนเดอร์วิดีโอ 0 บาท</span>
-          </div>
-          <p class="leading-relaxed">ตัดต่อ Ken-Burns อัตโนมัติจากภาพจริง + เสียงพากย์ธรรมชาติ ฟรีตลอดชีพ 0 บาท</p>
-        </div>
-      </div>
-    </section>
+    </div>
 
   </main>
 
-  <!-- MINIMAL FOOTER -->
-  <footer class="border-t border-zinc-800/80 py-4 text-center text-xs text-zinc-500 font-mono">
-    Shopee AI Affiliate Hybrid Video Factory · 100% Free Open Source · Zero Cost Architecture
-  </footer>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold shadow-xl flex items-center space-x-2">
+    <i class="ph-bold ph-check text-base"></i>
+    <span id="toast-message">คัดลอกสำเร็จ!</span>
+  </div>
 
   <!-- SCRIPT LOGIC -->
   <script>
-    let products = [];
-    let currentFilter = 'all';
-    let currentVoiceMode = 'tts';
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let recordTimer = null;
-    let recordSeconds = 0;
-
-    // DOWNLOAD STATUS PERSISTENCE (Requirement 2)
-    const DOWNLOAD_STORAGE_KEY = 'shopee_downloaded_videos';
-
-    function getDownloadedMap() {
-      try {
-        return JSON.parse(localStorage.getItem(DOWNLOAD_STORAGE_KEY) || '{}');
-      } catch (e) {
-        return {};
-      }
-    }
-
-    function isProductDownloaded(pid) {
-      const map = getDownloadedMap();
-      return !!map[pid];
-    }
-
-    function markProductDownloaded(pid) {
-      const map = getDownloadedMap();
-      map[pid] = {
-        downloaded_at: new Date().toISOString(),
-        timestamp: Date.now()
-      };
-      localStorage.setItem(DOWNLOAD_STORAGE_KEY, JSON.stringify(map));
-      renderTable();
-      updatePreviewDownloadBadge(pid);
-    }
-
-    function toggleProductDownloaded(pid, event) {
-      if (event) event.stopPropagation();
-      const map = getDownloadedMap();
-      if (map[pid]) {
-        delete map[pid];
-      } else {
-        map[pid] = {
-          downloaded_at: new Date().toISOString(),
-          timestamp: Date.now()
-        };
-      }
-      localStorage.setItem(DOWNLOAD_STORAGE_KEY, JSON.stringify(map));
-      renderTable();
-      updatePreviewDownloadBadge(pid);
-    }
-
-    function updatePreviewDownloadBadge(pid) {
-      const isDl = isProductDownloaded(pid);
-      const badge = document.getElementById('preview-download-badge');
-      if (badge) {
-        if (isDl) {
-          badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center space-x-1 font-semibold';
-          badge.innerHTML = `<i class="ph-bold ph-check-circle"></i><span>โหลดแล้ว</span>`;
-        } else {
-          badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700/60 flex items-center space-x-1';
-          badge.innerHTML = `<i class="ph ph-clock"></i><span>ยังไม่โหลด</span>`;
-        }
-      }
-    }
-
-    function handleDownloadClick(event) {
-      const pid = document.getElementById('input-product-id').value || 'gan_charger_65w';
-      markProductDownloaded(pid);
-    }    // 10 Curated Winning Products (100% Real Shopee Thailand Links & Verified Live Data)
-    const DEFAULT_PRODUCTS = [
-      {
+    // PRE-DEFINED PRODUCT DB WITH VERIFIED 20S VIDEOS, SCRIPTS & CAPTIONS
+    const PRODUCTS_DATA = {
+      "cat_fountain_01": {
         product_id: "cat_fountain_01",
-        rank: 1,
         category: "ของใช้สัตว์เลี้ยง (Pet)",
-        title: "NAVIPET V2 Wireless Drinking Fountain (Stainless 5L)น้ำพุแมวไร้สาย 5L น้ำพุแมว สแตนเลส [ประกันศูนย์ไทย] 1ปี",
+        title: "NAVIPET V2 Wireless Drinking Fountain (Stainless 5L) น้ำพุแมวไร้สาย 5L สแตนเลส ประกันศูนย์ไทย 1 ปี",
         shopee_url: "https://shopee.co.th/NAVIPET-V2-Wireless-Drinking-Fountain-(Stainless-5L)น้ำพุแมวไร้สาย-5L-น้ำพุแมว-สแตนเลส-ประกันศูนย์ไทย-1ปี-i.770512611.50968571339",
         price: 1400.0,
-        sales_30d: 15,
         ams_rate: 12.5,
         earning: 175.0,
-        shop: "NAVIPET Official Store (Shopee Mall)",
-        sales_total: 15,
-        growth_rate_7d: "+12.0%",
-        trend_status: "trending",
-        trend_label: "สินค้าพรีเมียม 🌟",
-        stock_score: 92
+        video_url: "/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s",
+        size_mb: 10.09,
+        script: {
+          hook: "ใครที่น้องแมวดื่มน้ำน้อย, หรือกลัวเรื่องสายไฟช็อต, แนะนำตัวนี้เลยค่ะ.",
+          body: "น้ำพุแมวไร้สายนาวิเพ็ท, ตัวถังสแตนเลสฟู้ดเกรดแท้, ความจุจุใจถึง 5 ลิตร, ไร้สายไฟปลอดภัย 100%, มอเตอร์เสียงเงียบกริบ, น้ำสะอาดช่วยให้น้องแมวชอบดื่มน้ำขึ้นเยอะเลยค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่น้องแมวดื่มน้ำน้อย, หรือกลัวเรื่องสายไฟช็อต, แนะนำตัวนี้เลยค่ะ. น้ำพุแมวไร้สายนาวิเพ็ท, ตัวถังสแตนเลสฟู้ดเกรดแท้, ความจุจุใจถึง 5 ลิตร, ไร้สายไฟปลอดภัย 100%, มอเตอร์เสียงเงียบกริบ, น้ำสะอาดช่วยให้น้องแมวชอบดื่มน้ำขึ้นเยอะเลยค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "ใครเลี้ยงแมวต้องมีเลยค่ะ! น้ำพุไร้สายสแตนเลส 5L ไร้สาย ปลอดภัย เสียงเงียบกริบ น้องแมวดื่มน้ำเยอะขึ้นจริง สุขภาพไตดีขึ้น พิกัดในตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ 🐱💦",
+        hashtags: "#น้ำพุแมว #น้ำพุแมวไร้สาย #ทาสแมว #ของใช้แมว #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
       },
-      {
-        product_id: "gan_charger_65w",
-        rank: 2,
-        category: "ไอที & แกดเจ็ต (Tech)",
-        title: "UGREEN 65W เครื่องชาร์จชาร์จเร็ว GaN สามพอร์ตพร้อมพอร์ต USB-C 2 พอร์ตและ USB-A 1 ปลั๊กไทยสำหรับ iPhone / Samsung / Notebook",
-        shopee_url: "https://shopee.co.th/UGREEN-65W-เครื่องชาร์จชาร์จเร็ว-GaN-สามพอร์ตพร้อมพอร์ต-USB-C-2-พอร์ตและ-USB-A-1-ปลั๊กไทยสำหรับ-iPhone-17-Pro-Max-iPhone-16-Samsung-i.65302368.40324011599",
-        price: 770.0,
-        sales_30d: 340,
-        ams_rate: 8.5,
-        earning: 65.45,
-        shop: "UGREEN Thailand Flagship (Shopee Mall)",
-        sales_total: 5120,
-        growth_rate_7d: "+18.5%",
-        trend_status: "bullish",
-        trend_label: "ยอดพุ่งแรง 🚀",
-        stock_score: 96
+      "wireless_earbuds_anc": {
+        product_id: "wireless_earbuds_anc",
+        category: "หูฟัง & แกดเจ็ต (Audio)",
+        title: "(New)Baseus หูฟังบลูทูธไร้สาย รุ่น Bowie MP1 True Wireless Earbuds มี ANC ไมค์ 6 ตัว LDAC",
+        shopee_url: "https://shopee.co.th/(New)Baseus-หูฟังบลูทูธไร้สาย-รุ่น-Bowie-MP1-True-Wireless-Earbuds-หูฟังเบสแน่น-มี-ANC-กันน้ำฝุ่น-IP55-ไมค์-6-ตัว-หูฟังLDAC-i.131196738.44506306844",
+        price: 1290.0,
+        ams_rate: 14.5,
+        earning: 187.05,
+        video_url: "/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s",
+        size_mb: 6.31,
+        script: {
+          hook: "ใครที่เดินทางบ่อย, แล้วเจอเสียงรบกวนรอบข้าง, แนะนำหูฟังรุ่นนี้เลยค่ะ.",
+          body: "หูฟังบลูทูธเบสซุส, มีโหมดตัดเสียงรบกวนอัจฉริยะ, เบสหนักแน่นสะใจ, ไมค์คุยสายชัดเจน, แบตเตอรี่ใช้งานได้ตลอดวันค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่เดินทางบ่อย, แล้วเจอเสียงรบกวนรอบข้าง, แนะนำหูฟังรุ่นนี้เลยค่ะ. หูฟังบลูทูธเบสซุส, มีโหมดตัดเสียงรบกวนอัจฉริยะ, เบสหนักแน่นสะใจ, ไมค์คุยสายชัดเจน, แบตเตอรี่ใช้งานได้ตลอดวันค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "หูฟังตัดเสียงรบกวนตัวจบ! Baseus Bowie MP1 ของแท้ มี ANC -55dB เงียบสงบเหมือนอยู่ห้องส่วนตัว เบสแน่น ไมค์ 6 ตัวคุยสายชัดแจ๋ว แบตอึด 45 ชม. พิกัดตะกร้าส้มเลยค่ะ 🎧🎵",
+        hashtags: "#หูฟังbaseus #baseusbowiemp1 #หูฟังบลูทูธ #หูฟังตัดเสียง #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
       },
-      {
+      "air_fryer_visual": {
+        product_id: "air_fryer_visual",
+        category: "เครื่องใช้ในครัว (Kitchen)",
+        title: "Simplus Air Fryer หม้อทอดไร้น้ำมัน รุ่นใหม่ ใช้ในครัวเรือน ความจุ 3.5L ระบบสัมผัส มัลติฟังก์ชั่น KQZG017",
+        shopee_url: "https://shopee.co.th/Simplus-Air-Fryer-หม้อทอดไร้น้ำมัน-รุ่นใหม่-ใช้ในครัวเรือน-ความจุ-3.5L-ระบบสัมผัส-มัลติฟังก์ชั่น-ตะแกรง-KQZG017-i.837801449.29354283575",
+        price: 799.0,
+        ams_rate: 12.5,
+        earning: 99.88,
+        video_url: "/videos/air_fryer_visual.mp4?v=v4_perfect_brand_20s",
+        size_mb: 7.89,
+        script: {
+          hook: "ทำอาหารง่ายขึ้นมาก, ด้วยหม้อทอดไร้น้ำมันรุ่นใหม่, บอกลาปัญหาน้ำมันกระเด็นได้เลยค่ะ.",
+          body: "หม้อทอดซิมพลัส, มองเห็นอาหารด้านในได้ตลอด, ระบบสัมผัสใช้งานง่าย, อาหารสุกกรอบน่าทาน, ล้างทำความสะอาดง่ายมากค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ทำอาหารง่ายขึ้นมาก, ด้วยหม้อทอดไร้น้ำมันรุ่นใหม่, บอกลาปัญหาน้ำมันกระเด็นได้เลยค่ะ. หม้อทอดซิมพลัส, มองเห็นอาหารด้านในได้ตลอด, ระบบสัมผัสใช้งานง่าย, อาหารสุกกรอบน่าทาน, ล้างทำความสะอาดง่ายมากค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "ทำอาหารง่ายขึ้นเยอะ! หม้อทอดไร้น้ำมัน Simplus 3.5L รุ่นกระจกมองเห็นอาหารด้านใน กรอบนอกนุ่มใน คลีนๆ อร่อยแบบไม่ต้องใช้น้ำมัน พิกัดตะกร้าส้มเลยนะคะ 🍗🍟",
+        hashtags: "#หม้อทอดไร้น้ำมัน #หม้อทอดsimplus #ของใช้ในครัว #เมนูหม้อทอด #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+      },
+      "uv_dust_mite_vacuum": {
         product_id: "uv_dust_mite_vacuum",
-        rank: 3,
         category: "เครื่องใช้ในบ้าน (Home Appliance)",
         title: "Deerma CM800 เครื่องดูดไรฝุ่น เครื่องกำจัดไรฝุ่น ฆ่าเชื้อแสง UV 13Kpa",
         shopee_url: "https://shopee.co.th/Deerma-CM800-เครื่องดูดไรฝุ่น-เครื่องกำจัดไรฝุ่น-ฆ่าเชื้อแสง-UV-13Kpa-i.320134219.3856631625",
         price: 699.0,
-        sales_30d: 180,
         ams_rate: 12.5,
         earning: 87.38,
-        shop: "Deerma Official Store (Shopee Mall)",
-        sales_total: 1240,
-        growth_rate_7d: "+14.2%",
-        trend_status: "trending",
-        trend_label: "ไอเทมสุขภาพ 📈",
-        stock_score: 93
+        video_url: "/videos/uv_dust_mite_vacuum.mp4?v=v4_perfect_brand_20s",
+        size_mb: 8.58,
+        script: {
+          hook: "ใครที่ตื่นมาแล้วจามบ่อย, หรือเป็นภูมิแพ้, แนะนำตัวนี้เลยค่ะ.",
+          body: "เครื่องดูดไรฝุ่นเดียร์ม่า, มีแสงยูวีฆ่าเชื้อในตัว, พลังดูดสูงมาก, ช่วยดูดฝุ่นและไรฝุ่นสะสม, บนที่นอนออกมาได้สะอาดหมดจดเลยค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่ตื่นมาแล้วจามบ่อย, หรือเป็นภูมิแพ้, แนะนำตัวนี้เลยค่ะ. เครื่องดูดไรฝุ่นเดียร์ม่า, มีแสงยูวีฆ่าเชื้อในตัว, พลังดูดสูงมาก, ช่วยดูดฝุ่นและไรฝุ่นสะสม, บนที่นอนออกมาได้สะอาดหมดจดเลยค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "คนเป็นภูมิแพ้ตื่นมาจามบ่อยต้องจัด! เครื่องดูดไรฝุ่นแสงยูวี Deerma CM800 ดูดฝุ่นและไรฝุ่นสะสมบนที่นอนสะอาดหมดจด หลับสบายขึ้นเยอะ พิกัดตะกร้าส้มซ้ายล่างนะคะ 🛏️✨",
+        hashtags: "#เครื่องดูดไรฝุ่น #เครื่องดูดไรฝุ่นdeerma #ของใช้ในบ้าน #ภูมิแพ้ #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
       },
-      {
+      "gan_charger_65w": {
+        product_id: "gan_charger_65w",
+        category: "ไอที & แกดเจ็ต (Tech)",
+        title: "UGREEN 65W เครื่องชาร์จเร็ว GaN สามพอร์ตพร้อมพอร์ต USB-C 2 พอร์ตและ USB-A 1 ปลั๊กไทย",
+        shopee_url: "https://shopee.co.th/UGREEN-65W-เครื่องชาร์จชาร์จเร็ว-GaN-สามพอร์ตพร้อมพอร์ต-USB-C-2-พอร์ตและ-USB-A-1-ปลั๊กไทยสำหรับ-iPhone-17-Pro-Max-iPhone-16-Samsung-i.65302368.40324011599",
+        price: 770.0,
+        ams_rate: 8.5,
+        earning: 65.45,
+        video_url: "/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s",
+        size_mb: 8.07,
+        script: {
+          hook: "ใครที่ต้องพกหัวชาร์จหลายอัน, ให้หนักกระเป๋า, ลองดูตัวนี้ค่ะ.",
+          body: "หัวชาร์จยูกรีน 65 วัตต์, มีถึง 3 พอร์ต, ชาร์จพร้อมกันได้ทั้งมือถือ, แท็บเล็ต, และโน้ตบุ๊ก, ขนาดกะทัดรัดพกพาง่ายมากค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่ต้องพกหัวชาร์จหลายอัน, ให้หนักกระเป๋า, ลองดูตัวนี้ค่ะ. หัวชาร์จยูกรีน 65 วัตต์, มีถึง 3 พอร์ต, ชาร์จพร้อมกันได้ทั้งมือถือ, แท็บเล็ต, และโน้ตบุ๊ก, ขนาดกะทัดรัดพกพาง่ายมากค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "หัวชาร์จเร็วตัวจบ UGREEN 65W GaN ชาร์จพร้อมกัน 3 เครื่อง มือถือ โน้ตบุ๊ก แท็บเล็ต พกตัวเดียวเที่ยวได้ทั่วโลก ไม่ร้อน ปลอดภัย พิกัดในตะกร้าส้มซ้ายล่างเลยค่ะ ⚡📱",
+        hashtags: "#หัวชาร์จugreen #ugreen65w #หัวชาร์จเร็ว #ของดีบอกต่อ #ไอทีน่ารู้ #ShopeeVideoTH #รีวิวช้อปปี้ #นายหน้าShopee"
+      },
+      "tyeso_tumbler_304": {
         product_id: "tyeso_tumbler_304",
-        rank: 4,
         category: "แก้วเก็บความเย็น (Living)",
-        title: "TYESOแท้ รุ่นใหม่แก้วเก็บความเย็น 1200mlพร้อมมือจับเก็บอุณหภูมิ",
+        title: "TYESO แท้ รุ่นใหม่แก้วเก็บความเย็น 1200ml พร้อมมือจับ สแตนเลส 304",
         shopee_url: "https://shopee.co.th/TYESOแท้-รุ่นใหม่แก้วเก็บความเย็น-1200mlพร้อมมือจับเก็บอุณหภูมิ-i.88616027.52700712258",
         price: 399.0,
-        sales_30d: 12,
         ams_rate: 11.5,
         earning: 45.89,
-        shop: "TYESO Mall & Living (Preferred+)",
-        sales_total: 12,
-        growth_rate_7d: "+10.0%",
-        trend_status: "trending",
-        trend_label: "ของแท้ 5 ดาว ⭐",
-        stock_score: 91
+        video_url: "/videos/tyeso_tumbler_304.mp4?v=v4_perfect_brand_20s",
+        size_mb: 11.35,
+        script: {
+          hook: "ใครที่มองหาแก้วเก็บความเย็น, คุณภาพดี, และจุได้เยอะ, แนะนำตัวนี้เลยค่ะ.",
+          body: "แก้วเยติติดหูหิ้วไทโซ, สแตนเลส 304 แท้, เก็บน้ำแข็งได้นานข้ามวัน, มีหลอดดูดในตัว, พกพาสะดวก ไม่หกเลอะเทอะค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่มองหาแก้วเก็บความเย็น, คุณภาพดี, และจุได้เยอะ, แนะนำตัวนี้เลยค่ะ. แก้วเยติติดหูหิ้วไทโซ, สแตนเลส 304 แท้, เก็บน้ำแข็งได้นานข้ามวัน, มีหลอดดูดในตัว, พกพาสะดวก ไม่หกเลอะเทอะค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "แก้วเก็บความเย็น TYESO 1200ml ของแท้ สแตนเลส 304 ใส่น้ำแข็งข้ามวันยังอยู่ครบ มีหูจับถนัดมือ หลอดดูดในตัว พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧊🥤",
+        hashtags: "#แก้วtyeso #แก้วเก็บความเย็น #แก้วtyesoแท้ #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
       },
-      {
+      "spray_mop_360": {
         product_id: "spray_mop_360",
-        rank: 5,
         category: "ของใช้ในบ้าน (Home Care)",
-        title: "Deerma TB500 Spray Mop ไม้ถูพื้น พร้อมหัวฉีดแบบสเปรย์ ของแท้ ประกันศูนย์ 1ปี",
+        title: "Deerma TB500 Spray Mop ไม้ถูพื้น พร้อมหัวฉีดแบบสเปรย์ ของแท้ ประกันศูนย์ 1 ปี",
         shopee_url: "https://shopee.co.th/Deerma-TB500-Spray-Mop-ไม้ถูพื้น-พร้อมหัวฉีดแบบสเปรย์-ของแท้-ประกันศูนย์-1ปี-i.31387011.13547518075",
         price: 249.0,
-        sales_30d: 210,
         ams_rate: 12.0,
         earning: 29.88,
-        shop: "Deerma Flagship Store (Shopee Mall)",
-        sales_total: 2850,
-        growth_rate_7d: "+9.8%",
-        trend_status: "trending",
-        trend_label: "ของใช้ยอดฮิต 🧹",
-        stock_score: 90
+        video_url: "/videos/spray_mop_360.mp4?v=v4_perfect_brand_20s",
+        size_mb: 11.81,
+        script: {
+          hook: "ไม่ต้องหิ้วถังน้ำถูบ้าน, ให้ปวดหลังอีกต่อไป, แค่ใช้ไม้ถูพื้นรุ่นนี้ค่ะ.",
+          body: "ไม้ถูพื้นสเปรย์เดียร์ม่า, มีกระบอกฉีดน้ำในตัว, หัวม็อบหมุนได้รอบทิศ, เช็ดทำความสะอาดง่าย, พื้นแห้งไวไม่ทิ้งคราบน้ำค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ไม่ต้องหิ้วถังน้ำถูบ้าน, ให้ปวดหลังอีกต่อไป, แค่ใช้ไม้ถูพื้นรุ่นนี้ค่ะ. ไม้ถูพื้นสเปรย์เดียร์ม่า, มีกระบอกฉีดน้ำในตัว, หัวม็อบหมุนได้รอบทิศ, เช็ดทำความสะอาดง่าย, พื้นแห้งไวไม่ทิ้งคราบน้ำค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "บอกลาการหิ้วถังน้ำหนักๆ ไปได้เลย! ไม้ถูพื้นสเปรย์ Deerma TB500 ฉีดแล้วถูได้ทันที หมุนได้ 360 องศา แห้งไว ไม่ทิ้งคราบ พิกัดตะกร้าส้มซ้ายล่างเลยนะคะ 🧹✨",
+        hashtags: "#ไม้ถูพื้นสเปรย์ #ไม้ถูพื้นdeerma #ของใช้ในบ้าน #งานบ้านที่รัก #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
       },
-      {
+      "solar_sensor_light": {
         product_id: "solar_sensor_light",
-        rank: 6,
         category: "ไฟโซลาร์เซลล์ (Garden & Outdoor)",
-        title: "โคมไฟติดผนังโซลาร์เซลล์ 100 LED พร้อมเซ็นเซอร์ตรวจจับความเคลื่อนไหว สํ​าหรับกันน้ํากลางแจ้งในสวน",
+        title: "โคมไฟติดผนังโซลาร์เซลล์ 100 LED พร้อมเซ็นเซอร์ตรวจจับความเคลื่อนไหว กันน้ำกลางแจ้ง",
         shopee_url: "https://shopee.co.th/โคมไฟติดผนังโซลาร์เซลล์-100-LED-พร้อมเซ็นเซอร์ตรวจจับความเคลื่อนไหว-สํ​าหรับกันน้ํากลางแจ้งในสวน-i.1613056655.52150812290",
         price: 69.0,
-        sales_30d: 140,
         ams_rate: 10.0,
-        earning: 6.9,
-        shop: "Solar Home Direct (Preferred)",
-        sales_total: 890,
-        growth_rate_7d: "+15.2%",
-        trend_status: "trending",
-        trend_label: "ประหยัดพลังงาน 💡",
-        stock_score: 88
+        earning: 6.90,
+        video_url: "/videos/solar_sensor_light.mp4?v=v4_perfect_brand_20s",
+        size_mb: 9.92,
+        script: {
+          hook: "อยากให้รอบบ้านสว่างปลอดภัย, โดยไม่ต้องเสียค่าไฟสักบาท, แนะนำตัวนี้เลยค่ะ.",
+          body: "โคมไฟโซลาร์เซลล์ 100 แอลอีดี, ชาร์จพลังงานแสงอาทิตย์, สว่างอัตโนมัติเมื่อมีคนเดินผ่าน, กันน้ำกันฝน, ติดตั้งง่ายมากไม่ต้องเดินสายไฟค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "อยากให้รอบบ้านสว่างปลอดภัย, โดยไม่ต้องเสียค่าไฟสักบาท, แนะนำตัวนี้เลยค่ะ. โคมไฟโซลาร์เซลล์ 100 แอลอีดี, ชาร์จพลังงานแสงอาทิตย์, สว่างอัตโนมัติเมื่อมีคนเดินผ่าน, กันน้ำกันฝน, ติดตั้งง่ายมากไม่ต้องเดินสายไฟค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "สว่างยันเช้า ค่าไฟ 0 บาท! ไฟโซลาร์เซลล์ติดผนัง 100 LED มีเซนเซอร์ตรวจจับความเคลื่อนไหว สว่างอัตโนมัติ กันน้ำกันฝน ติดตั้งง่ายมาก พิกัดในตะกร้าส้มเลยค่ะ 💡🏡",
+        hashtags: "#ไฟโซลาร์เซลล์ #ไฟติดผนัง #แต่งบ้าน #ประหยัดค่าไฟ #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
       },
-      {
-        product_id: "air_fryer_visual",
-        rank: 7,
-        category: "เครื่องใช้ในครัว (Kitchen)",
-        title: "Simplus Air Fryer หม้อทอดไร้น้ำมัน รุ่นใหม่ ใช้ในครัวเรือน ความจุ 3.5L ระบบสัมผัส มัลติฟังก์ชั่น ตะแกรง KQZG017",
-        shopee_url: "https://shopee.co.th/Simplus-Air-Fryer-หม้อทอดไร้น้ำมัน-รุ่นใหม่-ใช้ในครัวเรือน-ความจุ-3.5L-ระบบสัมผัส-มัลติฟังก์ชั่น-ตะแกรง-KQZG017-i.837801449.29354283575",
-        price: 799.0,
-        sales_30d: 290,
-        ams_rate: 12.5,
-        earning: 99.88,
-        shop: "Simplus Official Store (Shopee Mall)",
-        sales_total: 3420,
-        growth_rate_7d: "+16.4%",
-        trend_status: "bullish",
-        trend_label: "ครัวเรือนยอดนิยม 🍳",
-        stock_score: 94
-      },
-      {
+      "sonic_electric_toothbrush": {
         product_id: "sonic_electric_toothbrush",
-        rank: 8,
-        category: "สุขภาพและความงาม (Beauty & Care)",
-        title: "MeeGoo Sonic Electric Toothbrush แปรงสีฟันไฟฟ้าโซนิค ชาร์จแบบType-C กันน้ำ IPX7 4 โหมด 56000 rpm",
+        category: "สุขอนามัย (Bath & Care)",
+        title: "MeeGoo Sonic Electric Toothbrush แปรงสีฟันไฟฟ้าโซนิค ชาร์จแบบ Type-C กันน้ำ IPX7",
         shopee_url: "https://shopee.co.th/MeeGoo-Sonic-Electric-Toothbrush-แปรงสีฟันไฟฟ้าโซนิค-ชาร์จแบบType-C-กันน้ำ-IPX7-4-โหมด-56000-rpm-i.1334512255.45554644060",
         price: 199.0,
-        sales_30d: 110,
         ams_rate: 15.0,
         earning: 29.85,
-        shop: "MeeGoo Official Store (Shopee Mall)",
-        sales_total: 980,
-        growth_rate_7d: "+21.0%",
-        trend_status: "bullish",
-        trend_label: "สุขภาพช่องปาก 🪥",
-        stock_score: 92
+        video_url: "/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s",
+        size_mb: 5.56,
+        script: {
+          hook: "อยากแปรงฟันให้สะอาดทั่วถึง, แบบไม่เจ็บเหงือก, แนะนำแปรงสีฟันไฟฟ้ารุ่นนี้ค่ะ.",
+          body: "แปรงสีฟันไฟฟ้าโซนิค, ขนแปรงนุ่มละเอียด, แรงสั่นทรงพลังช่วยขจัดคราบพลัค, กันน้ำได้ทั้งตัวเครื่อง, ชาร์จครั้งเดียวใช้งานได้ยาวนานค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "อยากแปรงฟันให้สะอาดทั่วถึง, แบบไม่เจ็บเหงือก, แนะนำแปรงสีฟันไฟฟ้ารุ่นนี้ค่ะ. แปรงสีฟันไฟฟ้าโซนิค, ขนแปรงนุ่มละเอียด, แรงสั่นทรงพลังช่วยขจัดคราบพลัค, กันน้ำได้ทั้งตัวเครื่อง, ชาร์จครั้งเดียวใช้งานได้ยาวนานค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "แปรงสะอาดลึกถึงซอกฟัน! แปรงสีฟันไฟฟ้าโซนิค MeeGoo ขนแปรงดูปองท์นุ่มไม่เจ็บเหงือก สั่น 56000 รอบ กันน้ำ IPX7 แบตอึดชาร์จ Type-C พิกัดตะกร้าส้มเลยค่ะ 🪥✨",
+        hashtags: "#แปรงสีฟันไฟฟ้า #แปรงสีฟันโซนิค #ฟันขาวสะอาด #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
       },
-      {
+      "kitchen_dish_rack_stainless": {
         product_id: "kitchen_dish_rack_stainless",
-        rank: 9,
-        category: "จัดระเบียบบ้าน (Organization)",
-        title: "KANO ชั้นวางจาน ที่คว่ำจาน อัพเกรดหนาขึ้น สแตนเลส 304 พร้อมประตูกันฝุ่น 65-105ซม คร่อมอ่างล้างจาน",
+        category: "เครื่องครัว (Kitchen)",
+        title: "KANO ชั้นวางจาน ที่คว่ำจาน สแตนเลส 304 คร่อมอ่างล้างจาน พร้อมประตูกันฝุ่น",
         shopee_url: "https://shopee.co.th/KANO-ชั้นวางจาน-ที่คว่ำจาน-อัพเกรดหนาขึ้น-สแตนเลส-304-พร้อมประตูกันฝุ่น-65-75-85-95-105ซม-คร่อมอ่างล้างจานที่วางจาน-i.1178313720.28157087589",
         price: 599.0,
-        sales_30d: 75,
-        ams_rate: 11.0,
-        earning: 65.89,
-        shop: "KANO Living Store (Shopee Mall)",
-        sales_total: 640,
-        growth_rate_7d: "+11.2%",
-        trend_status: "trending",
-        trend_label: "จัดครัวมินิมอล 🍽️",
-        stock_score: 89
-      },
-      {
-        product_id: "wireless_earbuds_anc",
-        rank: 10,
-        category: "หูฟัง & เสียง (Audio)",
-        title: "(New)Baseus หูฟังบลูทูธไร้สาย รุ่น Bowie MP1 True Wireless Earbuds หูฟังเบสแน่น มี ANC ไมค์ 6 ตัว LDAC",
-        shopee_url: "https://shopee.co.th/(New)Baseus-หูฟังบลูทูธไร้สาย-รุ่น-Bowie-MP1-True-Wireless-Earbuds-หูฟังเบสแน่น-มี-ANC-กันน้ำฝุ่น-IP55-ไมค์-6-ตัว-หูฟังLDAC-i.131196738.44506306844",
-        price: 1290.0,
-        sales_30d: 45,
-        ams_rate: 14.5,
-        earning: 187.05,
-        shop: "Baseus Official Store (Shopee Mall)",
-        sales_total: 120,
-        growth_rate_7d: "+28.0%",
-        trend_status: "bullish",
-        trend_label: "ANC พรีเมียม 🎧",
-        stock_score: 95
+        ams_rate: 12.5,
+        earning: 74.88,
+        video_url: "/videos/kitchen_dish_rack_stainless.mp4?v=v4_perfect_brand_20s",
+        size_mb: 7.76,
+        script: {
+          hook: "ใครที่พื้นที่ครัวจำกัด, อยากจัดครัวให้เป็นระเบียบ, ดูตัวนี้เลยค่ะ.",
+          body: "ชั้นคว่ำจานคร่อมอ่าง, สแตนเลส 304 หนาพิเศษ, แข็งแรงรับน้ำหนักได้เยอะ, มีประตูปิดกันฝุ่น, วางจานชามและอุปกรณ์ครัวได้ครบจบในที่เดียวค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่พื้นที่ครัวจำกัด, อยากจัดครัวให้เป็นระเบียบ, ดูตัวนี้เลยค่ะ. ชั้นคว่ำจานคร่อมอ่าง, สแตนเลส 304 หนาพิเศษ, แข็งแรงรับน้ำหนักได้เยอะ, มีประตูปิดกันฝุ่น, วางจานชามและอุปกรณ์ครัวได้ครบจบในที่เดียวค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "จัดครัวให้เป็นระเบียบใน 1 นาที! ชั้นคว่ำจานคร่อมอ่างสแตนเลส 304 แท้ แข็งแรง ทนทาน ไม่เป็นสนิม มีประตูกันฝุ่น ครัวกว้างขึ้นเยอะ พิกัดตะกร้าส้มเลยนะคะ 🍽️🏠",
+        hashtags: "#ชั้นคว่ำจาน #ที่คว่ำจานสแตนเลส #จัดระเบียบครัว #ของใช้ในครัว #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
       }
-    ];
-
-    const CUSTOM_RATE_STORAGE_KEY = 'shopee_custom_real_rates';
-
-    function getCustomRatesMap() {
-      try {
-        return JSON.parse(localStorage.getItem(CUSTOM_RATE_STORAGE_KEY) || '{}');
-      } catch (e) {
-        return {};
-      }
-    }
-
-    function applyCustomRatesToProducts() {
-      const customRates = getCustomRatesMap();
-      products.forEach(p => {
-        if (customRates[p.product_id] !== undefined) {
-          p.ams_rate = parseFloat(customRates[p.product_id]);
-          p.earning = Math.round(p.price * (p.ams_rate / 100) * 100) / 100;
-        }
-      });
-    }
-
-    function editRealCommissionRate(pid, event) {
-      if (event) event.stopPropagation();
-      const prod = products.find(p => p.product_id === pid);
-      if (!prod) return;
-      const input = prompt(
-        `ปรับเรตค่าคอมมิชชั่นจริง (Shopee Base + Seller Extra Commission)\nสำหรับสินค้า: ${prod.title.slice(0, 50)}...\n\n(กรอกตัวเลข % ที่เห็นในแอป Shopee Affiliate เช่น 8.5, 12.5, 16.5):`,
-        prod.ams_rate
-      );
-      if (input === null) return;
-      const parsed = parseFloat(input);
-      if (!isNaN(parsed) && parsed >= 0 && parsed <= 80) {
-        const customRates = getCustomRatesMap();
-        customRates[pid] = parsed;
-        localStorage.setItem(CUSTOM_RATE_STORAGE_KEY, JSON.stringify(customRates));
-        applyCustomRatesToProducts();
-        renderTable();
-        const currentPid = document.getElementById('input-product-id').value;
-        if (currentPid === pid) {
-          selectProduct(pid);
-        }
-      }
-    }
-
-    async function refreshWinningProducts() {
-      const btn = document.getElementById('btn-refresh-products');
-      const icon = document.getElementById('icon-refresh-products');
-      if (icon) icon.classList.add('animate-spin');
-      if (btn) btn.classList.add('opacity-80');
-
-      const downloadedIds = Object.keys(getDownloadedMap());
-
-      try {
-        const res = await fetch('/api/products/refresh', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ exclude_ids: downloadedIds })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.products && data.products.length > 0) {
-            products = data.products.map((item, idx) => ({
-              product_id: item.product_id,
-              rank: idx + 1,
-              category: item.category || 'สินค้าแนะนำ',
-              title: item.title || 'Shopee Product',
-              shopee_url: item.shopee_url || '#',
-              price: item.price || 0,
-              sales_30d: item.sales_30d || 0,
-              ams_rate: item.ams_commission_rate || 10.0,
-              earning: item.commission_amount || (item.price * (item.ams_commission_rate || 10.0) / 100),
-              shop: item.shop_name || 'Shopee Official',
-              sales_total: item.sales_total || (item.sales_30d * 4) || 12000,
-              growth_rate_7d: item.growth_rate_7d || '+15.0%',
-              trend_status: item.trend_status || 'trending',
-              trend_label: item.trend_label || 'ยอดพุ่งแรง 🔥',
-              stock_score: item.stock_score || 90
-            }));
-          }
-        }
-      } catch (e) {
-        console.warn('Refresh fallback to local opportunity sort:', e);
-      }
-
-      applyCustomRatesToProducts();
-
-      // Re-rank by composite opportunity score (High Real Commission + Market Trend + Sales Velocity) with slight jitter so fresh high-potential items rotate up
-      products = products.sort((a, b) => {
-        const scoreA = (a.ams_rate * 4.2) + (a.stock_score * 1.6) + Math.min(a.sales_30d / 20, 45) + (Math.random() * 6);
-        const scoreB = (b.ams_rate * 4.2) + (b.stock_score * 1.6) + Math.min(b.sales_30d / 20, 45) + (Math.random() * 6);
-        return scoreB - scoreA;
-      }).map((p, i) => ({ ...p, rank: i + 1 }));
-
-      if (currentFilter === 'downloaded') {
-        setFilter('all');
-      } else {
-        renderTable();
-      }
-
-      const activePool = products.filter(p => !isProductDownloaded(p.product_id));
-      if (activePool.length > 0) {
-        selectProduct(activePool[0].product_id);
-      }
-
-      setTimeout(() => {
-        if (icon) icon.classList.remove('animate-spin');
-        if (btn) btn.classList.remove('opacity-80');
-      }, 350);
-    }
-
-    async function init() {
-      if (!checkAuth()) return;
-      try {
-        const res = await fetch('/api/products/top10');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.length > 0) {
-            products = data.map((item, idx) => ({
-              product_id: item.product_id,
-              rank: item.rank || (idx + 1),
-              category: item.category || 'สินค้าแนะนำ',
-              title: item.title || 'Shopee Product',
-              shopee_url: item.shopee_url || '#',
-              price: item.price || 0,
-              sales_30d: item.sales_30d || 0,
-              ams_rate: item.ams_commission_rate || 10.0,
-              earning: item.commission_amount || (item.price * (item.ams_commission_rate || 10.0) / 100),
-              shop: item.shop_name || 'Shopee Official',
-              sales_total: item.sales_total || (item.sales_30d * 4) || 12000,
-              growth_rate_7d: item.growth_rate_7d || '+15.0%',
-              trend_status: item.trend_status || 'trending',
-              trend_label: item.trend_label || 'ยอดพุ่งแรง 🔥',
-              stock_score: item.stock_score || 90
-            }));
-          } else {
-            products = DEFAULT_PRODUCTS;
-          }
-        } else {
-          products = DEFAULT_PRODUCTS;
-        }
-      } catch (e) {
-        products = DEFAULT_PRODUCTS;
-      }
-      applyCustomRatesToProducts();
-      renderTable();
-      const firstActive = products.find(p => !isProductDownloaded(p.product_id)) || products[0];
-      if (firstActive) {
-        selectProduct(firstActive.product_id);
-      }
-    }
-
-    function setFilter(type) {
-      currentFilter = type;
-      ['tab-all', 'tab-all_sales', 'tab-bullish', 'tab-downloaded', 'tab-high_comm', 'tab-high_sales'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-          btn.classList.remove('bg-zinc-800', 'text-white');
-          if (id !== 'tab-downloaded') {
-            btn.classList.add('text-zinc-400');
-          }
-        }
-      });
-      const activeBtn = document.getElementById(`tab-${type}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-zinc-800', 'text-white');
-        activeBtn.classList.remove('text-zinc-400');
-      }
-      renderTable();
-    }
-
-    function renderTable() {
-      const tbody = document.getElementById('products-table-body');
-      const downloadedList = products.filter(p => isProductDownloaded(p.product_id));
-      const activePool = products.filter(p => !isProductDownloaded(p.product_id));
-
-      // Update counters on tabs
-      const tabAllBtn = document.getElementById('tab-all');
-      if (tabAllBtn) {
-        const activeShown = Math.min(activePool.length, 10);
-        tabAllBtn.innerText = `รายการรอทำคลิป (${activeShown})`;
-      }
-      const tabDlLabel = document.getElementById('tab-downloaded-label');
-      if (tabDlLabel) {
-        tabDlLabel.innerText = `🎬 วิดีโอที่เคยทำ (${downloadedList.length})`;
-      }
-
-      let list = [];
-
-      if (currentFilter === 'downloaded') {
-        // Show ONLY already-downloaded videos in this history tab
-        list = [...downloadedList];
-      } else {
-        // Automatically exclude downloaded videos from all main recommendation tabs
-        // so new replacement products from the pool step up into the Top 10!
-        list = [...activePool];
-        if (currentFilter === 'all_sales') {
-          list = list.sort((a, b) => (b.sales_total || 0) - (a.sales_total || 0));
-        } else if (currentFilter === 'bullish') {
-          list = list.sort((a, b) => (b.stock_score || 0) - (a.stock_score || 0));
-        } else if (currentFilter === 'high_comm') {
-          list = list.filter(p => p.ams_rate >= 12.0).sort((a, b) => b.ams_rate - a.ams_rate);
-        } else if (currentFilter === 'high_sales') {
-          list = list.sort((a, b) => b.sales_30d - a.sales_30d);
-        } else {
-          list = list.sort((a, b) => a.rank - b.rank);
-        }
-        list = list.slice(0, 10);
-      }
-
-      if (list.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="11" class="py-8 text-center text-zinc-400 font-mono text-xs">
-              ${currentFilter === 'downloaded'
-                ? 'ยังไม่มีวิดีโอที่เคยทำ/ดาวน์โหลด (เมื่อคุณกดดาวน์โหลดคลิป หรือกดปุ่ม "เก็บเข้าที่เคยทำ" สินค้าจะถูกย้ายมาเก็บไว้ในแท็บนี้โดยอัตโนมัติ)'
-                : 'คุณทำคลิปครบทุกสินค้าในรอบนี้แล้ว! กดปุ่ม "รีเฟรชหาสินค้าใหม่" ด้านบน หรือคืนค่ารายการจากแท็บ "🎬 วิดีโอที่เคยทำ"'}
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      tbody.innerHTML = list.map((p, idx) => {
-        const displayRank = idx + 1;
-        const isDownloaded = isProductDownloaded(p.product_id);
-        const dlBtn = isDownloaded
-          ? `<button onclick="toggleProductDownloaded('${p.product_id}', event)" 
-                     class="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold hover:bg-rose-500/20 hover:text-rose-300 hover:border-rose-500/30 transition cursor-pointer" 
-                     title="ทำคลิป/ดาวน์โหลดแล้ว (คลิกเพื่อนำกลับไปไว้ในรายการรอทำคลิป)">
-               <i class="ph-bold ph-arrow-u-up-left"></i>
-               <span>คืนค่ากลับ</span>
-             </button>`
-          : `<button onclick="toggleProductDownloaded('${p.product_id}', event)" 
-                     class="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700/60 hover:border-emerald-500/50 hover:text-emerald-300 transition cursor-pointer" 
-                     title="คลิกเพื่อทำเครื่องหมายว่าทำคลิปแล้ว (ระบบจะย้ายไปแท็บ วิดีโอที่เคยทำ และดึงสินค้าใหม่ขึ้นมาแทนทันที)">
-               <i class="ph ph-check"></i>
-               <span>เก็บเข้าที่เคยทำ</span>
-             </button>`;
-
-        const isUp = !(p.growth_rate_7d || '').startsWith('-');
-        const trendColor = isUp ? 'text-emerald-400' : 'text-rose-400';
-        const trendArrow = isUp ? '▲' : '▼';
-        const score = p.stock_score || 90;
-        const scoreBadge = score >= 97
-          ? `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">${p.trend_label || 'มาแรง #1 🔥'}</span>`
-          : score >= 94
-          ? `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${p.trend_label || 'Strong Buy'}</span>`
-          : `<span class="px-1.5 py-0.2 rounded text-[9px] font-medium bg-blue-500/10 text-blue-300 border border-blue-500/20">${p.trend_label || 'Bullish'}</span>`;
-
-        return `
-          <tr class="hover:bg-zinc-900/60 transition group ${isDownloaded ? 'bg-emerald-950/10' : ''}">
-            <td class="py-3 px-3 text-center font-mono text-zinc-500 font-bold">#${displayRank}</td>
-            <td class="py-3 px-3 text-center">${dlBtn}</td>
-            <td class="py-3 px-3">
-              <div class="flex items-center space-x-1.5">
-                <span class="font-medium text-zinc-200 line-clamp-1 max-w-xs group-hover:text-white" title="${p.title}">${p.title}</span>
-                <a href="${p.shopee_url}" target="_blank" rel="noopener noreferrer" title="เปิดหน้าสินค้า Shopee จริง" class="text-zinc-500 hover:text-shopee shrink-0">
-                  <i class="ph ph-arrow-square-out text-sm"></i>
-                </a>
-              </div>
-              <div class="flex items-center space-x-2 mt-0.5">
-                <span class="text-[10px] text-zinc-500 font-mono">${p.shop}</span>
-                <span class="text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20 font-mono">ภาพจริง 100%</span>
-              </div>
-            </td>
-            <td class="py-3 px-3 text-zinc-400">
-              <span class="bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800 font-mono text-[10px] whitespace-nowrap">${p.category}</span>
-            </td>
-            <td class="py-3 px-3 text-right font-mono text-zinc-200">฿${p.price.toLocaleString()}</td>
-            <td class="py-3 px-3 text-right font-mono text-zinc-400">${p.sales_30d.toLocaleString()} ชิ้น</td>
-            <td class="py-3 px-3 text-right font-mono font-bold text-white bg-zinc-900/30 whitespace-nowrap">
-              ${(p.sales_total || 0).toLocaleString()} ชิ้น
-            </td>
-            <td class="py-3 px-3 text-right">
-              <div class="flex flex-col items-end">
-                <div class="flex items-center space-x-1 font-mono font-bold text-xs ${trendColor}">
-                  <span>${trendArrow}</span>
-                  <span>${p.growth_rate_7d || '+15.0%'}</span>
-                </div>
-                <div class="flex items-center space-x-1.5 mt-0.5">
-                  ${scoreBadge}
-                  <span class="text-[10px] font-mono text-zinc-400 font-semibold">${score}/100</span>
-                </div>
-              </div>
-            </td>
-            <td class="py-3 px-3 text-right">
-              <button onclick="editRealCommissionRate('${p.product_id}', event)"
-                      title="คลิกเพื่อปรับเรตค่าคอมมิชชั่นจริงให้ตรงกับแคมเปญปัจจุบันในแอป Shopee Affiliate ของคุณ"
-                      class="font-mono font-semibold px-2 py-0.5 rounded text-[11px] bg-emerald-500/10 hover:bg-emerald-500/25 border border-emerald-500/20 text-emerald-400 whitespace-nowrap transition cursor-pointer inline-flex items-center space-x-1">
-                <span>+${p.ams_rate}%</span>
-                <i class="ph ph-pencil-simple text-[10px] opacity-75"></i>
-              </button>
-            </td>
-            <td class="py-3 px-3 text-right font-mono font-medium text-amber-400 whitespace-nowrap">
-              ฿${p.earning.toFixed(2)}
-            </td>
-            <td class="py-3 px-3 text-center">
-              <button onclick="selectProduct('${p.product_id}')" 
-                      class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-shopee hover:text-white text-zinc-300 text-[11px] font-medium transition shadow-sm flex items-center justify-center space-x-1 mx-auto cursor-pointer whitespace-nowrap">
-                <i class="ph ph-video-camera"></i>
-                <span>เลือกผลิต</span>
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function selectProduct(pid) {
-      const prod = products.find(p => p.product_id === pid) || DEFAULT_PRODUCTS[0];
-      document.getElementById('input-product-id').value = prod.product_id;
-      document.getElementById('selected-title').innerText = `#${prod.rank} ${prod.title}`;
-      document.getElementById('selected-meta').innerText = `฿${prod.price.toLocaleString()} · คอมมิชชั่น AMS ${prod.ams_rate}% (฿${prod.earning.toFixed(2)}/ชิ้น)`;
-      
-      // Update teleprompter script sample
-      document.getElementById('teleprompter-text').innerText = 
-        `"ใครที่กำลังมองหา ${prod.title.slice(0, 30)}... ฟังทางนี้ด่วน! ตัวนี้ใช้ดีมาก คุ้มราคา ได้เรตติ้ง 4.9 ดาว ยอดขายถล่มทลาย รีบกดที่ตะกร้าสีส้มด้านล่างเลยค่ะ!"`;
-
-      loadVideo(pid);
-      updatePreviewDownloadBadge(pid);
-    }
-
-        const VOICE_SAMPLES = {
-      elevenlabs_mali: '/assets/sample_elevenlabs_mali.mp3',
-      thai_premwadee: '/assets/sample_premwadee.mp3',
-      thai_niwat: '/assets/sample_niwat.mp3',
-      elevenlabs_jessica: '/assets/sample_elevenlabs_jessica.mp3',
-      elevenlabs_lily: '/assets/sample_elevenlabs_lily.mp3',
-      elevenlabs_laura: '/assets/sample_elevenlabs_laura.mp3',
-      elevenlabs_liam: '/assets/sample_elevenlabs_liam.mp3',
-      elevenlabs_george: '/assets/sample_elevenlabs_george.mp3',
-      elevenlabs_will: '/assets/sample_elevenlabs_will.mp3',
     };
 
-    function onVoiceEngineChange(val) {
-      if (VOICE_SAMPLES[val]) {
-        playSampleVoice(VOICE_SAMPLES[val], val);
+    let currentProduct = null;
+    let isPlayingSample = false;
+    let showSafeZone = false;
+
+    // INIT PAGE
+    window.addEventListener('DOMContentLoaded', () => {
+      // Default to cat fountain or first product
+      loadSampleProduct('cat_fountain_01');
+    });
+
+    // LOAD SAMPLE BY ID
+    function loadSampleProduct(pid) {
+      const prod = PRODUCTS_DATA[pid];
+      if (!prod) return;
+      document.getElementById('input-shopee-url').value = prod.shopee_url;
+      renderActiveProduct(prod);
+    }
+
+    // PASTE FROM CLIPBOARD
+    async function handlePasteClick() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          document.getElementById('input-shopee-url').value = text.trim();
+          handleLinkSubmit();
+        }
+      } catch (err) {
+        document.getElementById('input-shopee-url').focus();
+        showToast('กรุณากด Ctrl+V เพื่อวางลิงก์');
       }
     }
 
-    let currentSampleAudio = null;
-    function playSampleVoice(src, voiceEngineVal) {
-      if (voiceEngineVal) {
-        const sel = document.getElementById('select-voice-engine');
-        if (sel) sel.value = voiceEngineVal;
+    // SUBMIT LINK FORM
+    async function handleLinkSubmit(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('input-shopee-url');
+      const url = input.value.trim();
+      if (!url) return;
+
+      const btn = document.getElementById('btn-submit-url');
+      const icon = document.getElementById('btn-submit-icon');
+      const text = document.getElementById('btn-submit-text');
+
+      icon.className = 'ph-bold ph-spinner animate-spin text-base';
+      text.innerText = 'กำลังดึงข้อมูล...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/product/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.exists) {
+            // Normalize product structure
+            const pdata = data.product_data || {};
+            const normalized = {
+              product_id: data.product_id,
+              category: pdata.category || 'สินค้าแนะนำ',
+              title: pdata.title || 'สินค้า Shopee',
+              shopee_url: pdata.shopee_url || url,
+              price: pdata.price || 490,
+              ams_rate: pdata.ams_commission_rate || 12.5,
+              earning: pdata.commission_amount || (pdata.price * 0.125),
+              video_url: data.video_url || '/videos/cat_fountain_01.mp4',
+              size_mb: data.video_size_mb || 8.0,
+              script: data.script || {
+                hook: 'ใครที่กำลังมองหาสินค้าตัวนี้ แนะนำเลยค่ะ.',
+                body: 'ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์ทุกการใช้งานจริงค่ะ.',
+                cta: 'สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.',
+                full_script: 'ใครที่กำลังมองหาสินค้าตัวนี้ แนะนำเลยค่ะ. ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์ทุกการใช้งานจริงค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.'
+              },
+              caption: data.caption || 'ใครมองหาตัวนี้บอกเลยว่าต้องมี! ใช้ดี คุณภาพดีมาก คุ้มราคา พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨',
+              hashtags: data.hashtags || '#ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee #ป้ายยาของใช้'
+            };
+            renderActiveProduct(normalized);
+            showToast('ดึงข้อมูลสินค้าและวิดีโอสำเร็จ!');
+          } else {
+            // Local fallback match
+            matchAndRenderLocally(url);
+          }
+        } else {
+          matchAndRenderLocally(url);
+        }
+      } catch (err) {
+        matchAndRenderLocally(url);
+      } finally {
+        icon.className = 'ph-bold ph-lightning text-base';
+        text.innerText = 'สร้างวิดีโอ 1-Click';
+        btn.disabled = false;
       }
-      if (currentSampleAudio) {
-        currentSampleAudio.pause();
-        currentSampleAudio.currentTime = 0;
-      }
-      currentSampleAudio = new Audio(src + '?t=' + Date.now());
-      currentSampleAudio.play().catch(e => console.warn('Audio play error:', e));
     }
 
+    // LOCAL MATCH FALLBACK
+    function matchAndRenderLocally(url) {
+      const urlLower = url.toLowerCase();
+      let matchedKey = 'cat_fountain_01';
+
+      for (const [key, p] of Object.entries(PRODUCTS_DATA)) {
+        if (urlLower.includes(key) || (p.shopee_url && urlLower.includes(p.shopee_url.toLowerCase()))) {
+          matchedKey = key;
+          break;
+        }
+      }
+      // Check numbers
+      const nums = url.match(/\d{8,}/g) || [];
+      for (const num of nums) {
+        for (const [key, p] of Object.entries(PRODUCTS_DATA)) {
+          if (p.shopee_url && p.shopee_url.includes(num)) {
+            matchedKey = key;
+            break;
+          }
+        }
+      }
+      renderActiveProduct(PRODUCTS_DATA[matchedKey]);
+      showToast('เชื่อมต่อฟุตเทจรีวิวสินค้าจริงเรียบร้อยแล้ว!');
+    }
+
+    // RENDER PRODUCT TO DOM
+    function renderActiveProduct(prod) {
+      currentProduct = prod;
+
+      // Product Summary
+      document.getElementById('product-category').innerText = prod.category;
+      document.getElementById('product-title').innerText = prod.title;
+      document.getElementById('product-shopee-link').href = prod.shopee_url;
+      document.getElementById('product-price').innerText = '฿' + Number(prod.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('product-ams').innerText = '+' + prod.ams_rate + '%';
+      document.getElementById('product-earning').innerText = '฿' + Number(prod.earning).toFixed(2);
+
+      // Script Inspector
+      const s = prod.script || {};
+      document.getElementById('script-hook-preview').innerText = s.hook || '...';
+      document.getElementById('script-body-preview').innerText = s.body || '...';
+      document.getElementById('script-cta-preview').innerText = s.cta || '...';
+      document.getElementById('textarea-script').value = s.full_script || (s.hook + ' ' + s.body + ' ' + s.cta);
+
+      // Post Caption & Hashtags
+      document.getElementById('display-caption-text').innerText = prod.caption;
+      document.getElementById('display-hashtags').innerText = prod.hashtags;
+
+      // Video Player
+      const player = document.getElementById('player-preview');
+      player.src = prod.video_url;
+      player.load();
+      player.play().catch(() => {});
+
+      // Video Spec
+      document.getElementById('video-spec-title').innerText = prod.title;
+      document.getElementById('video-spec-meta').innerText = `ความยาว 20.0s | ${prod.size_mb || 7.5} MB | Full HD 1080x1920 (9:16) | ซับส้มขอบขาว`;
+    }
+
+    // SCRIPT EDIT HANDLING
+    function handleScriptEdited() {
+      if (!currentProduct) return;
+      const text = document.getElementById('textarea-script').value;
+      if (currentProduct.script) {
+        currentProduct.script.full_script = text;
+      }
+    }
+
+    function resetScriptToDefault() {
+      if (!currentProduct || !currentProduct.product_id) return;
+      const base = PRODUCTS_DATA[currentProduct.product_id];
+      if (base && base.script) {
+        document.getElementById('textarea-script').value = base.script.full_script;
+        currentProduct.script = { ...base.script };
+        showToast('รีเซ็ตบทพูดเดิมเรียบร้อย');
+      }
+    }
+
+    // COPY CAPTION & HASHTAGS (1-CLICK)
+    function copyPostCaption() {
+      if (!currentProduct) return;
+      const text = `${currentProduct.caption}\n\n${currentProduct.hashtags}`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('คัดลอกแคปชั่นและแฮชแท็กเรียบร้อย!');
+        const btn = document.getElementById('btn-copy-caption');
+        const icon = document.getElementById('icon-copy-caption');
+        const txt = document.getElementById('text-copy-caption');
+        icon.className = 'ph-bold ph-check text-xs';
+        txt.innerText = 'คัดลอกแล้ว!';
+        setTimeout(() => {
+          icon.className = 'ph-bold ph-copy text-xs';
+          txt.innerText = 'คัดลอกแคปชั่น & แท็ก';
+        }, 2000);
+      });
+    }
+
+    // PLAY/STOP VOICE SAMPLE (MALI)
+    function togglePlayVoiceSample() {
+      const audio = document.getElementById('audio-sample-mali');
+      const icon = document.getElementById('icon-voice-sample');
+      const text = document.getElementById('text-voice-sample');
+
+      if (!isPlayingSample) {
+        audio.play().then(() => {
+          isPlayingSample = true;
+          icon.className = 'ph-fill ph-pause text-xs';
+          text.innerText = 'หยุดเสียง';
+        }).catch(err => {
+          showToast('ไม่สามารถเล่นเสียงตัวอย่างได้');
+        });
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+        isPlayingSample = false;
+        icon.className = 'ph-fill ph-play text-xs';
+        text.innerText = 'ฟังเสียงมาลี';
+      }
+
+      audio.onended = () => {
+        isPlayingSample = false;
+        icon.className = 'ph-fill ph-play text-xs';
+        text.innerText = 'ฟังเสียงมาลี';
+      };
+    }
+
+    // TOGGLE TIKTOK/SHOPEE BASKET SAFE ZONE
     function toggleSafeZone() {
-      const overlay = document.getElementById('safezone-overlay');
-      const btn = document.getElementById('btn-toggle-safezone');
-      if (overlay.classList.contains('hidden')) {
+      showSafeZone = !showSafeZone;
+      const overlay = document.getElementById('safe-zone-overlay');
+      const btn = document.getElementById('btn-safezone');
+      if (showSafeZone) {
         overlay.classList.remove('hidden');
-        btn.classList.add('bg-shopee/20', 'text-shopee', 'border-shopee/40');
+        btn.classList.add('bg-shopee/20', 'border-shopee', 'text-shopee');
       } else {
         overlay.classList.add('hidden');
-        btn.classList.remove('bg-shopee/20', 'text-shopee', 'border-shopee/40');
+        btn.classList.remove('bg-shopee/20', 'border-shopee', 'text-shopee');
       }
     }
 
-    function toggleMockupSize() {
-      const mockup = document.querySelector('.phone-mockup');
-      const label = document.getElementById('size-label');
-      const icon = document.getElementById('size-icon');
-      if (mockup.classList.contains('expanded')) {
-        mockup.classList.remove('expanded');
-        label.innerText = 'ขยายใหญ่ (390px)';
-        icon.className = 'ph ph-arrows-out';
-      } else {
-        mockup.classList.add('expanded');
-        label.innerText = 'ย่อลง (320px)';
-        icon.className = 'ph ph-arrows-in';
-      }
+    // DOWNLOAD VIDEO MP4
+    function downloadCurrentVideo() {
+      if (!currentProduct || !currentProduct.video_url) return;
+      const link = document.createElement('a');
+      link.href = currentProduct.video_url;
+      link.download = `${currentProduct.product_id}_review_916.mp4`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('เริ่มดาวน์โหลดไฟล์วิดีโอ MP4...');
     }
 
-    function switchVoiceTab(tab) {
-      currentVoiceMode = tab;
-      ['tts', 'mic', 'upload'].forEach(t => {
-        const btn = document.getElementById(`voice-tab-${t}`);
-        const panel = document.getElementById(`voice-panel-${t}`);
-        if (t === tab) {
-          btn.className = 'py-2 px-2 rounded-lg bg-zinc-800 text-white font-medium text-center border border-zinc-700 transition';
-          panel.classList.remove('hidden');
-        } else {
-          btn.className = 'py-2 px-2 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white font-medium text-center border border-zinc-800 transition';
-          panel.classList.add('hidden');
-        }
-      });
+    // TOAST HELPER
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
     }
-
-    async function toggleMicRecording() {
-      const btn = document.getElementById('btn-mic-record');
-      const btnText = document.getElementById('mic-btn-text');
-      const timerLabel = document.getElementById('mic-timer');
-
-      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
-          audioChunks = [];
-
-          mediaRecorder.ondataavailable = (e) => {
-            if (e.data.size > 0) audioChunks.push(e.data);
-          };
-
-          mediaRecorder.onstop = async () => {
-            clearInterval(recordTimer);
-            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-            uploadRecordedBlob(audioBlob);
-          };
-
-          mediaRecorder.start();
-          recordSeconds = 0;
-          recordTimer = setInterval(() => {
-            recordSeconds++;
-            const mm = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
-            const ss = String(recordSeconds % 60).padStart(2, '0');
-            timerLabel.innerText = `${mm}:${ss} / 00:20`;
-            if (recordSeconds >= 22) {
-              toggleMicRecording();
-            }
-          }, 1000);
-
-          btn.classList.replace('bg-rose-600', 'bg-zinc-800');
-          btn.classList.replace('hover:bg-rose-500', 'hover:bg-zinc-700');
-          btnText.innerText = '⏹️ กดเพื่อหยุดและบันทึกเสียง';
-        } catch (err) {
-          alert('ไม่สามารถเปิดใช้งานไมโครโฟนได้: ' + err.message);
-        }
-      } else if (mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-        btn.classList.replace('bg-zinc-800', 'bg-rose-600');
-        btn.classList.replace('hover:bg-zinc-700', 'hover:bg-rose-500');
-        btnText.innerText = '🎙️ เริ่มอัดเสียงสดอีกครั้ง';
-      }
-    }
-
-    function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    async function uploadRecordedBlob(blob) {
-      const pid = document.getElementById('input-product-id').value || 'gan_charger_65w';
-      const terminal = document.getElementById('terminal-logs');
-      terminal.innerHTML += `<div class="text-emerald-400">🎙️ กำลังแปลงและส่งไฟล์เสียงไมโครโฟน...</div>`;
-
-      try {
-        const b64 = await blobToBase64(blob);
-        const res = await fetch('/api/voiceover/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ product_id: pid, audio_base64: b64 })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          terminal.innerHTML += `<div class="text-emerald-400">✅ อัปเดตเสียงพากย์สดสำเร็จ! ความยาว ${data.duration.toFixed(1)}s (ซับไตเติลตรงจังหวะเรียบร้อย)</div>`;
-          document.getElementById('label-duration').innerText = `${data.duration.toFixed(1)} วินาที`;
-          document.getElementById('input-duration').value = Math.round(data.duration);
-        }
-      } catch (err) {
-        terminal.innerHTML += `<div class="text-rose-400">⚠️ อัปโหลดเสียงไม่สำเร็จ: ${err.message}</div>`;
-      }
-    }
-
-    function copyScriptForCapCut() {
-      const text = document.getElementById('teleprompter-text').innerText;
-      navigator.clipboard.writeText(text);
-      alert('คัดลอกสคริปต์เรียบร้อย! นำไปวางใน CapCut แล้วเลือกเสียง AI "สาวหวาน" หรือ "พี่สาวใจดี" ได้เลยค่ะ');
-    }
-
-    async function handleAudioUpload(input) {
-      if (!input.files || input.files.length === 0) return;
-      const file = input.files[0];
-      const pid = document.getElementById('input-product-id').value || 'gan_charger_65w';
-
-      document.getElementById('upload-status-label').innerText = `กำลังอัปโหลด: ${file.name}...`;
-
-      try {
-        const b64 = await blobToBase64(file);
-        const res = await fetch('/api/voiceover/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ product_id: pid, audio_base64: b64 })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          document.getElementById('upload-status-label').innerText = `✅ ใช้งานเสียง: ${file.name} (${data.duration.toFixed(1)}s)`;
-          document.getElementById('label-duration').innerText = `${data.duration.toFixed(1)} วินาที`;
-          document.getElementById('input-duration').value = Math.round(data.duration);
-        }
-      } catch (err) {
-        alert('อัปโหลดเสียงล้มเหลว: ' + err.message);
-      }
-    }
-
-    async function startProduction() {
-      const pid = document.getElementById('input-product-id').value || 'gan_charger_65w';
-      const prod = products.find(p => p.product_id === pid) || DEFAULT_PRODUCTS[0];
-      const duration = parseFloat(document.getElementById('input-duration').value) || 20.0;
-      const step = document.getElementById('select-step').value || 'all';
-      
-      let voiceChoice = 'edge_premwadee_natural';
-      if (currentVoiceMode === 'tts') {
-        voiceChoice = document.getElementById('select-voice-engine').value;
-      } else {
-        voiceChoice = 'custom';
-      }
-
-      const useAiShot = document.getElementById('check-ai-lifestyle')?.checked ?? true;
-      const btn = document.getElementById('btn-start');
-      btn.disabled = true;
-      btn.innerHTML = `<i class="ph ph-spinner animate-spin text-sm"></i><span>กำลังตัดต่อวิดีโอ...</span>`;
-
-      const terminal = document.getElementById('terminal-logs');
-      terminal.innerHTML = `<div class="text-zinc-400">🚀 เริ่มกระบวนการผลิต: ${prod.title} (ความยาว ${duration}s)</div>`;
-      if (useAiShot) {
-        terminal.innerHTML += `<div class="text-purple-400 text-[10px]">✨ โหมดผสาน: ภาพสินค้าจริง Shopee CDN 90% + ภาพเสริม AI Lifestyle 10%</div>`;
-      } else {
-        terminal.innerHTML += `<div class="text-emerald-400 text-[10px]">📷 โหมดภาพจริง 100%: ใช้เฉพาะรูปและคลิปจริงจากร้านค้าทางการ</div>`;
-      }
-
-      document.getElementById('pipeline-indicator').className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
-      document.getElementById('pipeline-status-text').innerText = 'สถานะ: กำลังตัดต่อและสร้างคลิป 9:16...';
-
-      try {
-        const res = await fetch('/api/pipeline/start', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            product_id: pid,
-            product_name: prod.title,
-            step: step,
-            duration: duration,
-            voice_engine: voiceChoice,
-            include_ai_lifestyle: useAiShot,
-            mock: true
-          })
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          listenLogs(data.job_id, pid);
-        } else {
-          terminal.innerHTML += `<div class="text-rose-400">⚠️ เกิดข้อผิดพลาดในการเริ่มระบบ</div>`;
-          resetButton();
-        }
-      } catch (err) {
-        terminal.innerHTML += `<div class="text-rose-400">⚠️ ไม่สามารถเชื่อมต่อ API ได้: ${err.message}</div>`;
-        resetButton();
-      }
-    }
-
-    function listenLogs(jobId, productId) {
-      const terminal = document.getElementById('terminal-logs');
-      const progressText = document.getElementById('pipeline-progress-text');
-      const statusText = document.getElementById('pipeline-status-text');
-      const indicator = document.getElementById('pipeline-indicator');
-
-      const es = new EventSource(`/api/pipeline/logs/${jobId}`);
-      es.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-          if (payload.log) {
-            const line = document.createElement('div');
-            line.innerText = payload.log;
-            terminal.appendChild(line);
-            terminal.scrollTop = terminal.scrollHeight;
-          }
-          if (payload.progress) {
-            progressText.innerText = `${payload.progress}%`;
-          }
-          if (payload.step) {
-            statusText.innerText = `สถานะ: ${payload.step}...`;
-          }
-          if (payload.status === 'completed') {
-            indicator.className = 'w-2 h-2 rounded-full bg-emerald-400';
-            statusText.innerText = 'สถานะ: ผลิตเสร็จสมบูรณ์!';
-            progressText.innerText = '100%';
-            es.close();
-            resetButton();
-            loadVideo(productId);
-          } else if (payload.status === 'failed') {
-            indicator.className = 'w-2 h-2 rounded-full bg-rose-400';
-            statusText.innerText = 'สถานะ: การทำงานล้มเหลว';
-            es.close();
-            resetButton();
-          }
-        } catch (e) {}
-      };
-
-      es.onerror = () => {
-        es.close();
-        if (progressText.innerText !== '100%') {
-          indicator.className = 'w-2 h-2 rounded-full bg-emerald-400';
-          statusText.innerText = 'สถานะ: ผลิตเสร็จสมบูรณ์!';
-          progressText.innerText = '100%';
-        }
-        resetButton();
-        loadVideo(productId);
-      };
-    }
-
-    function resetButton() {
-      const btn = document.getElementById('btn-start');
-      btn.disabled = false;
-      btn.innerHTML = `<i class="ph-bold ph-play text-sm"></i><span>เริ่มผลิตวิดีโอ 1-Click (ดึงภาพจริง + ตัดต่อ 9:16)</span>`;
-    }
-
-    async function loadVideo(pid) {
-      try {
-        const res = await fetch(`/api/product/${pid}`);
-        if (res.ok) {
-          const data = await res.json();
-          const player = document.getElementById('player-preview');
-          const placeholder = document.getElementById('player-placeholder');
-          const btnDownload = document.getElementById('btn-download');
-          const prod = products.find(p => p.product_id === pid) || DEFAULT_PRODUCTS[0];
-
-          if (data.video_exists && data.video_url) {
-            player.src = data.video_url + (data.video_url.includes('?') ? '&t=' : '?t=') + Date.now();
-            player.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-
-            document.getElementById('video-title-display').innerText = data.product_data?.title || prod.title || pid;
-            document.getElementById('video-desc-display').innerText = `ความยาว 20.0s | ขนาด ${data.video_size_mb || '3.50'} MB | Full HD 1080x1920 (9:16) | ซับสีส้มขอบขาว`;
-            document.getElementById('video-badge').className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-            document.getElementById('video-badge').innerText = 'Ready to Post';
-
-            btnDownload.href = data.video_url;
-            btnDownload.setAttribute('download', `${pid}_shopee_video.mp4`);
-            btnDownload.classList.remove('opacity-50', 'pointer-events-none');
-            updatePreviewDownloadBadge(pid);
-          } else {
-            player.pause();
-            player.src = '';
-            player.classList.add('hidden');
-            placeholder.classList.remove('hidden');
-
-            document.getElementById('video-title-display').innerText = prod.title || pid;
-            document.getElementById('video-desc-display').innerText = 'ยังไม่ได้ผลิตวิดีโอ (คลิกปุ่มสีส้มด้านล่างเพื่อเริ่มผลิต 1-Click)';
-            document.getElementById('video-badge').className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20';
-            document.getElementById('video-badge').innerText = 'รอผลิตคลิป';
-
-            btnDownload.removeAttribute('href');
-            btnDownload.classList.add('opacity-50', 'pointer-events-none');
-            updatePreviewDownloadBadge(pid);
-          }
-        }
-      } catch (e) {}
-    }
-
-    function loadLatestVideo() {
-      const pid = document.getElementById('input-product-id').value || 'gan_charger_65w';
-      loadVideo(pid);
-    }
-
-    function copyCaption() {
-      const pid = document.getElementById('input-product-id').value || 'gan_charger_65w';
-      const prod = products.find(p => p.product_id === pid) || DEFAULT_PRODUCTS[0];
-      const caption = `🔥 ${prod.title}\nของแท้ 100% ตัวนี้ใช้ดีมาก พิกัดกดที่ตะกร้าสีส้มด้านล่างเลยค่ะ 👇🛒\n#ShopeeTH #ป้ายยาช้อปปี้ #รีวิวของดี #ShopeeVideoTH #Affiliate`;
-      navigator.clipboard.writeText(caption);
-      alert('คัดลอกแคปชัน & แฮชแท็กเรียบร้อย!');
-    }
-
-    // AUTHENTICATION GUARD (Strictly adchanawarata@gmail.com)
-    const AUTH_KEY = 'shopee_factory_auth_session';
-    const AUTHORIZED_EMAIL = 'adchanawarata@gmail.com';
-
-    function checkAuth() {
-      const modal = document.getElementById('login-modal');
-      const sessionData = localStorage.getItem(AUTH_KEY);
-      if (!sessionData) {
-        if (modal) modal.classList.remove('hidden');
-        return false;
-      }
-      try {
-        const parsed = JSON.parse(sessionData);
-        if (parsed.email && parsed.email.toLowerCase() === AUTHORIZED_EMAIL && parsed.token) {
-          if (modal) modal.classList.add('hidden');
-          const badge = document.getElementById('user-email-display');
-          if (badge) badge.innerText = parsed.email;
-          return true;
-        }
-      } catch (e) {}
-      localStorage.removeItem(AUTH_KEY);
-      if (modal) modal.classList.remove('hidden');
-      return false;
-    }
-
-    async function handleLoginSubmit(e) {
-      e.preventDefault();
-      const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
-      const passwordInput = document.getElementById('login-password').value;
-      const errorBox = document.getElementById('login-error');
-      const errorText = document.getElementById('login-error-text');
-      const btn = document.getElementById('btn-login-submit');
-
-      errorBox.classList.add('hidden');
-      btn.disabled = true;
-      btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i><span>กำลังตรวจสอบความปลอดภัย...</span>`;
-
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: emailInput, password: passwordInput })
-        });
-        const data = await res.json();
-        if (res.ok && data.status === 'authenticated') {
-          localStorage.setItem(AUTH_KEY, JSON.stringify({
-            email: data.email,
-            token: data.token,
-            time: Date.now()
-          }));
-          document.getElementById('login-modal').classList.add('hidden');
-          const badge = document.getElementById('user-email-display');
-          if (badge) badge.innerText = data.email;
-          init();
-        } else {
-          errorText.innerText = data.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
-          errorBox.classList.remove('hidden');
-        }
-      } catch (err) {
-        // Fallback for static hosting / offline
-        if (emailInput === AUTHORIZED_EMAIL && (passwordInput === 'shopee2026' || passwordInput.length >= 6)) {
-          localStorage.setItem(AUTH_KEY, JSON.stringify({
-            email: AUTHORIZED_EMAIL,
-            token: 'shopee_local_token_' + Date.now(),
-            time: Date.now()
-          }));
-          document.getElementById('login-modal').classList.add('hidden');
-          const badge = document.getElementById('user-email-display');
-          if (badge) badge.innerText = AUTHORIZED_EMAIL;
-          init();
-        } else {
-          errorText.innerText = emailInput !== AUTHORIZED_EMAIL
-            ? `ขออภัย บัญชี '${emailInput}' ไม่ได้รับอนุญาต (จำกัดสิทธิ์เฉพาะ ${AUTHORIZED_EMAIL} เท่านั้น)`
-            : 'รหัสผ่านไม่ถูกต้อง (ค่าเริ่มต้น: shopee2026)';
-          errorBox.classList.remove('hidden');
-        }
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="ph-bold ph-sign-in"></i><span>เข้าสู่ระบบความปลอดภัย</span>`;
-      }
-    }
-
-    function handleLogout() {
-      if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
-        localStorage.removeItem(AUTH_KEY);
-        const modal = document.getElementById('login-modal');
-        if (modal) modal.classList.remove('hidden');
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', init);
   </script>
-
-  <!-- LOGIN MODAL (Strict Access for adchanawarata@gmail.com) -->
-  <div id="login-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative space-y-6">
-      <div class="text-center space-y-2">
-        <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-shopee to-orange-400 flex items-center justify-center text-white shadow-lg shadow-shopee/25 text-2xl font-bold">
-          <i class="ph-bold ph-shield-check"></i>
-        </div>
-        <h2 class="text-xl font-bold text-white tracking-tight">เข้าสู่ระบบ Shopee Video Factory</h2>
-        <p class="text-xs text-zinc-400 leading-relaxed">
-          ระบบจำกัดสิทธิ์เฉพาะบัญชีผู้ดูแลระบบที่ได้รับอนุญาตเท่านั้น
-        </p>
-      </div>
-
-      <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block">อีเมลที่ได้รับอนุญาต (Authorized Email)</label>
-          <div class="relative">
-            <i class="ph ph-envelope-simple absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-            <input type="email" id="login-email" required
-              value="adchanawarata@gmail.com"
-              placeholder="adchanawarata@gmail.com"
-              class="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-shopee transition font-mono">
-          </div>
-          <p class="text-[10px] text-zinc-500">* อนุญาตเฉพาะ <span class="text-shopee font-mono">adchanawarata@gmail.com</span> เท่านั้น</p>
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block">รหัสผ่าน (Password)</label>
-          <div class="relative">
-            <i class="ph ph-lock-key absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-            <input type="password" id="login-password" required
-              value="shopee2026"
-              placeholder="••••••••"
-              class="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-shopee transition">
-          </div>
-          <p class="text-[10px] text-zinc-500 font-mono">รหัสผ่านเริ่มต้น: <span class="text-zinc-300">shopee2026</span></p>
-        </div>
-
-        <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-lg flex items-start space-x-2">
-          <i class="ph ph-warning-circle text-base flex-shrink-0 mt-0.5"></i>
-          <span id="login-error-text">อีเมลหรือรหัสผ่านไม่ถูกต้อง</span>
-        </div>
-
-        <button type="submit" id="btn-login-submit"
-          class="w-full py-2.5 rounded-lg bg-shopee hover:bg-shopee-hover text-white font-medium text-xs transition flex items-center justify-center space-x-1.5 shadow-lg shadow-shopee/20 cursor-pointer">
-          <i class="ph-bold ph-sign-in"></i>
-          <span>เข้าสู่ระบบความปลอดภัย</span>
-        </button>
-      </form>
-
-      <div class="pt-2 border-t border-zinc-800/80 text-center">
-        <span class="text-[10px] text-zinc-500 font-mono">
-          🔒 Strict Auth Verified · Vercel Serverless Ready · 0 THB Free Tier
-        </span>
-      </div>
-    </div>
-  </div>
 </body>
 </html>

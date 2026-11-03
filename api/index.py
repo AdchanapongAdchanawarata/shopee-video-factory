@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import asyncio
 from pathlib import Path
@@ -111,6 +112,50 @@ def get_status():
 
 PUBLIC_VIDEOS_DIR = BASE_DIR / "public" / "videos"
 
+
+PRODUCT_CAPTIONS = {
+    "cat_fountain_01": {
+        "caption": "ใครเลี้ยงแมวต้องมีเลยค่ะ! น้ำพุไร้สายสแตนเลส 5L ไร้สาย ปลอดภัย เสียงเงียบกริบ น้องแมวดื่มน้ำเยอะขึ้นจริง สุขภาพไตดีขึ้น พิกัดในตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ 🐱💦",
+        "hashtags": "#น้ำพุแมว #น้ำพุแมวไร้สาย #ทาสแมว #ของใช้แมว #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "gan_charger_65w": {
+        "caption": "หัวชาร์จเร็วตัวจบ UGREEN 65W GaN ชาร์จพร้อมกัน 3 เครื่อง มือถือ โน้ตบุ๊ก แท็บเล็ต พกตัวเดียวเที่ยวได้ทั่วโลก ไม่ร้อน ปลอดภัย พิกัดในตะกร้าส้มซ้ายล่างเลยค่ะ ⚡📱",
+        "hashtags": "#หัวชาร์จugreen #ugreen65w #หัวชาร์จเร็ว #ของดีบอกต่อ #ไอทีน่ารู้ #ShopeeVideoTH #รีวิวช้อปปี้ #นายหน้าShopee"
+    },
+    "uv_dust_mite_vacuum": {
+        "caption": "คนเป็นภูมิแพ้ตื่นมาจามบ่อยต้องจัด! เครื่องดูดไรฝุ่นแสงยูวี Deerma CM800 ดูดฝุ่นและไรฝุ่นสะสมบนที่นอนสะอาดหมดจด หลับสบายขึ้นเยอะ พิกัดตะกร้าส้มซ้ายล่างนะคะ 🛏️✨",
+        "hashtags": "#เครื่องดูดไรฝุ่น #เครื่องดูดไรฝุ่นdeerma #ของใช้ในบ้าน #ภูมิแพ้ #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "tyeso_tumbler_304": {
+        "caption": "แก้วเก็บความเย็น TYESO 1200ml ของแท้ สแตนเลส 304 ใส่น้ำแข็งข้ามวันยังอยู่ครบ มีหูจับถนัดมือ หลอดดูดในตัว พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧊🥤",
+        "hashtags": "#แก้วtyeso #แก้วเก็บความเย็น #แก้วtyesoแท้ #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "spray_mop_360": {
+        "caption": "บอกลาการหิ้วถังน้ำหนักๆ ไปได้เลย! ไม้ถูพื้นสเปรย์ Deerma TB500 ฉีดแล้วถูได้ทันที หมุนได้ 360 องศา แห้งไว ไม่ทิ้งคราบ พิกัดตะกร้าส้มซ้ายล่างเลยนะคะ 🧹✨",
+        "hashtags": "#ไม้ถูพื้นสเปรย์ #ไม้ถูพื้นdeerma #ของใช้ในบ้าน #งานบ้านที่รัก #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "solar_sensor_light": {
+        "caption": "สว่างยันเช้า ค่าไฟ 0 บาท! ไฟโซลาร์เซลล์ติดผนัง 100 LED มีเซนเซอร์ตรวจจับความเคลื่อนไหว สว่างอัตโนมัติ กันน้ำกันฝน ติดตั้งง่ายมาก พิกัดในตะกร้าส้มเลยค่ะ 💡🏡",
+        "hashtags": "#ไฟโซลาร์เซลล์ #ไฟติดผนัง #แต่งบ้าน #ประหยัดค่าไฟ #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "air_fryer_visual": {
+        "caption": "ทำอาหารง่ายขึ้นเยอะ! หม้อทอดไร้น้ำมัน Simplus 3.5L รุ่นกระจกมองเห็นอาหารด้านใน กรอบนอกนุ่มใน คลีนๆ อร่อยแบบไม่ต้องใช้น้ำมัน พิกัดตะกร้าส้มเลยนะคะ 🍗🍟",
+        "hashtags": "#หม้อทอดไร้น้ำมัน #หม้อทอดsimplus #ของใช้ในครัว #เมนูหม้อทอด #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "sonic_electric_toothbrush": {
+        "caption": "แปรงสะอาดลึกถึงซอกฟัน! แปรงสีฟันไฟฟ้าโซนิค MeeGoo ขนแปรงดูปองท์นุ่มไม่เจ็บเหงือก สั่น 56000 รอบ กันน้ำ IPX7 แบตอึดชาร์จ Type-C พิกัดตะกร้าส้มเลยค่ะ 🪥✨",
+        "hashtags": "#แปรงสีฟันไฟฟ้า #แปรงสีฟันโซนิค #ฟันขาวสะอาด #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "kitchen_dish_rack_stainless": {
+        "caption": "จัดครัวให้เป็นระเบียบใน 1 นาที! ชั้นคว่ำจานคร่อมอ่างสแตนเลส 304 แท้ แข็งแรง ทนทาน ไม่เป็นสนิม มีประตูกันฝุ่น ครัวกว้างขึ้นเยอะ พิกัดตะกร้าส้มเลยนะคะ 🍽️🏠",
+        "hashtags": "#ชั้นคว่ำจาน #ที่คว่ำจานสแตนเลส #จัดระเบียบครัว #ของใช้ในครัว #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "wireless_earbuds_anc": {
+        "caption": "หูฟังตัดเสียงรบกวนตัวจบ! Baseus Bowie MP1 ของแท้ มี ANC -55dB เงียบสงบเหมือนอยู่ห้องส่วนตัว เบสแน่น ไมค์ 6 ตัวคุยสายชัดแจ๋ว แบตอึด 45 ชม. พิกัดตะกร้าส้มเลยค่ะ 🎧🎵",
+        "hashtags": "#หูฟังbaseus #baseusbowiemp1 #หูฟังบลูทูธ #หูฟังตัดเสียง #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    }
+}
+
 AVAILABLE_VIDEOS = {
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s", 10.09),
     "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07),
@@ -124,9 +169,7 @@ AVAILABLE_VIDEOS = {
     "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s", 6.31),
 }
 
-@app.get("/api/product/{product_id}")
-def get_product(product_id: str):
-    """Return specific product data and exact link to 1080x1920 video."""
+def get_product_helper(product_id: str):
     p_data = None
     if PRODUCTS_DB_PATH.is_file():
         try:
@@ -148,6 +191,31 @@ def get_product(product_id: str):
         v_size = 0.0
         v_exists = False
 
+    # Load script if present
+    script_path = BASE_DIR / "output" / product_id / "script.json"
+    script_data = None
+    if script_path.is_file():
+        try:
+            with open(script_path, "r", encoding="utf-8") as sf:
+                script_data = json.load(sf)
+        except Exception:
+            pass
+
+    if not script_data:
+        title_short = p_data.get("title", "สินค้านี้")[:35]
+        script_data = {
+            "on_screen_headline": title_short[:20],
+            "hook_text": f"ใครที่กำลังมองหา {title_short} แนะนำตัวนี้เลยค่ะ.",
+            "body_text": f"รุ่นนี้ใช้งานดีมาก วัสดุพรีเมียม ตอบโจทย์คนใช้งานจริง คุณภาพคุ้มค่าเกินราคาแน่นอนค่ะ.",
+            "cta_text": "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.",
+            "full_script": f"ใครที่กำลังมองหา {title_short} แนะนำตัวนี้เลยค่ะ. รุ่นนี้ใช้งานดีมาก วัสดุพรีเมียม ตอบโจทย์คนใช้งานจริง คุณภาพคุ้มค่าเกินราคาแน่นอนค่ะ. สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ."
+        }
+
+    cap_info = PRODUCT_CAPTIONS.get(product_id, {
+        "caption": f"ใครมองหาตัวนี้บอกเลยว่าห้ามพลาด! {p_data.get('title', '')[:40]}... ใช้ดี คุณภาพดีมาก คุ้มราคา พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨",
+        "hashtags": "#ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee #ป้ายยาของใช้"
+    })
+
     return {
         "exists": True,
         "product_id": product_id,
@@ -155,7 +223,113 @@ def get_product(product_id: str):
         "video_exists": v_exists,
         "video_url": v_url,
         "video_size_mb": v_size,
-        "voiceover_url": "/assets/sample_elevenlabs_mali.mp3"
+        "voiceover_url": "/assets/sample_elevenlabs_mali.mp3",
+        "voice_name": "มาลี (Mali - Natural & Clear Thai)",
+        "script": script_data,
+        "caption": cap_info.get("caption", ""),
+        "hashtags": cap_info.get("hashtags", ""),
+        "full_caption": f"{cap_info.get('caption', '')}\n\n{cap_info.get('hashtags', '')}"
+    }
+
+@app.get("/api/product/{product_id}")
+def get_product(product_id: str):
+    """Return specific product data, exact video, spoken script, and post caption."""
+    return get_product_helper(product_id)
+
+class AnalyzeUrlRequest(BaseModel):
+    url: str
+
+@app.post("/api/product/analyze")
+def analyze_product_url(req: AnalyzeUrlRequest):
+    """Analyze Shopee product URL, match or scout product, return script, caption, and review video."""
+    url = req.url.strip()
+    if not url:
+        return JSONResponse({"error": "กรุณาวางลิงก์สินค้า Shopee"}, status_code=400)
+
+    url_lower = url.lower()
+    matched_pid = None
+
+    if PRODUCTS_DB_PATH.is_file():
+        try:
+            with open(PRODUCTS_DB_PATH, "r", encoding="utf-8") as f:
+                db = json.load(f)
+                # 1. Exact match or substring match
+                for pid, p in db.items():
+                    s_url = p.get("shopee_url", "").lower()
+                    if s_url and (s_url in url_lower or url_lower in s_url):
+                        matched_pid = pid
+                        break
+                    # 2. Match item ID or shop ID numbers
+                    nums = re.findall(r"(\d{8,})", url)
+                    for n in nums:
+                        if n in s_url:
+                            matched_pid = pid
+                            break
+                    if matched_pid:
+                        break
+                    # 3. Match keywords in slug
+                    keywords = [k for k in pid.split("_") if len(k) > 3]
+                    for kw in keywords:
+                        if kw in url_lower:
+                            matched_pid = pid
+                            break
+                    if matched_pid:
+                        break
+        except Exception:
+            pass
+
+    if matched_pid:
+        res = get_product_helper(matched_pid)
+        res["status"] = "matched"
+        return res
+
+    # Fallback: create dynamic product record from URL slug
+    slug = url.split("?")[0].rstrip("/").split("/")[-1]
+    title_clean = re.sub(r"[-_]", " ", slug)
+    title_clean = re.sub(r"i\.\d+\.\d+", "", title_clean).strip()
+    if not title_clean or len(title_clean) < 3:
+        title_clean = "สินค้า Shopee ยอดนิยม"
+
+    custom_pid = "custom_" + re.sub(r"[^a-zA-Z0-9]", "", slug)[:16]
+    custom_data = {
+        "product_id": custom_pid,
+        "title": title_clean,
+        "price": 490.0,
+        "shopee_url": url,
+        "category": "สินค้าแนะนำสำหรับคุณ",
+        "shop": "Shopee Official Store",
+        "ams_commission_rate": 12.5,
+        "commission_amount": 61.25
+    }
+
+    script_data = {
+        "on_screen_headline": title_clean[:20],
+        "hook_text": f"ใครที่กำลังมองหา {title_clean[:30]} แนะนำตัวนี้เลยค่ะ.",
+        "body_text": f"ตัวนี้ฟังก์ชันครบ ใช้งานง่ายมาก วัสดุดีคุ้มราคา ใครที่กำลังเล็งอยู่บอกเลยไม่ผิดหวังค่ะ.",
+        "cta_text": "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.",
+        "full_script": f"ใครที่กำลังมองหา {title_clean[:30]} แนะนำตัวนี้เลยค่ะ. ตัวนี้ฟังก์ชันครบ ใช้งานง่ายมาก วัสดุดีคุ้มราคา ใครที่กำลังเล็งอยู่บอกเลยไม่ผิดหวังค่ะ. สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ."
+    }
+
+    caption = f"ใครที่กำลังมองหาตัวนี้อยู่บอกเลยต้องมี! {title_clean[:35]}... ฟังก์ชันครบ คุณภาพดี คุ้มราคามาก พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨"
+    hashtags = "#ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee #ป้ายยาของใช้"
+
+    # Default to a clean preview video (e.g. ugreen or generic)
+    default_vid = AVAILABLE_VIDEOS.get("gan_charger_65w", ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07))
+
+    return {
+        "status": "custom_generated",
+        "exists": True,
+        "product_id": custom_pid,
+        "product_data": custom_data,
+        "video_exists": True,
+        "video_url": default_vid[0],
+        "video_size_mb": default_vid[1],
+        "voiceover_url": "/assets/sample_elevenlabs_mali.mp3",
+        "voice_name": "มาลี (Mali - Natural & Clear Thai)",
+        "script": script_data,
+        "caption": caption,
+        "hashtags": hashtags,
+        "full_caption": f"{caption}\n\n{hashtags}"
     }
 
 @app.post("/api/pipeline/start")

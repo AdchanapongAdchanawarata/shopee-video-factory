@@ -92,6 +92,17 @@ def scrape_shopee_product(page: Page, url: str) -> Dict[str, Any]:
     Extracts Product Title, Price, 30-day Sales, Seller Rating,
     AMS Commission %, Product Videos, and Review details from Shopee product page.
     """
+    captured_stream_videos = []
+    def on_res_check(response):
+        try:
+            u = response.url
+            if any(k in u for k in [".mp4", "vod.susercontent", "play-ws"]):
+                if u not in captured_stream_videos:
+                    captured_stream_videos.append(u)
+        except Exception:
+            pass
+    page.on("response", on_res_check)
+
     print(f"🔎 Navigating to: {url}")
     page.goto(url, wait_until="domcontentloaded", timeout=60000)
     random_delay(2.0, 3.5)
@@ -226,6 +237,14 @@ def scrape_shopee_product(page: Page, url: str) -> Dict[str, Any]:
                 continue
     except Exception as e:
         print(f"⚠️ Warning scraping reviews: {e}")
+
+    # Merge any network-intercepted media stream URLs
+    if captured_stream_videos:
+        for v_url in captured_stream_videos:
+            if not product_videos:
+                product_videos.append(v_url)
+            elif v_url not in product_videos and v_url not in review_videos:
+                review_videos.append(v_url)
 
     # Enforce default fallback AMS if on public page without affiliate extension
     if ams_rate == 0.0:

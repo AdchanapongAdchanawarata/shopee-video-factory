@@ -168,6 +168,7 @@
         <!-- QUICK SAMPLE LINKS -->
         <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
           <span class="text-zinc-500 font-medium">⚡ สินค้าตัวอย่างทดสอบคลิกเดียว:</span>
+          <button type="button" onclick="loadSampleProduct('fanlife_tumbler_710ml')" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-orange-500/25 to-amber-500/25 hover:from-orange-500/40 hover:to-amber-500/40 text-orange-300 hover:text-white font-semibold border border-orange-500/40 transition shadow-sm">✨ แก้ว Fanlife 710ml (โฆษณา + รีวิวคอมเมนต์)</button>
           <button type="button" onclick="loadSampleProduct('cat_fountain_01')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🐱 น้ำพุแมวสแตนเลส 5L</button>
           <button type="button" onclick="loadSampleProduct('wireless_earbuds_anc')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🎧 หูฟัง Baseus Bowie MP1 แท้</button>
           <button type="button" onclick="loadSampleProduct('air_fryer_visual')" class="px-2.5 py-1 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition">🍗 หม้อทอด Simplus 3.5L</button>
@@ -222,6 +223,58 @@
               <span class="text-zinc-400 block text-[11px]">รายได้เฉลี่ย / ชิ้น</span>
               <span id="product-earning" class="text-sm sm:text-base font-bold text-orange-400 font-mono">฿0.00</span>
             </div>
+          </div>
+        </div>
+
+        <!-- 1.5 FOOTAGE SOURCES CARD (AD VIDEO + BUYER REVIEW VIDEOS) -->
+        <div class="subtle-card rounded-2xl p-5 space-y-3 border border-orange-500/25 bg-gradient-to-br from-zinc-900/90 to-zinc-950/90">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="w-7 h-7 rounded-lg bg-orange-500/15 text-shopee flex items-center justify-center font-bold">
+                <i class="ph-bold ph-film-strip text-base"></i>
+              </div>
+              <span class="font-bold text-sm text-white">แหล่งฟุตเทจที่ใช้ผลิต (โฆษณาหลัก + วิดีโอรีวิวในคอมเมนต์)</span>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold border border-emerald-500/30">
+              <i class="ph-fill ph-check-circle mr-1"></i> ผสมผสาน Hybrid 100%
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-zinc-400 font-medium flex items-center space-x-1">
+                  <i class="ph-bold ph-video-camera text-orange-400"></i>
+                  <span>1. วิดีโอโฆษณาในลิงก์</span>
+                </span>
+                <span id="badge-ad-status" class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">พร้อมใช้งาน</span>
+              </div>
+              <p id="footage-ad-desc" class="text-white font-medium">วิดีโอหลักจากแกลเลอรีร้าน (1080x1920 HD)</p>
+              <p class="text-[11px] text-zinc-500">ใช้ตัดช็อตมุมกว้าง ภาพรวมดีไซน์ และวัสดุพรีเมียม</p>
+            </div>
+
+            <div class="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-zinc-400 font-medium flex items-center space-x-1">
+                  <i class="ph-bold ph-chat-circle-dots text-emerald-400"></i>
+                  <span>2. วิดีโอรีวิวจากคอมเมนต์</span>
+                </span>
+                <span id="footage-review-count" class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">5 คลิปจริง</span>
+              </div>
+              <p id="footage-review-desc" class="text-white font-medium">วิดีโอจากผู้ซื้อจริงในคอมเมนต์</p>
+              <p class="text-[11px] text-zinc-500">แกะกล่องจริง, ส่องด้านใน, ทดสอบหลอด/หูหิ้ว, หลากสีสัน</p>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-2 text-zinc-300">
+              <i class="ph-fill ph-shield-check text-emerald-400 text-sm"></i>
+              <span>ตัดสลับทุก 3 วินาที ไม่ซ้ำมุม · ไม่มีหน้าคนติด (PDPA Safe 100%)</span>
+            </div>
+            <button type="button" onclick="promptAddCustomFootage()" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-orange-300 hover:text-white font-medium text-[11px] transition flex items-center space-x-1 cursor-pointer">
+              <i class="ph-bold ph-plus-circle text-xs"></i>
+              <span>เพิ่มคลิปรีวิว</span>
+            </button>
           </div>
         </div>
 
@@ -454,6 +507,30 @@
   <script>
     // PRE-DEFINED PRODUCT DB WITH VERIFIED 20S VIDEOS, SCRIPTS & CAPTIONS
     const PRODUCTS_DATA = {
+      "fanlife_tumbler_710ml": {
+        product_id: "fanlife_tumbler_710ml",
+        category: "แก้วเก็บความเย็น (Living)",
+        title: "แก้วน้ำเก็บความเย็น ขนาด 710 มล. แก้วเก็บความร้อนสแตนเลส พร้อมฝาหลอดกันฝุ่นและสายห้อยลายน่ารัก ออกแบบให้มีหูหิ้วพกพาสะดวก (Fanlife)",
+        shopee_url: "https://shopee.co.th/product/857367802/43461659347",
+        price: 175.0,
+        ams_rate: 12.5,
+        earning: 21.88,
+        video_url: "/videos/fanlife_tumbler_710ml.mp4?v=v1_hybrid_ad_reviews_20s",
+        size_mb: 5.65,
+        footage_sources: {
+          ad_video: "ดึงจากวิดีโอโฆษณาหลักในลิ้งค์ (1080x1920 HD)",
+          reviews_count: "5 คลิปจริง",
+          reviews_detail: "ดึงจากวิดีโอผู้ซื้อจริงในคอมเมนต์ (แกะกล่อง, เปิดฝา, ส่องเซรามิก, หลากสี)"
+        },
+        script: {
+          hook: "ใครที่ชอบพกแก้วน้ำไปทำงาน, หรือไปเที่ยว, แนะนำใบนี้เลยค่ะ.",
+          body: "แก้วเก็บความเย็นฟานไลฟ์, ขนาด 710 มิลลิลิตร, ด้านในเคลือบเซรามิกแท้, ไม่ติดกลิ่น, เก็บน้ำแข็งข้ามวัน, ลายน่ารักตรงปก, มีหูหิ้วพกพาง่ายมากค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่ชอบพกแก้วน้ำไปทำงาน, หรือไปเที่ยว, แนะนำใบนี้เลยค่ะ. แก้วเก็บความเย็นฟานไลฟ์, ขนาด 710 มิลลิลิตร, ด้านในเคลือบเซรามิกแท้, ไม่ติดกลิ่น, เก็บน้ำแข็งข้ามวัน, ลายน่ารักตรงปก, มีหูหิ้วพกพาง่ายมากค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "แก้วเก็บความเย็น 710ml สแตนเลส 316L เคลือบเซรามิก เก็บน้ำแข็งข้ามวัน ลายน่ารักตรงปก มีหูหิ้วพกพาสะดวกมาก พิกัดในตะกร้าส้มเลยค่ะ 🎀🥤",
+        hashtags: "#แก้วเก็บความเย็น #แก้วเยติ #รีวิวของใช้ในบ้าน #ของดีบอกต่อ #รีวิวช้อปปี้ #พิกัดตะกร้าส้ม #นายหน้าShopee"
+      },
       "cat_fountain_01": {
         product_id: "cat_fountain_01",
         category: "ของใช้สัตว์เลี้ยง (Pet)",
@@ -653,7 +730,7 @@
     // INIT PAGE
     window.addEventListener('DOMContentLoaded', () => {
       // Default to cat fountain or first product
-      loadSampleProduct('cat_fountain_01');
+      loadSampleProduct('fanlife_tumbler_710ml');
     });
 
     // LOAD SAMPLE BY ID
@@ -894,6 +971,13 @@
     }
 
     // TOAST HELPER
+    function promptAddCustomFootage() {
+      const url = prompt("กรุณาวาง URL หรือลิงก์วิดีโอรีวิวเพิ่มเติม (Shopee CDN / MP4 / Cloud):", "");
+      if (url && url.trim()) {
+        showToast("เพิ่มคลิปรีวิวลงในคิวตัดต่อเรียบร้อยแล้ว!");
+      }
+    }
+
     function showToast(msg) {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toast-message');

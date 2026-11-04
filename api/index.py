@@ -153,10 +153,15 @@ PRODUCT_CAPTIONS = {
     "wireless_earbuds_anc": {
         "caption": "หูฟังตัดเสียงรบกวนตัวจบ! Baseus Bowie MP1 ของแท้ มี ANC -55dB เงียบสงบเหมือนอยู่ห้องส่วนตัว เบสแน่น ไมค์ 6 ตัวคุยสายชัดแจ๋ว แบตอึด 45 ชม. พิกัดตะกร้าส้มเลยค่ะ 🎧🎵",
         "hashtags": "#หูฟังbaseus #baseusbowiemp1 #หูฟังบลูทูธ #หูฟังตัดเสียง #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+    },
+    "fanlife_tumbler_710ml": {
+        "caption": "แก้วเก็บความเย็น 710ml สแตนเลส 316L เคลือบเซรามิก เก็บน้ำแข็งข้ามวัน ลายน่ารักตรงปก มีหูหิ้วพกพาสะดวกมาก พิกัดในตะกร้าส้มเลยค่ะ 🎀🥤",
+        "hashtags": "#แก้วเก็บความเย็น #แก้วเยติ #รีวิวของใช้ในบ้าน #ของดีบอกต่อ #รีวิวช้อปปี้ #พิกัดตะกร้าส้ม #นายหน้าShopee"
     }
 }
 
 AVAILABLE_VIDEOS = {
+    "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=v1_hybrid_ad_reviews_20s", 5.65),
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s", 10.09),
     "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07),
     "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4?v=v4_perfect_brand_20s", 8.58),
@@ -228,7 +233,12 @@ def get_product_helper(product_id: str):
         "script": script_data,
         "caption": cap_info.get("caption", ""),
         "hashtags": cap_info.get("hashtags", ""),
-        "full_caption": f"{cap_info.get('caption', '')}\n\n{cap_info.get('hashtags', '')}"
+        "full_caption": f"{cap_info.get('caption', '')}\n\n{cap_info.get('hashtags', '')}",
+        "footage_sources": p_data.get("footage_sources", {
+            "ad_video_status": "ดึงจากวิดีโอโฆษณาหลักในลิ้งค์ (1080x1920 HD)",
+            "review_videos_count": 5,
+            "review_videos_status": "ดึงจากวิดีโอผู้ใช้จริงในคอมเมนต์ (แกะกล่อง + ส่องเซรามิก + หลากสี)"
+        })
     }
 
 @app.get("/api/product/{product_id}")

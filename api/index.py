@@ -377,6 +377,50 @@ def lookup_title_from_chrome_history(item_id: str) -> Optional[str]:
         pass
     return None
 
+class VoiceSynthesizeRequest(BaseModel):
+    text: str
+    voice_id: Optional[str] = "OB8jPhZsR8bpZJnVSkvQ"
+
+@app.post("/api/voice/synthesize")
+def synthesize_mali_voice(req: VoiceSynthesizeRequest):
+    """Real-time Mali Thai voice synthesis for ANY arbitrary product text."""
+    text = req.text.strip()
+    if not text:
+        return JSONResponse({"error": "No text provided"}, status_code=400)
+
+    api_key = os.getenv("ELEVENLABS_API_KEY", "") or "sk_323a5525e4dc6505f33bc3426bd634b54443b2dea530923b"
+    voice_id = req.voice_id or "OB8jPhZsR8bpZJnVSkvQ"
+
+    try:
+        r = requests.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            headers={
+                "xi-api-key": api_key,
+                "Content-Type": "application/json"
+            },
+            json={
+                "text": text,
+                "model_id": "eleven_multilingual_v2",
+                "voice_settings": {
+                    "stability": 0.5,
+                    "similarity_boost": 0.8
+                }
+            },
+            timeout=25
+        )
+        if r.status_code == 200:
+            import base64
+            b64_audio = base64.b64encode(r.content).decode("utf-8")
+            return {
+                "status": "success",
+                "audio_base64": f"data:audio/mp3;base64,{b64_audio}",
+                "duration": round(len(r.content) / (192 * 1024 / 8), 2)
+            }
+        else:
+            return JSONResponse({"error": r.text}, status_code=r.status_code)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
 @app.post("/api/product/analyze")
 def analyze_product_url(req: AnalyzeUrlRequest):
     """Analyze Shopee product URL, match or scout product, return script, caption, and review video."""

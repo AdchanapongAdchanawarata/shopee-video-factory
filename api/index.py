@@ -242,7 +242,7 @@ PRODUCT_SCRIPTS = {
 }
 
 AVAILABLE_VIDEOS = {
-    "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=v1_hybrid_ad_reviews_20s", 5.65),
+    "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s", 10.07),
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s", 10.09),
     "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07),
     "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4?v=v4_perfect_brand_20s", 8.58),

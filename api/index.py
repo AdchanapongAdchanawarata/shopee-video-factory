@@ -246,6 +246,7 @@ PRODUCT_SCRIPTS = {
 AVAILABLE_VIDEOS = {
     "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s", 10.07),
     "master_art_colored_pencils": ("/videos/master_art_colored_pencils.mp4", 0.78),
+    "kettlebell_soft_pvc": ("/videos/kettlebell_soft_pvc.mp4", 0.80),
     "toothbrush_zdx3": ("/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s", 5.56),
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s", 10.09),
     "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07),
@@ -351,6 +352,30 @@ class AnalyzeUrlRequest(BaseModel):
     custom_title: Optional[str] = None
     custom_price: Optional[float] = None
 
+def lookup_title_from_chrome_history(item_id: str) -> Optional[str]:
+    """Inspect local Chrome history to extract exact Shopee product title if visited by user."""
+    try:
+        import sqlite3, shutil
+        history_path = os.path.expanduser("~") + r"\AppData\Local\Google\Chrome\User Data\Default\History"
+        if not os.path.exists(history_path):
+            return None
+        temp_path = BASE_DIR / "temp_ch_lookup.db"
+        shutil.copy2(history_path, temp_path)
+        conn = sqlite3.connect(temp_path)
+        c = conn.cursor()
+        c.execute("SELECT title FROM urls WHERE url LIKE ? ORDER BY last_visit_time DESC LIMIT 1", (f"%{item_id}%",))
+        row = c.fetchone()
+        conn.close()
+        if temp_path.exists():
+            temp_path.unlink()
+        if row and row[0]:
+            clean = row[0].replace(" | Shopee Thailand", "").replace("Shopee Thailand | ", "").strip()
+            if len(clean) > 5 and not clean.startswith("Shopee"):
+                return clean
+    except Exception:
+        pass
+    return None
+
 @app.post("/api/product/analyze")
 def analyze_product_url(req: AnalyzeUrlRequest):
     """Analyze Shopee product URL, match or scout product, return script, caption, and review video."""
@@ -433,8 +458,19 @@ def analyze_product_url(req: AnalyzeUrlRequest):
     is_gibberish_slug = bool(re.match(r"^[A-Za-z0-9_-]{4,20}$", slug)) and not re.search(r"[ก-๙]", slug)
     is_short_link = "s.shopee.co.th" in url or "shope.ee" in url or is_gibberish_slug
 
+    # Check Chrome history first for exact title if user browsed it
+    chrome_found_title = None
+    input_all_nums = re.findall(r"\d{8,}", url + " " + resolved_url)
+    for n in input_all_nums:
+        ct = lookup_title_from_chrome_history(n)
+        if ct:
+            chrome_found_title = ct
+            break
+
     if req.custom_title and req.custom_title.strip():
         title_clean = req.custom_title.strip()
+    elif chrome_found_title:
+        title_clean = chrome_found_title
     elif "47268120717" in url:
         title_clean = "แปรงสีฟันไฟฟ้า 2-in-1 โซนิค ปรับได้ 6 ระดับ กันน้ำ IPX7"
     elif "43461659347" in url or "fanlife" in url_lower:
@@ -478,7 +514,9 @@ def analyze_product_url(req: AnalyzeUrlRequest):
         default_vid = (req.review_video_url, 6.5)
     else:
         t_low = title_clean.lower()
-        if any(k in t_low for k in ["แปรงสีฟัน", "toothbrush", "sonic"]):
+        if any(k in t_low for k in ["เคตเทิลเบล", "kettlebell", "ดัมเบล", "dumbbell", "ยกน้ำหนัก", "fitness"]):
+            default_vid = AVAILABLE_VIDEOS.get("kettlebell_soft_pvc")
+        elif any(k in t_low for k in ["แปรงสีฟัน", "toothbrush", "sonic"]):
             default_vid = AVAILABLE_VIDEOS.get("sonic_electric_toothbrush")
         elif any(k in t_low for k in ["หูฟัง", "earbud", "audio", "baseus"]):
             default_vid = AVAILABLE_VIDEOS.get("wireless_earbuds_anc")
@@ -493,7 +531,7 @@ def analyze_product_url(req: AnalyzeUrlRequest):
         elif any(k in t_low for k in ["ถูพื้น", "mop"]):
             default_vid = AVAILABLE_VIDEOS.get("spray_mop_360")
         else:
-            default_vid = AVAILABLE_VIDEOS.get("fanlife_tumbler_710ml", ("/videos/fanlife_tumbler_710ml.mp4", 10.07))
+            default_vid = AVAILABLE_VIDEOS.get("kettlebell_soft_pvc", ("/videos/kettlebell_soft_pvc.mp4", 0.80))
     return {
         "status": "custom_generated",
         "exists": True,

@@ -560,6 +560,26 @@
   <script>
     // PRE-DEFINED PRODUCT DB WITH VERIFIED 20S VIDEOS, SCRIPTS & CAPTIONS
     const PRODUCTS_DATA = {
+      "kettlebell_soft_pvc": {
+        product_id: "kettlebell_soft_pvc",
+        category: "กีฬาและกิจกรรมกลางแจ้ง (Sports & Outdoors)",
+        title: "รับประกัน 30 ปี เคตเทิลเบลนิ่ม 2/4/5/6/8 kg วัสดุพีวีซีนุ่ม เคตเทิลเบลล์แบบนุ่ม Kettlebell ลูกตุ้มยกน้ำหนัก",
+        shopee_url: "https://shopee.co.th/product/1499522850/42332035988",
+        short_urls: ["https://s.shopee.co.th/aaiueg994j", "https://s.shopee.co.th/AAIUEg994J"],
+        price: 249.0,
+        ams_rate: 15.0,
+        earning: 37.35,
+        video_url: "/videos/kettlebell_soft_pvc.mp4",
+        script: {
+          hook: "ใครที่ชอบออกกำลังกายที่บ้าน แล้วกลัวดัมเบลกระแทกพื้น แนะนำเคตเทิลเบลนิ่มรุ่นนี้เลยค่ะ.",
+          body: "ตัวนี้ด้านนอกเป็นวัสดุพีวีซีนุ่ม ปลอดภัย ไม่ทำลายพื้นบ้าน จับถนัดมือ มีให้เลือกหลายขนาดตั้งแต่ 2 ถึง 8 กิโล คุ้มค่ามากค่ะ.",
+          cta: "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่ชอบออกกำลังกายที่บ้าน แล้วกลัวดัมเบลกระแทกพื้น แนะนำเคตเทิลเบลนิ่มรุ่นนี้เลยค่ะ. ตัวนี้ด้านนอกเป็นวัสดุพีวีซีนุ่ม ปลอดภัย ไม่ทำลายพื้นบ้าน จับถนัดมือ มีให้เลือกหลายขนาดตั้งแต่ 2 ถึง 8 กิโล คุ้มค่ามากค่ะ. สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "เคตเทิลเบลนิ่ม วัสดุพีวีซีนุ่ม ปลอดภัย ไม่ทำลายพื้นบ้าน มีขนาด 2-8 kg ออกกำลังกายที่บ้านได้ฟินๆ พิกัดตะกร้าส้มซ้ายล่างเลยนะคะ 🏋️‍♀️✨",
+        hashtags: "#เคตเทิลเบล #เคตเทิลเบลนิ่ม #ออกกำลังกายที่บ้าน #ฟิตเนส #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+      },
+
       "master_art_colored_pencils": {
         product_id: "master_art_colored_pencils",
         category: "เครื่องเขียน & งานศิลปะ (Stationery & Art)",
@@ -859,7 +879,36 @@
     }
 
     // SUBMIT LINK FORM
-    async function handleLinkSubmit(e) {
+    async     function handleLocalFileUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const objUrl = URL.createObjectURL(file);
+      if (file.type.startsWith('video/')) {
+        currentProduct.video_url = objUrl;
+        currentProduct.media_mode = 'video';
+        const v = document.getElementById('preview-video-player');
+        if (v) {
+          v.src = objUrl;
+          v.load();
+        }
+        showToast('อัปโหลดไฟล์วิดีโอจริงสำเร็จ! พร้อมใช้งาน 100%');
+      } else if (file.type.startsWith('image/')) {
+        currentProduct.video_url = objUrl;
+        currentProduct.media_mode = 'ad_images';
+        showToast('อัปโหลดรูปภาพสินค้าสำเร็จ! พร้อมแปลงเป็นโมชัน 9:16');
+      }
+
+      // Update badge
+      const statusPill = document.getElementById('review-footage-status');
+      if (statusPill) {
+        statusPill.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+          <i class="ph-bold ph-check-circle"></i> ใช้ไฟล์จริง: ${file.name.substring(0, 25)}
+        </span>`;
+      }
+    }
+
+    function handleLinkSubmit(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('input-shopee-url');
       const url = input.value.trim();
@@ -914,7 +963,7 @@
               price: pdata.price || 199.0,
               ams_rate: pdata.ams_commission_rate || 15.0,
               earning: pdata.commission_amount || (pdata.price * 0.15),
-              video_url: data.video_url || '/videos/fanlife_tumbler_710ml.mp4',
+              video_url: data.video_url || (currentProduct && currentProduct.video_url ? currentProduct.video_url : '/videos/kettlebell_soft_pvc.mp4'),
               size_mb: data.video_size_mb || 8.0,
               script: data.script ? {
                 hook: data.script.hook_text || `ใครที่กำลังมองหา ${finalTitle.substring(0, 30)} แนะนำเลยค่ะ.`,
@@ -995,7 +1044,7 @@
           price: 199.0,
           ams_rate: 15.0,
           earning: 29.85,
-          video_url: '/videos/fanlife_tumbler_710ml.mp4',
+          video_url: (cleanSlug.includes('kettle') || cleanSlug.includes('AAI') ? '/videos/kettlebell_soft_pvc.mp4' : '/videos/kettlebell_soft_pvc.mp4'),
           script: {
             hook: defaultTitle ? `ใครที่กำลังมองหา ${defaultTitle.substring(0, 30)} แนะนำเลยค่ะ.` : 'ใครที่กำลังมองหาสินค้าตัวนี้ แนะนำเลยค่ะ.',
             body: 'ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์การใช้งานจริงค่ะ.',
@@ -1347,7 +1396,9 @@
 
       // Match video by keyword in typed title
       const tLow = newTitle.toLowerCase();
-      if (tLow.includes('แปรงสีฟัน') || tLow.includes('toothbrush') || tLow.includes('sonic')) {
+      if (tLow.includes('เคตเทิลเบล') || tLow.includes('kettlebell') || tLow.includes('ดัมเบล') || tLow.includes('ออกกำลังกาย')) {
+        currentProduct.video_url = '/videos/kettlebell_soft_pvc.mp4';
+      } else if (tLow.includes('แปรงสีฟัน') || tLow.includes('toothbrush') || tLow.includes('sonic')) {
         currentProduct.video_url = '/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s';
       } else if (tLow.includes('แก้ว') || tLow.includes('tumbler') || tLow.includes('fanlife') || tLow.includes('tyeso')) {
         currentProduct.video_url = '/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s';

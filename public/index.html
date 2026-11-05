@@ -560,6 +560,26 @@
   <script>
     // PRE-DEFINED PRODUCT DB WITH VERIFIED 20S VIDEOS, SCRIPTS & CAPTIONS
     const PRODUCTS_DATA = {
+      "sanmax_earphones_i14b": {
+        product_id: "sanmax_earphones_i14b",
+        category: "อุปกรณ์เสริมมือถือ & เสียง (Mobile & Audio)",
+        title: "sanmax หูฟังบลูทูธแบบมีสาย i14B เสียงดี มีไมโครโฟนในตัว สำหรับ phone 7 8 x 11 12 13 14 （รับประกัน 6 เดือน）",
+        shopee_url: "https://shopee.co.th/product/1445766984/27881500559",
+        short_urls: ["https://s.shopee.co.th/9zz48ZObR0", "https://s.shopee.co.th/9zz48ZObRO", "https://s.shopee.co.th/9zz48zobr0", "https://s.shopee.co.th/9ZZ48ZOBRO"],
+        price: 99.0,
+        ams_rate: 15.0,
+        earning: 14.85,
+        video_url: "/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s",
+        script: {
+          hook: "ใครที่กำลังมองหา หูฟังบลูทูธแบบมีสาย เสียงดี คุยสายชัด แนะนำ sanmax i14B ตัวนี้เลยค่ะ.",
+          body: "รุ่นนี้ใช้งานง่ายมาก เสียบปุ๊บต่อบลูทูธปั๊บ มีไมโครโฟนในตัว เสียงใส เบสแน่น คุยสายชัดเจน มีรับประกัน 6 เดือน คุ้มราคามากค่ะ.",
+          cta: "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่กำลังมองหา หูฟังบลูทูธแบบมีสาย เสียงดี คุยสายชัด แนะนำ sanmax i14B ตัวนี้เลยค่ะ. รุ่นนี้ใช้งานง่ายมาก เสียบปุ๊บต่อบลูทูธปั๊บ มีไมโครโฟนในตัว เสียงใส เบสแน่น คุยสายชัดเจน มีรับประกัน 6 เดือน คุ้มราคามากค่ะ. สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "หูฟังบลูทูธแบบมีสาย sanmax i14B เสียงดี มีไมค์ในตัว คุยสายชัด รับประกัน 6 เดือน พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🎧✨",
+        hashtags: "#หูฟังบลูทูธ #หูฟังไอโฟน #หูฟังsanmax #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee"
+      },
+
       "kettlebell_soft_pvc": {
         product_id: "kettlebell_soft_pvc",
         category: "กีฬาและกิจกรรมกลางแจ้ง (Sports & Outdoors)",
@@ -1412,7 +1432,9 @@
 
       // Match video by keyword in typed title
       const tLow = newTitle.toLowerCase();
-      if (tLow.includes('เคตเทิลเบล') || tLow.includes('kettlebell') || tLow.includes('ดัมเบล') || tLow.includes('ออกกำลังกาย')) {
+      if (tLow.includes('sanmax') || tLow.includes('i14') || tLow.includes('หูฟัง') || tLow.includes('earbud')) {
+        currentProduct.video_url = '/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s';
+      } else if (tLow.includes('เคตเทิลเบล') || tLow.includes('kettlebell') || tLow.includes('ดัมเบล') || tLow.includes('ออกกำลังกาย')) {
         currentProduct.video_url = '/videos/kettlebell_soft_pvc.mp4';
       } else if (tLow.includes('แปรงสีฟัน') || tLow.includes('toothbrush') || tLow.includes('sonic')) {
         currentProduct.video_url = '/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s';

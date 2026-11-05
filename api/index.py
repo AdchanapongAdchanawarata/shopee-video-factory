@@ -247,6 +247,7 @@ AVAILABLE_VIDEOS = {
     "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s", 10.07),
     "master_art_colored_pencils": ("/videos/master_art_colored_pencils.mp4", 0.78),
     "kettlebell_soft_pvc": ("/videos/kettlebell_soft_pvc.mp4", 0.80),
+    "sanmax_earphones_i14b": ("/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s", 6.31),
     "toothbrush_zdx3": ("/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s", 5.56),
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s", 10.09),
     "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07),
@@ -383,24 +384,40 @@ def analyze_product_url(req: AnalyzeUrlRequest):
     if not url:
         return JSONResponse({"error": "กรุณาวางลิงก์สินค้า Shopee"}, status_code=400)
 
-    # 0. Automatically follow 301/302 shortlink redirects (e.g. s.shopee.co.th/BV8FG1emk)
+    # 0. Automatically follow 301/302 shortlink redirects with typo tolerance (O/0, l/I/1)
     resolved_url = url
     if "s.shopee.co.th" in url or "shope.ee" in url:
-        try:
-            r = requests.get(
-                url,
-                headers={
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                    "Referer": "https://www.google.com/"
-                },
-                allow_redirects=False,
-                timeout=5
-            )
-            if r.status_code in (301, 302, 307, 308) and r.headers.get("Location"):
-                resolved_url = r.headers["Location"]
-        except Exception:
-            pass
+        code = url.split("?")[0].rstrip("/").split("/")[-1]
+        test_codes = [code]
+        # Generate common OCR/manual typo variations
+        for idx, ch in enumerate(code):
+            if ch in "O0":
+                test_codes.append(code[:idx] + ("0" if ch == "O" else "O") + code[idx+1:])
+            elif ch in "Il1":
+                for alt in ("I", "l", "1"):
+                    if alt != ch:
+                        test_codes.append(code[:idx] + alt + code[idx+1:])
+
+        for tc in test_codes:
+            t_url = url.replace(code, tc)
+            try:
+                r = requests.get(
+                    t_url,
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Referer": "https://www.google.com/"
+                    },
+                    allow_redirects=False,
+                    timeout=5
+                )
+                if r.status_code in (301, 302, 307, 308) and r.headers.get("Location"):
+                    loc = r.headers["Location"]
+                    if "error_page" not in loc:
+                        resolved_url = loc
+                        break
+            except Exception:
+                pass
 
     url_lower = url.lower()
     resolved_lower = resolved_url.lower()
@@ -476,12 +493,12 @@ def analyze_product_url(req: AnalyzeUrlRequest):
     elif "43461659347" in url or "fanlife" in url_lower:
         title_clean = "แก้วน้ำเก็บความเย็น ขนาด 710 มล. เคลือบเซรามิกแท้ (Fanlife)"
     elif is_short_link or not slug or len(slug) < 3:
-        title_clean = "สินค้าแนะนำ Shopee Mall ยอดนิยม"
+        title_clean = ""
     else:
         title_clean = re.sub(r"[-_]", " ", slug)
         title_clean = re.sub(r" i\.\d+\.\d+", "", title_clean).strip()
         if re.match(r"^\d+$", title_clean):
-            title_clean = "สินค้าแนะนำ Shopee Mall ยอดนิยม"
+            title_clean = ""
 
     price_val = float(req.custom_price) if req.custom_price and req.custom_price > 0 else 199.0
     commission_val = round(price_val * 0.15, 2)

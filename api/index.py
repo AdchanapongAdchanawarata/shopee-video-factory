@@ -247,7 +247,7 @@ AVAILABLE_VIDEOS = {
     "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s", 10.07),
     "master_art_colored_pencils": ("/videos/master_art_colored_pencils.mp4", 0.78),
     "kettlebell_soft_pvc": ("/videos/kettlebell_soft_pvc.mp4", 0.80),
-    "sanmax_earphones_i14b": ("/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s", 6.31),
+    "sanmax_earphones_i14b": ("/videos/sanmax_earphones_i14b.mp4", 8.37),
     "toothbrush_zdx3": ("/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s", 5.56),
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s", 10.09),
     "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07),
@@ -536,7 +536,7 @@ def analyze_product_url(req: AnalyzeUrlRequest):
         elif any(k in t_low for k in ["แปรงสีฟัน", "toothbrush", "sonic"]):
             default_vid = AVAILABLE_VIDEOS.get("sonic_electric_toothbrush")
         elif any(k in t_low for k in ["หูฟัง", "earbud", "audio", "baseus"]):
-            default_vid = AVAILABLE_VIDEOS.get("wireless_earbuds_anc")
+            default_vid = AVAILABLE_VIDEOS.get("sanmax_earphones_i14b")
         elif any(k in t_low for k in ["แมว", "fountain", "pet", "น้ำพุ"]):
             default_vid = AVAILABLE_VIDEOS.get("cat_fountain_01")
         elif any(k in t_low for k in ["ชาร์จ", "charger", "gan", "ugreen"]):

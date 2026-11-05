@@ -431,7 +431,7 @@
     "ams_commission_rate": 15.0,
     "commission_amount": 14.85,
     "shop_name": "sanmax Official Store",
-    "video_file": "wireless_earbuds_anc.mp4",
+    "video_file": "sanmax_earphones_i14b.mp4",
     "script": {
       "hook": "ใครที่กำลังมองหา หูฟังบลูทูธแบบมีสาย เสียงดี คุยสายชัด แนะนำ sanmax i14B ตัวนี้เลยค่ะ.",
       "body": "รุ่นนี้ใช้งานง่ายมาก เสียบปุ๊บต่อบลูทูธปั๊บ มีไมโครโฟนในตัว เสียงใส เบสแน่น คุยสายชัดเจน มีรับประกัน 6 เดือน คุ้มราคามากค่ะ.",

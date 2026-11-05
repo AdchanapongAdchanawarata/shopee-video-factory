@@ -176,7 +176,6 @@
               id="input-shopee-url"
               placeholder="วางลิงก์สินค้า Shopee ที่นี่ เช่น https://shopee.co.th/product/1825643764/47268120717"
               class="w-full pl-10 pr-24 py-2.5 bg-zinc-950 border border-zinc-700/80 rounded-xl text-white text-xs sm:text-sm placeholder:text-zinc-500 focus:outline-none focus:border-shopee focus:ring-1 focus:ring-shopee transition"
-              required
             />
             <button
               type="button"
@@ -191,6 +190,7 @@
           <button
             type="submit"
             id="btn-submit-url"
+            onclick="handleLinkSubmit(event)"
             class="px-5 py-2.5 rounded-xl bg-shopee hover:bg-shopee-hover text-white font-semibold text-xs sm:text-sm transition shadow-lg shadow-shopee/25 flex items-center justify-center space-x-1.5 shrink-0 cursor-pointer"
           >
             <i class="ph-bold ph-arrows-clockwise text-sm" id="btn-submit-icon"></i>
@@ -884,13 +884,25 @@
       if (!file) return;
 
       const objUrl = URL.createObjectURL(file);
+      if (!currentProduct) {
+        currentProduct = {
+          product_id: 'custom_upload_' + Date.now(),
+          title: file.name.replace(/\.[^/.]+$/, ''),
+          price: 249.0,
+          ams_rate: 15.0,
+          earning: 37.35,
+          shopee_url: '#'
+        };
+      }
+
       if (file.type.startsWith('video/')) {
         currentProduct.video_url = objUrl;
         currentProduct.media_mode = 'video';
-        const v = document.getElementById('preview-video-player');
+        const v = document.getElementById('player-preview') || document.getElementById('preview-video-player');
         if (v) {
           v.src = objUrl;
           v.load();
+          v.play().catch(() => {});
         }
         showToast('อัปโหลดไฟล์วิดีโอจริงสำเร็จ! พร้อมใช้งาน 100%');
       } else if (file.type.startsWith('image/')) {
@@ -908,11 +920,15 @@
       }
     }
 
-    function handleLinkSubmit(e) {
+    async function handleLinkSubmit(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('input-shopee-url');
       const url = input.value.trim();
-      if (!url) return;
+      if (!url) {
+        showToast('กรุณาวางลิงก์สินค้า Shopee ในช่องก่อนกดดึงข้อมูลนะคะ');
+        input.focus();
+        return;
+      }
 
       const btn = document.getElementById('btn-submit-url');
       const icon = document.getElementById('btn-submit-icon');

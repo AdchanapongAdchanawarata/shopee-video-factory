@@ -1,3 +1,4 @@
+import requests
 from typing import Optional
 import os
 import re
@@ -244,6 +245,7 @@ PRODUCT_SCRIPTS = {
 
 AVAILABLE_VIDEOS = {
     "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s", 10.07),
+    "master_art_colored_pencils": ("/videos/master_art_colored_pencils.mp4", 0.78),
     "toothbrush_zdx3": ("/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s", 5.56),
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s", 10.09),
     "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07),
@@ -356,7 +358,27 @@ def analyze_product_url(req: AnalyzeUrlRequest):
     if not url:
         return JSONResponse({"error": "กรุณาวางลิงก์สินค้า Shopee"}, status_code=400)
 
+    # 0. Automatically follow 301/302 shortlink redirects (e.g. s.shopee.co.th/BV8FG1emk)
+    resolved_url = url
+    if "s.shopee.co.th" in url or "shope.ee" in url:
+        try:
+            r = requests.get(
+                url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Referer": "https://www.google.com/"
+                },
+                allow_redirects=False,
+                timeout=5
+            )
+            if r.status_code in (301, 302, 307, 308) and r.headers.get("Location"):
+                resolved_url = r.headers["Location"]
+        except Exception:
+            pass
+
     url_lower = url.lower()
+    resolved_lower = resolved_url.lower()
     matched_pid = None
 
     if PRODUCTS_DB_PATH.is_file():
@@ -369,15 +391,26 @@ def analyze_product_url(req: AnalyzeUrlRequest):
                     if s_url and (s_url in url_lower or url_lower in s_url):
                         matched_pid = pid
                         break
-                    # 2. Match item ID or shop ID numbers
-                    nums = re.findall(r"(\d{8,})", url)
-                    for n in nums:
-                        if n in s_url:
-                            matched_pid = pid
-                            break
-                    if matched_pid:
+                    # 2. Match short_urls
+                    short_urls = [su.lower() for su in p.get("short_urls", [])]
+                    if url_lower in short_urls or any(su in url_lower for su in short_urls):
+                        matched_pid = pid
                         break
-                    # 3. Match keywords in slug
+
+                    # 3. Match short codes (e.g. bv8fg1emk, 2vt30jflys)
+                    short_codes = [su.split('/')[-1].lower() for su in p.get('short_urls', []) if '/' in su]
+                    if any(sc in url_lower or sc in resolved_lower for sc in short_codes if len(sc) >= 5):
+                        matched_pid = pid
+                        break
+
+                    # 4. Match item ID or shop ID numbers strictly between input and product shopee_url
+                    input_nums = set(re.findall(r'\d{8,}', url + ' ' + resolved_url))
+                    p_nums = set(re.findall(r'\d{8,}', s_url))
+                    if input_nums and p_nums and input_nums.intersection(p_nums):
+                        matched_pid = pid
+                        break
+
+                    # 5. Match keywords in slug
                     keywords = [k for k in pid.split("_") if len(k) > 3]
                     for kw in keywords:
                         if kw in url_lower:

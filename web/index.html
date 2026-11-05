@@ -225,17 +225,7 @@
                 placeholder="ระบุชื่อสินค้าจริง เช่น แก้วเก็บความเย็น 710ml / แปรงสีฟันไฟฟ้าโซนิค..."
                 class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-600 text-white text-xs font-semibold focus:outline-none focus:border-shopee focus:ring-1 focus:ring-shopee"
               />
-              <!-- 1-CLICK QUICK CATEGORY TEMPLATES -->
-              <div class="flex flex-wrap items-center gap-1 pt-1">
-                <span class="text-[10px] text-zinc-400 font-medium">หมวดหมู่ด่วน 1-คลิก:</span>
-                <button type="button" onclick="selectQuickTemplate('fanlife_tumbler_710ml')" class="px-2 py-0.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-[10px] transition cursor-pointer border border-zinc-700">🥤 แก้วน้ำ Fanlife</button>
-                <button type="button" onclick="selectQuickTemplate('toothbrush_zdx3')" class="px-2 py-0.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-[10px] transition cursor-pointer border border-zinc-700">🪥 แปรงสีฟันไฟฟ้า</button>
-                <button type="button" onclick="selectQuickTemplate('wireless_earbuds_anc')" class="px-2 py-0.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-[10px] transition cursor-pointer border border-zinc-700">🎧 หูฟัง Baseus</button>
-                <button type="button" onclick="selectQuickTemplate('cat_fountain_01')" class="px-2 py-0.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-[10px] transition cursor-pointer border border-zinc-700">🐱 น้ำพุแมว 5L</button>
-                <button type="button" onclick="selectQuickTemplate('air_fryer_visual')" class="px-2 py-0.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-[10px] transition cursor-pointer border border-zinc-700">🍳 หม้อทอด Simplus</button>
-                <button type="button" onclick="selectQuickTemplate('spray_mop_360')" class="px-2 py-0.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-[10px] transition cursor-pointer border border-zinc-700">🧹 ไม้ถูพื้นสเปรย์</button>
               </div>
-            </div>
 
             <!-- PRICE (EDITABLE) -->
             <div class="sm:col-span-2 space-y-1">
@@ -570,6 +560,26 @@
   <script>
     // PRE-DEFINED PRODUCT DB WITH VERIFIED 20S VIDEOS, SCRIPTS & CAPTIONS
     const PRODUCTS_DATA = {
+      "master_art_colored_pencils": {
+        product_id: "master_art_colored_pencils",
+        category: "เครื่องเขียน & งานศิลปะ (Stationery & Art)",
+        title: "สีไม้มาสเตอร์อาร์ต Premium สีไม้ 1 หัว แท่งยาว 12สี , 24สี รุ่นใหม่ Master Art / 1 กล่อง",
+        shopee_url: "https://shopee.co.th/product/483328858/24726799601",
+        short_urls: ["https://s.shopee.co.th/bv8fg1emk", "https://s.shopee.co.th/2vt30jflys", "https://s.shopee.co.th/2vt3ojflys"],
+        price: 75.0,
+        ams_rate: 15.0,
+        earning: 11.25,
+        video_url: "/videos/master_art_colored_pencils.mp4",
+        script: {
+          hook: "ใครที่ชอบวาดรูป ระบายสี หรือกำลังหาสีไม้ดีๆ ให้ลูกหลาน แนะนำสีไม้มาสเตอร์อาร์ตรุ่นใหม่นี้เลยค่ะ.",
+          body: "ไส้สีสูตรใหม่ เนื้อเนียนนุ่ม ระบายลื่น สีสดคมชัด ไส้แข็งแรงไม่หักง่าย เหลาง่าย ใช้ได้ทั้งเด็กและผู้ใหญ่ คุ้มราคามากค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่ชอบวาดรูป ระบายสี หรือกำลังหาสีไม้ดีๆ ให้ลูกหลาน แนะนำสีไม้มาสเตอร์อาร์ตรุ่นใหม่นี้เลยค่ะ. ไส้สีสูตรใหม่ เนื้อเนียนนุ่ม ระบายลื่น สีสดคมชัด ไส้แข็งแรงไม่หักง่าย เหลาง่าย ใช้ได้ทั้งเด็กและผู้ใหญ่ คุ้มราคามากค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "สีไม้มาสเตอร์อาร์ต Premium รุ่นใหม่ ไส้นุ่ม สีสด ระบายลื่น ไม่หักง่าย 12สี / 24สี ระบายสวยมาก พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🎨✏️✨",
+        hashtags: "#สีไม้มาสเตอร์อาร์ต #รีวิวเครื่องเขียน #สีไม้ #ของดีบอกต่อ #ShopeeVideoTH #นายหน้าShopee"
+      },
+
       "toothbrush_zdx3": {
         product_id: "toothbrush_zdx3",
         category: "สุขภาพช่องปาก (Oral Care)",
@@ -818,8 +828,12 @@
 
     // INIT PAGE
     window.addEventListener('DOMContentLoaded', () => {
-      // Default to cat fountain or first product
-      loadSampleProduct('fanlife_tumbler_710ml');
+      // Start clean - no fake pre-fills
+      currentProduct = null;
+      document.getElementById('input-shopee-url').value = '';
+      document.getElementById('input-product-name').value = '';
+      document.getElementById('input-product-price').value = '';
+      document.getElementById('input-review-url').value = '';
     });
 
     // LOAD SAMPLE BY ID
@@ -879,14 +893,16 @@
             const pdata = data.product_data || {};
             let finalTitle = pdata.title || '';
 
-            // Guard against gibberish like 2Vt3OJFLys
+            // Guard against gibberish like 2Vt3OJFLys / BV8FG1emk
             if (isGibberish(finalTitle)) {
-              if (url.includes('47268120717')) {
+              if (url.includes('BV8FG1emk') || url.includes('2Vt3') || url.includes('24726799601')) {
+                finalTitle = 'สีไม้มาสเตอร์อาร์ต Premium สีไม้ 1 หัว แท่งยาว 12สี , 24สี รุ่นใหม่ Master Art / 1 กล่อง';
+              } else if (url.includes('47268120717')) {
                 finalTitle = 'แปรงสีฟันไฟฟ้า 2-in-1 โซนิค ปรับได้ 6 ระดับ กันน้ำ IPX7';
               } else if (url.includes('43461659347')) {
                 finalTitle = 'แก้วน้ำเก็บความเย็น ขนาด 710 มล. เคลือบเซรามิกแท้ (Fanlife)';
               } else {
-                finalTitle = 'แก้วน้ำเก็บความเย็น ขนาด 710 มล. เคลือบเซรามิกแท้ (Fanlife)';
+                finalTitle = '';
               }
             }
 
@@ -934,26 +950,65 @@
         // LOCAL MATCH FALLBACK
     function matchAndRenderLocally(url) {
       const urlLower = url.toLowerCase();
-      let matchedKey = 'cat_fountain_01';
+      let matchedKey = null;
 
+      // 1. Check known short links
       for (const [key, p] of Object.entries(PRODUCTS_DATA)) {
-        if (urlLower.includes(key) || (p.shopee_url && urlLower.includes(p.shopee_url.toLowerCase()))) {
+        if (p.short_urls && p.short_urls.some(su => {
+          const code = su.split('/').pop().toLowerCase();
+          return (code && urlLower.includes(code)) || urlLower.includes(su.toLowerCase());
+        })) {
+          matchedKey = key;
+          break;
+        }
+        if (p.shopee_url && urlLower.includes(p.shopee_url.toLowerCase())) {
           matchedKey = key;
           break;
         }
       }
-      // Check numbers
-      const nums = url.match(/\d{8,}/g) || [];
-      for (const num of nums) {
-        for (const [key, p] of Object.entries(PRODUCTS_DATA)) {
-          if (p.shopee_url && p.shopee_url.includes(num)) {
-            matchedKey = key;
-            break;
+
+      // 2. Check item id numbers
+      if (!matchedKey) {
+        const nums = url.match(/\d{8,}/g) || [];
+        for (const num of nums) {
+          for (const [key, p] of Object.entries(PRODUCTS_DATA)) {
+            if (p.shopee_url && p.shopee_url.includes(num)) {
+              matchedKey = key;
+              break;
+            }
           }
+          if (matchedKey) break;
         }
       }
-      renderActiveProduct(PRODUCTS_DATA[matchedKey]);
-      showToast('เชื่อมต่อฟุตเทจรีวิวสินค้าจริงเรียบร้อยแล้ว!');
+
+      if (matchedKey && PRODUCTS_DATA[matchedKey]) {
+        renderActiveProduct(PRODUCTS_DATA[matchedKey]);
+        showToast('ดึงข้อมูลสินค้าตรงตามลิงก์เรียบร้อย!');
+      } else {
+        // Unknown product: Let user type real product title cleanly
+        const cleanSlug = url.split('?')[0].split('/').pop() || '';
+        const defaultTitle = isGibberish(cleanSlug) ? '' : cleanSlug.replace(/[-_]/g, ' ');
+        const customObj = {
+          product_id: 'custom_' + Date.now(),
+          title: defaultTitle,
+          shopee_url: url,
+          price: 199.0,
+          ams_rate: 15.0,
+          earning: 29.85,
+          video_url: '/videos/fanlife_tumbler_710ml.mp4',
+          script: {
+            hook: defaultTitle ? `ใครที่กำลังมองหา ${defaultTitle.substring(0, 30)} แนะนำเลยค่ะ.` : 'ใครที่กำลังมองหาสินค้าตัวนี้ แนะนำเลยค่ะ.',
+            body: 'ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์การใช้งานจริงค่ะ.',
+            cta: 'สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.',
+            full_script: (defaultTitle ? `ใครที่กำลังมองหา ${defaultTitle.substring(0, 30)} แนะนำเลยค่ะ.` : 'ใครที่กำลังมองหาสินค้าตัวนี้ แนะนำเลยค่ะ.') + ' ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์การใช้งานจริงค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.'
+          },
+          caption: defaultTitle ? `ใครมองหาตัวนี้บอกเลยต้องมี! ${defaultTitle.substring(0, 35)}... คุณภาพดี คุ้มราคา พิกัดตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨` : 'ใครมองหาตัวนี้บอกเลยต้องมี! คุณภาพดี คุ้มราคา พิกัดตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨',
+          hashtags: '#ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee'
+        };
+        renderActiveProduct(customObj);
+        document.getElementById('input-product-name').focus();
+        showToast('กรุณาพิมพ์ชื่อสินค้าจริง เพื่อให้ AI ร่างสคริปต์ได้ตรง 100%');
+      }
     }
 
     // RENDER PRODUCT TO DOM

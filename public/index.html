@@ -235,7 +235,7 @@
               </div>
               <span class="font-bold text-sm text-white">แหล่งฟุตเทจที่ใช้ผลิต (โฆษณาหลัก + วิดีโอรีวิวในคอมเมนต์)</span>
             </div>
-            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold border border-emerald-500/30">
+            <span id="footage-mode-badge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold border border-emerald-500/30">
               <i class="ph-fill ph-check-circle mr-1"></i> ผสมผสาน Hybrid 100%
             </span>
           </div>
@@ -904,6 +904,35 @@
       document.getElementById('display-caption-text').innerText = prod.caption;
       document.getElementById('display-hashtags').innerText = prod.hashtags;
 
+      // Check Media Mode: Video vs Ad Image Fallback ("ถ้าลิงก์ไหนไม่มี vdo ให้ใช้รูปภาพโฆษณาแทน")
+      const isImageMode = prod.media_mode === 'ad_images' || prod.is_image_fallback;
+      const modeBadge = document.getElementById('footage-mode-badge');
+      const adStatusBadge = document.getElementById('badge-ad-status');
+      const adDesc = document.getElementById('footage-ad-desc');
+      const adSub = document.getElementById('footage-ad-sub');
+
+      if (isImageMode) {
+        if (modeBadge) {
+          modeBadge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-semibold border border-amber-500/30';
+          modeBadge.innerHTML = '<i class="ph-fill ph-image mr-1"></i> โหมดภาพโฆษณาแท้ (Ken-Burns 9:16)';
+        }
+        if (adStatusBadge) {
+          adStatusBadge.className = 'text-[10px] text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded';
+          adStatusBadge.innerText = 'ภาพโฆษณา 6-8 ภาพ';
+        }
+        if (adDesc) adDesc.innerText = 'ภาพถ่ายโฆษณาแท้จากร้านค้า (1080x1920 Motion)';
+      } else {
+        if (modeBadge) {
+          modeBadge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold border border-emerald-500/30';
+          modeBadge.innerHTML = '<i class="ph-fill ph-check-circle mr-1"></i> ผสมผสาน Hybrid 100%';
+        }
+        if (adStatusBadge) {
+          adStatusBadge.className = 'text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded';
+          adStatusBadge.innerText = 'พร้อมใช้งาน';
+        }
+        if (adDesc) adDesc.innerText = 'วิดีโอหลักจากแกลเลอรีร้าน (1080x1920 HD)';
+      }
+
       // Video Player
       const player = document.getElementById('player-preview');
       player.src = prod.video_url;
@@ -912,7 +941,8 @@
 
       // Video Spec
       document.getElementById('video-spec-title').innerText = prod.title;
-      document.getElementById('video-spec-meta').innerText = `ความยาว 20.0s | ${prod.size_mb || 7.5} MB | Full HD 1080x1920 (9:16) | ซับส้มขอบขาว`;
+      const modeLabel = isImageMode ? 'ภาพโฆษณาแท้ Dynamic Motion' : 'วิดีโอเคลื่อนไหวจริง 100%';
+      document.getElementById('video-spec-meta').innerText = `ความยาว 20.0s | ${prod.size_mb || 7.5} MB | Full HD 1080x1920 (9:16) | ${modeLabel} | ซับส้มขอบขาว`;
     }
 
     // SCRIPT EDIT HANDLING

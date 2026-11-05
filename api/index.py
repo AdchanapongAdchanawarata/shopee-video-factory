@@ -303,11 +303,28 @@ def get_product_helper(product_id: str):
         "hashtags": "#ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee #ป้ายยาของใช้"
     })
 
+    media_mode = p_data.get("media_mode", "video" if v_exists else "ad_images")
+    if not v_exists:
+        footage = {
+            "ad_video_status": "ไม่มีวิดีโอในลิงก์ -> สลับใช้รูปภาพโฆษณาแท้ของสินค้าอัตโนมัติ (6-8 ภาพ)",
+            "review_videos_count": 0,
+            "review_videos_status": "แปลงภาพถ่ายโฆษณาเป็นโมชัน 9:16 (Ken-Burns Dynamic Motion)",
+            "media_mode": "ad_images"
+        }
+    else:
+        footage = p_data.get("footage_sources", {
+            "ad_video_status": "ดึงจากวิดีโอโฆษณาหลักในลิ้งค์ (1080x1920 HD)",
+            "review_videos_count": 5,
+            "review_videos_status": "ดึงจากวิดีโอผู้ใช้จริงในคอมเมนต์ (แกะกล่อง + ส่องเซรามิก + หลากสี)",
+            "media_mode": "video"
+        })
+
     return {
         "exists": True,
         "product_id": product_id,
         "product_data": p_data,
         "video_exists": v_exists,
+        "media_mode": media_mode,
         "video_url": v_url,
         "video_size_mb": v_size,
         "voiceover_url": "/assets/sample_elevenlabs_mali.mp3",
@@ -316,11 +333,7 @@ def get_product_helper(product_id: str):
         "caption": cap_info.get("caption", ""),
         "hashtags": cap_info.get("hashtags", ""),
         "full_caption": f"{cap_info.get('caption', '')}\n\n{cap_info.get('hashtags', '')}",
-        "footage_sources": p_data.get("footage_sources", {
-            "ad_video_status": "ดึงจากวิดีโอโฆษณาหลักในลิ้งค์ (1080x1920 HD)",
-            "review_videos_count": 5,
-            "review_videos_status": "ดึงจากวิดีโอผู้ใช้จริงในคอมเมนต์ (แกะกล่อง + ส่องเซรามิก + หลากสี)"
-        })
+        "footage_sources": footage
     }
 
 @app.get("/api/product/{product_id}")

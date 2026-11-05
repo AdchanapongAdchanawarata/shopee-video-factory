@@ -444,27 +444,46 @@ def assemble_curated_video(
                     accumulated_dur += clip_target
                     seg_counter += 1
 
-    # Supplement ONLY with whitelisted official product images (e.g. ugreen_*.png, baseus_*.jpg) if strictly needed
-    # NEVER fall back to unverified random web images to avoid brand mismatch / PDPA violations
+    # Supplement or Fallback: If no video cuts exist or video is shorter than 20s,
+    # use the official product advertisement images from raw_media (Ken-Burns 9:16 Dynamic Motion)
     if accumulated_dur < total_target_dur and raw_media_dir.is_dir():
-        allowed_img_patterns = ("ugreen_*.png", "baseus_*.jpg")
         image_files: List[Path] = []
-        for pat in allowed_img_patterns:
-            for img_p in sorted(raw_media_dir.glob(pat)):
-                image_files.append(img_p)
+        for ext in ("*.jpg", "*.jpeg", "*.png", "*.webp"):
+            for img_p in sorted(raw_media_dir.glob(ext)):
+                # Avoid tiny icon or preview files
+                if img_p.stat().st_size > 15000:
+                    image_files.append(img_p)
 
-        for cur_img in image_files:
-            if accumulated_dur >= total_target_dur:
-                break
-            clip_dur = min(2.0, total_target_dur - accumulated_dur)
-            if clip_dur < 0.8:
-                clip_dur = total_target_dur - accumulated_dur
-            clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
-            ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
-            if ok:
-                processed_clips.append(clip_p)
-                accumulated_dur += clip_dur
-                seg_counter += 1
+        if image_files:
+            # If zero videos exist, calculate duration per image so all images fill 20.0s
+            if len(processed_clips) == 0:
+                print("📸 [โหมดภาพโฆษณาแท้] ตรวจพบว่าลิงก์นี้ไม่มีวิดีโอ -> ใช้รูปภาพโฆษณาสินค้าแปลงเป็นโมชัน 9:16 แทนอัตโนมัติ")
+                num_imgs = min(len(image_files), 7)
+                dur_per_img = round(total_target_dur / num_imgs, 2)
+                for cur_img in image_files[:num_imgs]:
+                    clip_dur = min(dur_per_img, total_target_dur - accumulated_dur)
+                    if clip_dur < 0.5:
+                        break
+                    clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
+                    ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
+                    if ok:
+                        processed_clips.append(clip_p)
+                        accumulated_dur += clip_dur
+                        seg_counter += 1
+            else:
+                # Supplement remaining duration with product ad images
+                for cur_img in image_files:
+                    if accumulated_dur >= total_target_dur:
+                        break
+                    clip_dur = min(2.5, total_target_dur - accumulated_dur)
+                    if clip_dur < 0.8:
+                        clip_dur = total_target_dur - accumulated_dur
+                    clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
+                    ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
+                    if ok:
+                        processed_clips.append(clip_p)
+                        accumulated_dur += clip_dur
+                        seg_counter += 1
 
     print(f"📦 Stitched {len(processed_clips)} 100% unique cuts (Total visual length: {accumulated_dur:.2f}s)")
 

@@ -192,12 +192,27 @@ def scrape_shopee_product(page: Page, url: str) -> Dict[str, Any]:
 
     # 6. Extract Product Videos & Images
     product_videos = []
+    product_images = []
     try:
         video_els = page.locator("video source, video").all()
         for v in video_els:
             src = v.get_attribute("src")
             if src and src.startswith("http") and src not in product_videos:
                 product_videos.append(src)
+
+        # Collect high-resolution product advertisement images (Gallery & Info)
+        img_els = page.locator(".product-briefing img, .page-product img, div[style*='background-image']").all()
+        for im in img_els:
+            src = im.get_attribute("src")
+            if not src:
+                style = im.get_attribute("style") or ""
+                m = re.search(r'url\([\'"]?(https?://[^\'")]+)[\'"]?\)', style)
+                if m:
+                    src = m.group(1)
+            if src and any(d in src for d in ["susercontent.com", "shopeemobile.com", "cf.shopee"]):
+                clean_img = src.replace("_tn", "").split("@")[0]
+                if clean_img not in product_images:
+                    product_images.append(clean_img)
     except Exception:
         pass
 
@@ -258,6 +273,7 @@ def scrape_shopee_product(page: Page, url: str) -> Dict[str, Any]:
         "ams_commission_rate": ams_rate,
         "product_videos": product_videos,
         "review_videos": review_videos,
+        "product_images": product_images,
         "reviews_5_star": reviews_5_star,
         "reviews_1_star": reviews_1_star,
     }
@@ -372,12 +388,23 @@ def scout_shopee_products(product_id: str, url: Optional[str] = None, use_mock: 
     if ams_rate < config.MIN_AMS_COMMISSION_RATE:
         print(f"⚠️ WARNING: AMS Commission {ams_rate}% is below threshold {config.MIN_AMS_COMMISSION_RATE}%.")
 
-    # Download any extracted media videos
+    # Download media: Videos if available, otherwise Fallback to Product Ad Images!
     all_videos = scraped.get("product_videos", []) + scraped.get("review_videos", [])
-    for idx, vid_url in enumerate(all_videos[:5]):
-        dest = raw_media_dir / f"clip_{idx+1}.mp4"
-        print(f"⬇️ Downloading media {idx+1}/{len(all_videos)}: {vid_url[:50]}...")
-        download_file(vid_url, dest)
+    if all_videos:
+        print(f"🎬 ตรวจพบวิดีโอ {len(all_videos)} คลิป -> กำลังดาวน์โหลดคลิปวิดีโอจริง...")
+        for idx, vid_url in enumerate(all_videos[:5]):
+            dest = raw_media_dir / f"clip_{idx+1}.mp4"
+            print(f"⬇️ กำลังดาวน์โหลดวิดีโอ {idx+1}/{min(len(all_videos), 5)}: {vid_url[:50]}...")
+            download_file(vid_url, dest)
+    else:
+        # Fallback Rule: "ถ้าลิ้งค์ไหน ไม่มี vdo ให้ใช้รูปภาพโฆษณาแทน"
+        print("📸 ลิงก์นี้ไม่มีวิดีโอ -> สลับใช้รูปภาพโฆษณาของสินค้าแปลงเป็นโมชัน 9:16 แทนอัตโนมัติ")
+        imgs = scraped.get("product_images", [])
+        if imgs:
+            for idx, img_url in enumerate(imgs[:8]):
+                dest = raw_media_dir / f"ad_image_{idx+1:02d}.jpg"
+                print(f"⬇️ กำลังดาวน์โหลดภาพโฆษณา {idx+1}/{min(len(imgs), 8)}: {img_url[:60]}...")
+                download_file(img_url, dest)
 
     # Save outputs
     product_file = out_dir / "product_data.json"

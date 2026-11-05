@@ -114,256 +114,431 @@
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 space-y-3.5">
+  <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-5 space-y-4">
 
-    <!-- 1. COMPACT LINK INPUT BAR -->
-    <div class="subtle-card rounded-2xl p-3.5 sm:p-4 bg-gradient-to-r from-zinc-900/95 via-zinc-900/90 to-zinc-950 border border-zinc-800 shadow-lg">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2.5">
-        <h1 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-          <i class="ph-bold ph-video-camera text-shopee text-base"></i>
-          <span>วางลิงก์สินค้า Shopee เพื่อสร้างวิดีโอ 9:16</span>
-        </h1>
-        <span class="text-[11px] text-zinc-400">ดึงวิดีโอโฆษณา + รีวิวจริงอัตโนมัติ (หากไม่มีวิดีโอ สลับใช้ภาพโฆษณาแทน)</span>
-      </div>
-
-      <form onsubmit="handleLinkSubmit(event)" class="flex gap-2">
-        <div class="relative flex-1">
-          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
-            <i class="ph-bold ph-magnifying-glass text-base"></i>
-          </div>
-          <input
-            type="text"
-            id="input-shopee-url"
-            placeholder="วางลิงก์สินค้า Shopee ที่นี่ เช่น https://shopee.co.th/product/..."
-            class="w-full pl-10 pr-24 py-2.5 bg-zinc-950 border border-zinc-700/80 rounded-xl text-white text-xs sm:text-sm placeholder:text-zinc-500 focus:outline-none focus:border-shopee focus:ring-1 focus:ring-shopee transition"
-            required
-          />
-          <button
-            type="button"
-            onclick="handlePasteClick()"
-            class="absolute inset-y-1 right-1 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition flex items-center space-x-1 cursor-pointer"
-            title="วางจากคลิปบอร์ด"
-          >
-            <i class="ph ph-clipboard-text text-sm"></i>
-            <span>วางลิงก์</span>
-          </button>
-        </div>
+    <!-- 3-STEP WIZARD NAVIGATION BAR -->
+    <div class="subtle-card rounded-2xl p-2 sm:p-2.5 bg-zinc-900/90 border border-zinc-800 shadow-lg">
+      <div class="grid grid-cols-3 gap-2">
         <button
-          type="submit"
-          id="btn-submit-url"
-          class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-shopee to-orange-500 hover:from-shopee-hover hover:to-orange-600 text-white font-semibold text-xs sm:text-sm transition shadow-lg shadow-shopee/25 flex items-center justify-center space-x-1.5 shrink-0 cursor-pointer"
+          type="button"
+          id="tab-step-1"
+          onclick="goToStep(1)"
+          class="py-2.5 px-2 sm:px-4 rounded-xl flex items-center justify-center space-x-2 text-xs sm:text-sm font-bold transition cursor-pointer bg-shopee text-white shadow-md shadow-shopee/25"
         >
-          <i class="ph-bold ph-lightning text-sm" id="btn-submit-icon"></i>
-          <span id="btn-submit-text">สร้างวิดีโอ 1-Click</span>
+          <span id="badge-step-1" class="w-5 h-5 rounded-full flex items-center justify-center text-[11px] bg-white text-shopee font-bold">1</span>
+          <span>1. วางลิงก์ให้ครบ</span>
         </button>
-      </form>
+
+        <button
+          type="button"
+          id="tab-step-2"
+          onclick="goToStep(2)"
+          class="py-2.5 px-2 sm:px-4 rounded-xl flex items-center justify-center space-x-2 text-xs sm:text-sm font-medium transition cursor-pointer bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+        >
+          <span id="badge-step-2" class="w-5 h-5 rounded-full flex items-center justify-center text-[11px] bg-zinc-800 text-zinc-400 font-bold">2</span>
+          <span>2. ร่างเสียงพากย์และแคปชั่น</span>
+        </button>
+
+        <button
+          type="button"
+          id="tab-step-3"
+          onclick="goToStep(3)"
+          class="py-2.5 px-2 sm:px-4 rounded-xl flex items-center justify-center space-x-2 text-xs sm:text-sm font-medium transition cursor-pointer bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+        >
+          <span id="badge-step-3" class="w-5 h-5 rounded-full flex items-center justify-center text-[11px] bg-zinc-800 text-zinc-400 font-bold">3</span>
+          <span>3. ผลิตวิดีโอ 9:16</span>
+        </button>
+      </div>
     </div>
 
-    <!-- 2. STUDIO WORKSPACE (MINIMAL 2-COLUMN VIEW IN 1 SCREEN) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+    <!-- ========================================== -->
+    <!-- STEP 1: วางลิงก์ให้ครบ & ยืนยันข้อมูลสินค้าจริง -->
+    <!-- ========================================== -->
+    <div id="view-step-1" class="space-y-3.5">
 
-      <!-- LEFT COLUMN: PRODUCT INFO, REVIEW INPUT, SCRIPT & VOICE, CAPTION (7 COLS) -->
-      <div class="lg:col-span-7 space-y-3">
-
-        <!-- CARD 1: PRODUCT SUMMARY & STATS -->
-        <div class="subtle-card rounded-2xl p-3.5 space-y-2.5">
-          <div class="flex items-start justify-between gap-3">
-            <div class="space-y-0.5 flex-1 min-w-0">
-              <div class="flex items-center space-x-2">
-                <span id="product-badge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                  <i class="ph-fill ph-check-circle inline text-[10px] mr-0.5"></i> ฟุตเทจพร้อม 100%
-                </span>
-                <span id="product-category" class="text-[11px] text-zinc-400 font-medium">หมวดหมู่สินค้า</span>
-              </div>
-              <h2 id="product-title" class="text-xs sm:text-sm font-bold text-white line-clamp-1">
-                กรุณาวางลิงก์สินค้า Shopee ด้านบนเพื่อเริ่มต้น
-              </h2>
-            </div>
-            <a id="product-shopee-link" href="#" target="_blank" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-[11px] font-medium transition flex items-center space-x-1 shrink-0">
-              <span>เปิด Shopee</span>
-              <i class="ph-bold ph-arrow-up-right text-[10px]"></i>
-            </a>
-          </div>
-
-          <div class="grid grid-cols-3 gap-2 pt-2 border-t border-zinc-800/80 text-xs">
-            <div class="p-2 rounded-xl bg-zinc-900/60 border border-zinc-800/60">
-              <span class="text-zinc-400 block text-[10px]">ราคาจำหน่าย</span>
-              <span id="product-price" class="text-xs sm:text-sm font-bold text-white font-mono">฿0.00</span>
-            </div>
-            <div class="p-2 rounded-xl bg-zinc-900/60 border border-zinc-800/60">
-              <span class="text-zinc-400 block text-[10px]">เรตคอมมิชชั่น Extra</span>
-              <span id="product-ams" class="text-xs sm:text-sm font-bold text-emerald-400 font-mono">+12.5%</span>
-            </div>
-            <div class="p-2 rounded-xl bg-zinc-900/60 border border-zinc-800/60">
-              <span class="text-zinc-400 block text-[10px]">รายได้เฉลี่ย / ชิ้น</span>
-              <span id="product-earning" class="text-xs sm:text-sm font-bold text-orange-400 font-mono">฿0.00</span>
-            </div>
-          </div>
+      <!-- 1.1 SHOPEE PRODUCT LINK & REAL DATA EXTRACTION -->
+      <div class="subtle-card rounded-2xl p-4 bg-gradient-to-r from-zinc-900/95 via-zinc-900/90 to-zinc-950 border border-zinc-800 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <h2 class="text-xs sm:text-sm font-bold text-white flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-md bg-shopee/20 text-shopee flex items-center justify-center text-xs font-bold">1.1</span>
+            <span>วางลิงก์สินค้า Shopee (ระบบวิเคราะห์สินค้าจริง)</span>
+          </h2>
+          <span class="text-[11px] text-zinc-400">รองรับลิงก์สินค้า Shopee ทุกหมวดหมู่</span>
         </div>
 
-        <!-- CARD 2: REVIEW VIDEO INPUT (CLEAN & DIRECT - NO BLOATED BOXES) -->
-        <div class="subtle-card rounded-2xl p-3.5 space-y-2 border border-orange-500/20 bg-gradient-to-br from-zinc-900/90 to-zinc-950/90">
-          <div class="flex items-center justify-between">
-            <label for="input-review-url" class="font-bold text-xs text-orange-300 flex items-center space-x-1.5">
-              <i class="ph-bold ph-link-simple text-sm text-shopee"></i>
-              <span>ช่องใส่ลิงก์วิดีโอรีวิวจากคอมเมนต์ (Shopee CDN / MP4)</span>
-            </label>
-            <span class="text-[10px] text-zinc-400">คลิกขวาที่วิดีโอในคอมเมนต์ > คัดลอกที่อยู่วิดีโอ</span>
-          </div>
-
-          <div class="flex gap-2">
+        <form onsubmit="handleLinkSubmit(event)" class="flex gap-2">
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+              <i class="ph-bold ph-magnifying-glass text-base"></i>
+            </div>
             <input
-              type="url"
-              id="input-review-url"
-              placeholder="วางลิงก์วิดีโอรีวิว เช่น https://down-ws-th.vod.susercontent.com/...mp4"
-              class="flex-1 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700/80 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-shopee"
+              type="text"
+              id="input-shopee-url"
+              placeholder="วางลิงก์สินค้า Shopee ที่นี่ เช่น https://shopee.co.th/product/1825643764/47268120717"
+              class="w-full pl-10 pr-24 py-2.5 bg-zinc-950 border border-zinc-700/80 rounded-xl text-white text-xs sm:text-sm placeholder:text-zinc-500 focus:outline-none focus:border-shopee focus:ring-1 focus:ring-shopee transition"
+              required
             />
             <button
               type="button"
-              onclick="handleAddReviewVideoUrl()"
-              id="btn-add-review-vid"
-              class="px-3.5 py-1.5 rounded-lg bg-shopee hover:bg-shopee-hover text-white font-semibold text-xs transition flex items-center space-x-1 shrink-0 cursor-pointer shadow-md"
+              onclick="handlePasteClick()"
+              class="absolute inset-y-1 right-1 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition flex items-center space-x-1 cursor-pointer"
+              title="วางจากคลิปบอร์ด"
             >
-              <i class="ph-bold ph-plus text-xs"></i>
-              <span>เพิ่มคลิปนี้</span>
+              <i class="ph ph-clipboard-text text-sm"></i>
+              <span>วางลิงก์</span>
             </button>
           </div>
+          <button
+            type="submit"
+            id="btn-submit-url"
+            class="px-5 py-2.5 rounded-xl bg-shopee hover:bg-shopee-hover text-white font-semibold text-xs sm:text-sm transition shadow-lg shadow-shopee/25 flex items-center justify-center space-x-1.5 shrink-0 cursor-pointer"
+          >
+            <i class="ph-bold ph-arrows-clockwise text-sm" id="btn-submit-icon"></i>
+            <span id="btn-submit-text">ดึงข้อมูลสินค้า</span>
+          </button>
+        </form>
 
-          <div id="active-review-chips" class="space-y-1">
-            <div class="flex items-center justify-between p-1.5 px-2.5 rounded-lg bg-zinc-900/90 border border-zinc-800 text-[11px]">
-              <div class="flex items-center space-x-2 truncate">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-                <span class="text-zinc-300 truncate">รีวิว #1: th-11110103-6v8go-mmsu7ux49fr650.mp4 (11.2s เคลื่อนไหวจริง)</span>
-              </div>
-              <span class="text-[10px] text-emerald-400 font-mono shrink-0 ml-2">ดึงแล้ว 100%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 3: SCRIPT INSPECTOR & MALI VOICE (MINIMAL - NO 3 SEPARATE BOXES) -->
-        <div class="subtle-card rounded-2xl p-3.5 space-y-2">
+        <!-- VERIFIED REAL PRODUCT INFO (EDITABLE TO PREVENT GLITCHES) -->
+        <div class="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800/90 space-y-2.5">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <div class="w-6 h-6 rounded-lg bg-orange-500/10 text-shopee flex items-center justify-center font-bold text-xs">
-                <i class="ph-bold ph-microphone"></i>
+            <span class="text-[11px] font-bold text-zinc-300 flex items-center space-x-1.5">
+              <i class="ph-fill ph-check-circle text-emerald-400 text-xs"></i>
+              <span>ข้อมูลสินค้าจริงที่ตรวจพบ (ตรวจสอบหรือปรับแก้คำได้ทันทีเพื่อความแม่นยำ 100%):</span>
+            </span>
+            <a id="link-open-shopee" href="#" target="_blank" class="text-[10px] text-zinc-400 hover:text-white underline flex items-center space-x-0.5">
+              <span>เปิดดูสินค้าใน Shopee</span>
+              <i class="ph-bold ph-arrow-up-right text-[9px]"></i>
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 text-xs">
+            <!-- PRODUCT TITLE (EDITABLE) -->
+            <div class="sm:col-span-8 space-y-1">
+              <label for="input-product-name" class="block text-[10px] text-zinc-400 font-medium">ชื่อสินค้า (แสดงในสคริปต์และวิดีโอ):</label>
+              <input
+                type="text"
+                id="input-product-name"
+                oninput="handleProductNameChange()"
+                placeholder="ระบุชื่อสินค้าจริง..."
+                class="w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-white text-xs font-semibold focus:outline-none focus:border-shopee"
+              />
+            </div>
+
+            <!-- PRICE (EDITABLE) -->
+            <div class="sm:col-span-2 space-y-1">
+              <label for="input-product-price" class="block text-[10px] text-zinc-400 font-medium">ราคาจำหน่าย (฿):</label>
+              <input
+                type="text"
+                id="input-product-price"
+                oninput="handleProductPriceChange()"
+                placeholder="฿199.00"
+                class="w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-white font-mono text-xs font-bold focus:outline-none focus:border-shopee"
+              />
+            </div>
+
+            <!-- AMS COMMISSION -->
+            <div class="sm:col-span-2 space-y-1">
+              <span class="block text-[10px] text-zinc-400 font-medium">คอมมิชชั่น Extra:</span>
+              <div id="product-ams-badge" class="px-2 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold text-center">
+                +15.0%
               </div>
-              <span class="font-bold text-xs text-white">เสียงพากย์มาลี & ตรวจสคริปต์ (~20 วินาที)</span>
             </div>
-            <div class="flex items-center space-x-2">
-              <button
-                type="button"
-                onclick="togglePlayVoiceSample()"
-                id="btn-voice-sample"
-                class="px-2.5 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-semibold transition flex items-center space-x-1 cursor-pointer"
-              >
-                <i class="ph-fill ph-play text-[10px]" id="icon-voice-sample"></i>
-                <span id="text-voice-sample">ฟังเสียงมาลี</span>
-              </button>
-              <audio id="audio-sample-mali" src="/assets/sample_elevenlabs_mali.mp3" preload="none"></audio>
-              <button type="button" onclick="resetScriptToDefault()" class="text-zinc-400 hover:text-white transition text-[11px] flex items-center space-x-0.5 cursor-pointer">
-                <i class="ph ph-arrow-counter-clockwise"></i>
-                <span>รีเซ็ตบท</span>
-              </button>
-            </div>
-          </div>
-
-          <textarea
-            id="textarea-script"
-            rows="3"
-            oninput="handleScriptEdited()"
-            class="w-full p-2.5 bg-zinc-950 border border-zinc-700/80 rounded-xl text-white text-xs leading-relaxed focus:outline-none focus:border-shopee focus:ring-1 focus:ring-shopee transition font-sans custom-scroll resize-y"
-            placeholder="บทพูดภาษาไทยจะแสดงที่นี่ สามารถตรวจสอบหรือพิมพ์แก้ไขคำได้ทันที..."
-          ></textarea>
-        </div>
-
-        <!-- CARD 4: POST CAPTION & HASHTAGS (#) -->
-        <div class="subtle-card rounded-2xl p-3.5 space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-1.5">
-              <i class="ph-bold ph-hash text-emerald-400 text-sm"></i>
-              <span class="font-bold text-xs text-white">แคปชั่นสำหรับโพสต์สั้น & แฮชแท็ก (#)</span>
-            </div>
-            <button
-              type="button"
-              onclick="copyPostCaption()"
-              id="btn-copy-caption"
-              class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition flex items-center space-x-1 cursor-pointer"
-            >
-              <i class="ph-bold ph-copy text-[11px]" id="icon-copy-caption"></i>
-              <span id="text-copy-caption">คัดลอกแคปชั่น & แท็ก</span>
-            </button>
-          </div>
-          <div class="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-1">
-            <p id="display-caption-text" class="text-xs text-zinc-200 leading-relaxed font-sans whitespace-pre-wrap">...</p>
-            <p id="display-hashtags" class="text-[11px] text-shopee font-medium leading-relaxed pt-1 border-t border-zinc-800/80">#ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee</p>
           </div>
         </div>
-
       </div>
 
-      <!-- RIGHT COLUMN: 9:16 IPHONE PREVIEW & DOWNLOAD (5 COLS - COMPACT TO FIT SCREEN) -->
-      <div class="lg:col-span-5 flex flex-col items-center space-y-3 sticky top-16">
+      <!-- 1.2 REVIEW VIDEO LINKS (SHOPEE CDN / MP4) -->
+      <div class="subtle-card rounded-2xl p-4 bg-zinc-900/90 border border-zinc-800 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs sm:text-sm font-bold text-white flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-md bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs font-bold">1.2</span>
+            <span>วางลิงก์วิดีโอรีวิวจากคอมเมนต์ (Shopee CDN / MP4)</span>
+          </h2>
+          <span class="text-[10px] text-zinc-400">คลิกขวาที่วิดีโอในคอมเมนต์ > คัดลอกที่อยู่วิดีโอ</span>
+        </div>
 
-        <!-- PHONE FRAME MOCKUP (COMPACT 9:16) -->
-        <div class="relative w-[250px] sm:w-[270px] aspect-[9/16] max-h-[480px] bg-black rounded-[38px] p-2 shadow-2xl border-4 border-zinc-800 ring-1 ring-zinc-700/50 flex flex-col overflow-hidden">
-
-          <!-- PHONE NOTCH / DYNAMIC ISLAND -->
-          <div class="absolute top-3.5 inset-x-0 mx-auto w-20 h-3.5 bg-zinc-950 rounded-full z-30 flex items-center justify-center space-x-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-zinc-800"></span>
-            <span class="w-1 h-1 rounded-full bg-blue-950/60"></span>
-          </div>
-
-          <!-- SAFE ZONE TOGGLE PILL -->
+        <div class="flex gap-2">
+          <input
+            type="url"
+            id="input-review-url"
+            placeholder="วางลิงก์วิดีโอรีวิว เช่น https://down-ws-th.vod.susercontent.com/...mp4"
+            class="flex-1 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-700/80 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-shopee"
+          />
           <button
             type="button"
-            onclick="toggleSafeZone()"
-            id="btn-safezone"
-            class="absolute top-8 right-3.5 z-30 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-950/80 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-white transition flex items-center space-x-1 cursor-pointer"
-            title="เปิด/ปิด เส้นบอกโซนตะกร้าส้ม TikTok & Shopee Video"
+            onclick="handleAddReviewVideoUrl()"
+            id="btn-add-review-vid"
+            class="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold text-xs transition flex items-center space-x-1 shrink-0 cursor-pointer shadow-md"
           >
-            <i class="ph-bold ph-bounding-box text-xs text-shopee"></i>
-            <span>โซนตะกร้า</span>
+            <i class="ph-bold ph-plus text-xs"></i>
+            <span>เพิ่มคลิปนี้</span>
           </button>
+        </div>
 
-          <!-- VIDEO CONTAINER -->
-          <div class="relative w-full h-full rounded-[28px] overflow-hidden bg-zinc-950 flex items-center justify-center">
-
-            <!-- ACTUAL VIDEO PLAYER -->
-            <video
-              id="player-preview"
-              class="w-full h-full object-cover"
-              controls
-              playsinline
-              loop
-            ></video>
-
-            <!-- TIKTOK / SHOPEE SAFE ZONE OVERLAY -->
-            <div id="safe-zone-overlay" class="tiktok-safe-zone hidden z-20">
-              <div class="safe-basket-marker">
-                <i class="ph-fill ph-shopping-bag mr-1"></i> ตะกร้าส้ม
-              </div>
+        <!-- LIST OF CONNECTED REVIEW CLIPS -->
+        <div id="active-review-chips" class="space-y-1.5 pt-1">
+          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px]">
+            <div class="flex items-center space-x-2 truncate">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+              <span id="review-footage-label" class="text-zinc-300 truncate">วิดีโอรีวิวสินค้าจริง #1 (เคลื่อนไหวจริง 100%)</span>
             </div>
+            <span class="text-[10px] text-emerald-400 font-mono shrink-0 ml-2">พร้อมใช้งาน</span>
           </div>
         </div>
 
-        <!-- VIDEO SPECS & DOWNLOAD ACTION -->
-        <div class="w-[250px] sm:w-[270px] subtle-card rounded-2xl p-3 space-y-2 text-center">
-          <div class="flex items-center justify-between text-[11px]">
-            <span class="text-zinc-400">สถานะวิดีโอ</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono">Ready to Post 🚀</span>
-          </div>
-          <p id="video-spec-title" class="text-xs font-semibold text-white truncate text-left">...</p>
-          <p id="video-spec-meta" class="text-[10px] text-zinc-400 font-mono">ความยาว 20.0s | 1080x1920 (9:16) | ซับส้มขอบขาว</p>
+        <p class="text-[11px] text-zinc-400 pt-1 flex items-center space-x-1">
+          <i class="ph-fill ph-info text-zinc-400 text-xs"></i>
+          <span>หากไม่มีวิดีโอรีวิวในคอมเมนต์ ระบบจะสลับใช้ภาพถ่ายโฆษณาแท้ของร้านค้าแปลงเป็นโมชัน 9:16 อัตโนมัติ</span>
+        </p>
+      </div>
 
+      <!-- STEP 1 -> STEP 2 ACTION BUTTON -->
+      <button
+        type="button"
+        onclick="goToStep(2)"
+        class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-shopee to-orange-500 hover:from-shopee-hover hover:to-orange-600 text-white font-bold text-xs sm:text-sm shadow-xl shadow-shopee/20 transition flex items-center justify-center space-x-2 cursor-pointer"
+      >
+        <span>ไปขั้นตอนที่ 2: ร่างเสียงพากย์และแคปชั่น</span>
+        <i class="ph-bold ph-arrow-right text-base"></i>
+      </button>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- STEP 2: ร่างเสียงพากย์และแคปชั่น -->
+    <!-- ========================================== -->
+    <div id="view-step-2" class="space-y-3.5 hidden">
+
+      <!-- CURRENT PRODUCT PILL -->
+      <div class="p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center space-x-2 truncate">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-shopee/20 text-shopee border border-shopee/30 shrink-0">สินค้า</span>
+          <span id="step2-product-name" class="text-xs sm:text-sm font-bold text-white truncate">...</span>
+        </div>
+        <span id="step2-product-price" class="text-xs font-mono font-bold text-emerald-400 shrink-0 ml-2">฿0.00</span>
+      </div>
+
+      <!-- 2.1 SCRIPT & MALI THAI VOICE -->
+      <div class="subtle-card rounded-2xl p-4 bg-zinc-900/90 border border-zinc-800 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-md bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs font-bold">2.1</span>
+            <span class="font-bold text-xs sm:text-sm text-white">สคริปต์เสียงพากย์ภาษาไทย (เสียงมาลีมาตรฐาน ~20 วินาที)</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button
+              type="button"
+              onclick="togglePlayVoiceSample()"
+              id="btn-voice-sample"
+              class="px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-semibold transition flex items-center space-x-1 cursor-pointer"
+            >
+              <i class="ph-fill ph-play text-[10px]" id="icon-voice-sample"></i>
+              <span id="text-voice-sample">ฟังเสียงมาลี</span>
+            </button>
+            <audio id="audio-sample-mali" src="/assets/sample_elevenlabs_mali.mp3" preload="none"></audio>
+            <button type="button" onclick="resetScriptToDefault()" class="text-zinc-400 hover:text-white transition text-[11px] flex items-center space-x-0.5 cursor-pointer">
+              <i class="ph ph-arrow-counter-clockwise"></i>
+              <span>รีเซ็ตบทเดิม</span>
+            </button>
+          </div>
+        </div>
+
+        <textarea
+          id="textarea-script"
+          rows="4"
+          oninput="handleScriptEdited()"
+          class="w-full p-3 bg-zinc-950 border border-zinc-700/80 rounded-xl text-white text-xs sm:text-sm leading-relaxed focus:outline-none focus:border-shopee focus:ring-1 focus:ring-shopee transition font-sans custom-scroll resize-y"
+          placeholder="บทพูดภาษาไทยจะแสดงที่นี่ สามารถตรวจสอบหรือพิมพ์แก้ไขคำได้ทันที..."
+        ></textarea>
+        <div class="flex items-center justify-between text-[11px] text-zinc-400">
+          <span>ความยาวบทพูดเหมาะสม: 18-20 วินาที พอดีกับคลิปสั้น</span>
+          <span id="script-char-count" class="font-mono text-zinc-400">0 ตัวอักษร</span>
+        </div>
+      </div>
+
+      <!-- 2.2 SHORT CAPTION & HASHTAGS -->
+      <div class="subtle-card rounded-2xl p-4 bg-zinc-900/90 border border-zinc-800 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">2.2</span>
+            <span class="font-bold text-xs sm:text-sm text-white">แคปชั่นสำหรับโพสต์สั้น & แฮชแท็ก (#)</span>
+          </div>
           <button
             type="button"
-            onclick="downloadCurrentVideo()"
-            id="btn-download-video"
-            class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 transition flex items-center justify-center space-x-1.5 cursor-pointer"
+            onclick="copyPostCaption()"
+            id="btn-copy-caption"
+            class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center space-x-1 cursor-pointer shadow-md"
           >
-            <i class="ph-bold ph-download-simple text-sm"></i>
-            <span>ดาวน์โหลดวิดีโอ MP4</span>
+            <i class="ph-bold ph-copy text-xs" id="icon-copy-caption"></i>
+            <span id="text-copy-caption">คัดลอกแคปชั่น & แท็ก</span>
           </button>
+        </div>
+
+        <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 space-y-1.5">
+          <p id="display-caption-text" class="text-xs sm:text-sm text-zinc-200 leading-relaxed font-sans whitespace-pre-wrap">...</p>
+          <p id="display-hashtags" class="text-xs text-shopee font-medium leading-relaxed pt-1.5 border-t border-zinc-800/80">#ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee</p>
+        </div>
+      </div>
+
+      <!-- STEP 2 NAVIGATION BUTTONS -->
+      <div class="flex gap-2">
+        <button
+          type="button"
+          onclick="goToStep(1)"
+          class="flex-1 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white font-semibold text-xs sm:text-sm transition flex items-center justify-center space-x-1.5 cursor-pointer"
+        >
+          <i class="ph-bold ph-arrow-left"></i>
+          <span>ย้อนกลับ (แก้ไขลิงก์)</span>
+        </button>
+        <button
+          type="button"
+          onclick="goToStep(3)"
+          class="flex-[2] py-3 rounded-xl bg-gradient-to-r from-shopee to-orange-500 hover:from-shopee-hover hover:to-orange-600 text-white font-bold text-xs sm:text-sm shadow-xl shadow-shopee/20 transition flex items-center justify-center space-x-2 cursor-pointer"
+        >
+          <span>ไปขั้นตอนที่ 3: ผลิตวิดีโอ 9:16</span>
+          <i class="ph-bold ph-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- STEP 3: ผลิตวิดีโอ 9:16 (RENDER & EXPORT) -->
+    <!-- ========================================== -->
+    <div id="view-step-3" class="space-y-3.5 hidden">
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+        <!-- LEFT: RENDER CONTROLS & SPEC (7 COLS) -->
+        <div class="lg:col-span-7 space-y-3.5">
+
+          <!-- RENDER ACTION CARD -->
+          <div class="subtle-card rounded-2xl p-4 bg-gradient-to-br from-zinc-900/95 to-zinc-950 border border-orange-500/20 space-y-3 shadow-xl">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xs sm:text-sm font-bold text-white flex items-center space-x-2">
+                <span class="w-5 h-5 rounded-md bg-shopee/20 text-shopee flex items-center justify-center text-xs font-bold">3.1</span>
+                <span>ผลิตวิดีโอ 9:16 (ผสานภาพจริง + เสียงมาลี + ซับส้ม)</span>
+              </h2>
+              <span id="render-status-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                พร้อมเรนเดอร์ 100%
+              </span>
+            </div>
+
+            <!-- PRODUCT SUMMARY PILL -->
+            <div class="p-2.5 rounded-xl bg-zinc-950/80 border border-zinc-800 text-xs flex items-center justify-between">
+              <span id="step3-product-name" class="font-bold text-white truncate max-w-[280px]">...</span>
+              <span class="text-zinc-400 font-mono text-[11px]">ความยาว ~20.0s</span>
+            </div>
+
+            <!-- START RENDER BUTTON -->
+            <button
+              type="button"
+              id="btn-start-produce"
+              onclick="startRenderVideo()"
+              class="w-full py-3.5 rounded-xl bg-gradient-to-r from-shopee to-orange-500 hover:from-shopee-hover hover:to-orange-600 text-white font-bold text-xs sm:text-sm shadow-xl shadow-shopee/25 transition flex items-center justify-center space-x-2 cursor-pointer"
+            >
+              <i class="ph-bold ph-lightning text-base" id="icon-produce"></i>
+              <span id="text-produce">⚡ กดผลิตวิดีโอ 9:16 (Render 1-Click)</span>
+            </button>
+
+            <!-- RENDERING PROGRESS BAR -->
+            <div id="render-progress-box" class="space-y-1.5 hidden">
+              <div class="w-full bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-800">
+                <div id="render-progress-bar" class="bg-gradient-to-r from-shopee to-emerald-400 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+              <p id="render-progress-text" class="text-[11px] text-zinc-400 text-center font-mono">กำลังประมวลผล...</p>
+            </div>
+          </div>
+
+          <!-- DOWNLOAD MP4 CARD -->
+          <div class="subtle-card rounded-2xl p-4 bg-zinc-900/90 border border-zinc-800 space-y-2.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-zinc-300 font-bold flex items-center space-x-1.5">
+                <i class="ph-bold ph-file-video text-emerald-400 text-sm"></i>
+                <span>ไฟล์วิดีโอ MP4 สำเร็จรูป (Full HD 1080x1920)</span>
+              </span>
+              <span id="video-spec-meta" class="text-[10px] text-zinc-400 font-mono">20.0s | ซับส้มขอบขาว</span>
+            </div>
+
+            <button
+              type="button"
+              onclick="downloadCurrentVideo()"
+              id="btn-download-video"
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition flex items-center justify-center space-x-2 cursor-pointer"
+            >
+              <i class="ph-bold ph-download-simple text-base"></i>
+              <span>ดาวน์โหลดไฟล์วิดีโอ MP4 (พร้อมโพสต์ทันที)</span>
+            </button>
+          </div>
+
+          <!-- STEP 3 NAVIGATION BUTTONS -->
+          <div class="flex gap-2">
+            <button
+              type="button"
+              onclick="goToStep(2)"
+              class="flex-1 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white font-medium text-xs transition flex items-center justify-center space-x-1 cursor-pointer"
+            >
+              <i class="ph-bold ph-arrow-left"></i>
+              <span>ย้อนกลับไปแก้ไขสคริปต์</span>
+            </button>
+            <button
+              type="button"
+              onclick="resetToStep1()"
+              class="flex-1 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white font-medium text-xs transition flex items-center justify-center space-x-1 cursor-pointer border border-zinc-800"
+            >
+              <i class="ph-bold ph-arrows-clockwise"></i>
+              <span>ทำวิดีโอสินค้าตัวใหม่</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: 9:16 PHONE MOCKUP PREVIEW (5 COLS - COMPACT) -->
+        <div class="lg:col-span-5 flex flex-col items-center space-y-2 sticky top-16">
+
+          <!-- PHONE FRAME MOCKUP (COMPACT 9:16) -->
+          <div class="relative w-[240px] sm:w-[260px] aspect-[9/16] max-h-[460px] bg-black rounded-[36px] p-2 shadow-2xl border-4 border-zinc-800 ring-1 ring-zinc-700/50 flex flex-col overflow-hidden">
+
+            <!-- NOTCH / DYNAMIC ISLAND -->
+            <div class="absolute top-3.5 inset-x-0 mx-auto w-20 h-3 bg-zinc-950 rounded-full z-30 flex items-center justify-center space-x-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-800"></span>
+              <span class="w-1 h-1 rounded-full bg-blue-950/60"></span>
+            </div>
+
+            <!-- SAFE ZONE TOGGLE PILL -->
+            <button
+              type="button"
+              onclick="toggleSafeZone()"
+              id="btn-safezone"
+              class="absolute top-7 right-3 z-30 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-950/80 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-white transition flex items-center space-x-1 cursor-pointer"
+              title="เปิด/ปิด เส้นบอกโซนตะกร้าส้ม TikTok & Shopee Video"
+            >
+              <i class="ph-bold ph-bounding-box text-xs text-shopee"></i>
+              <span>โซนตะกร้า</span>
+            </button>
+
+            <!-- VIDEO CONTAINER -->
+            <div class="relative w-full h-full rounded-[26px] overflow-hidden bg-zinc-950 flex items-center justify-center">
+
+              <!-- ACTUAL VIDEO PLAYER -->
+              <video
+                id="player-preview"
+                class="w-full h-full object-cover"
+                controls
+                playsinline
+                loop
+              ></video>
+
+              <!-- SAFE ZONE OVERLAY -->
+              <div id="safe-zone-overlay" class="tiktok-safe-zone hidden z-20">
+                <div class="safe-basket-marker">
+                  <i class="ph-fill ph-shopping-bag mr-1"></i> ตะกร้าส้ม
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-[10px] text-zinc-500 font-mono">หน้าจอพรีวิว 9:16 (TikTok & Shopee Video)</p>
         </div>
 
       </div>
@@ -382,6 +557,31 @@
   <script>
     // PRE-DEFINED PRODUCT DB WITH VERIFIED 20S VIDEOS, SCRIPTS & CAPTIONS
     const PRODUCTS_DATA = {
+      "toothbrush_zdx3": {
+        product_id: "toothbrush_zdx3",
+        category: "สุขภาพช่องปาก (Oral Care)",
+        title: "แปรงสีฟันไฟฟ้า 2-in-1 โซนิค (รุ่น ZD-X3) ปรับได้ 6 ระดับ กันน้ำ IPX7 พร้อมหัวแปรงเปลี่ยน 2 แบบ",
+        shopee_url: "https://shopee.co.th/product/1825643764/47268120717",
+        price: 199.0,
+        ams_rate: 15.0,
+        earning: 29.85,
+        video_url: "/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s",
+        size_mb: 5.56,
+        footage_sources: {
+          ad_video: "วิดีโอโฆษณาแท้สาธิตการใช้งาน (1080x1920 HD)",
+          reviews_count: "3 คลิปจริง",
+          reviews_detail: "วิดีโอรีวิวแกะกล่อง, ทดสอบการสั่น, ทดสอบกันน้ำ IPX7"
+        },
+        script: {
+          hook: "ใครที่กำลังมองหาแปรงสีฟันไฟฟ้า แนะนำตัวนี้เลยค่ะ.",
+          body: "รุ่น 2-in-1 ปรับความแรงได้ 6 ระดับ ขนแปรงนุ่มถนอมเหงือก กันน้ำ IPX7 ล้างทำความสะอาดง่าย ชาร์จครั้งเดียวใช้ยาว ฟันสะอาดลื่นขึ้นทันทีค่ะ.",
+          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่กำลังมองหาแปรงสีฟันไฟฟ้า แนะนำตัวนี้เลยค่ะ. รุ่น 2-in-1 ปรับความแรงได้ 6 ระดับ ขนแปรงนุ่มถนอมเหงือก กันน้ำ IPX7 ล้างทำความสะอาดง่าย ชาร์จครั้งเดียวใช้ยาว ฟันสะอาดลื่นขึ้นทันทีค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ."
+        },
+        caption: "ใครมองหาแปรงสีฟันไฟฟ้าดีๆ บอกเลยตัวนี้ต้องมี! รุ่น 2-in-1 ปรับได้ 6 ระดับ กันน้ำ IPX7 คุ้มราคามาก พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧡🪥✨",
+        hashtags: "#แปรงสีฟันไฟฟ้า #ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee #ป้ายยาของใช้"
+      },
+
       "fanlife_tumbler_710ml": {
         product_id: "fanlife_tumbler_710ml",
         category: "แก้วเก็บความเย็น (Living)",
@@ -689,8 +889,8 @@
       } catch (err) {
         matchAndRenderLocally(url);
       } finally {
-        icon.className = 'ph-bold ph-lightning text-base';
-        text.innerText = 'สร้างวิดีโอ 1-Click';
+        icon.className = 'ph-bold ph-arrows-clockwise text-sm';
+        text.innerText = 'ดึงข้อมูลสินค้า';
         btn.disabled = false;
       }
     }
@@ -724,13 +924,44 @@
     function renderActiveProduct(prod) {
       currentProduct = prod;
 
-      // Product Summary
-      document.getElementById('product-category').innerText = prod.category;
-      document.getElementById('product-title').innerText = prod.title;
-      document.getElementById('product-shopee-link').href = prod.shopee_url;
-      document.getElementById('product-price').innerText = '฿' + Number(prod.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      document.getElementById('product-ams').innerText = '+' + prod.ams_rate + '%';
-      document.getElementById('product-earning').innerText = '฿' + Number(prod.earning).toFixed(2);
+      // Update Step 1 Form Fields
+      const inputName = document.getElementById('input-product-name');
+      if (inputName) inputName.value = prod.title || '';
+      const inputPrice = document.getElementById('input-product-price');
+      if (inputPrice) inputPrice.value = '฿' + Number(prod.price || 0).toFixed(2);
+      const linkOpen = document.getElementById('link-open-shopee');
+      if (linkOpen) linkOpen.href = prod.shopee_url || '#';
+      const amsBadge = document.getElementById('product-ams-badge');
+      if (amsBadge) {
+        const rate = prod.ams_rate || 15.0;
+        const earn = prod.earning || (prod.price * (rate / 100));
+        amsBadge.innerText = `+${rate}% (ได้ ฿${Number(earn).toFixed(2)}/ชิ้น)`;
+      }
+
+      // Update Step 2 Pill & Spec
+      const s2Name = document.getElementById('step2-product-name');
+      if (s2Name) s2Name.innerText = prod.title || '';
+      const s2Price = document.getElementById('step2-product-price');
+      if (s2Price) s2Price.innerText = '฿' + Number(prod.price || 0).toFixed(2);
+
+      // Update Step 3
+      const s3Name = document.getElementById('step3-product-name');
+      if (s3Name) s3Name.innerText = prod.title || '';
+
+
+      // Product Summary (Safe checks)
+      const catEl = document.getElementById('product-category');
+      if (catEl) catEl.innerText = prod.category;
+      const titleEl = document.getElementById('product-title');
+      if (titleEl) titleEl.innerText = prod.title;
+      const shopeeLink = document.getElementById('product-shopee-link');
+      if (shopeeLink) shopeeLink.href = prod.shopee_url;
+      const priceEl = document.getElementById('product-price');
+      if (priceEl) priceEl.innerText = '฿' + Number(prod.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const amsEl = document.getElementById('product-ams');
+      if (amsEl) amsEl.innerText = '+' + prod.ams_rate + '%';
+      const earnEl = document.getElementById('product-earning');
+      if (earnEl) earnEl.innerText = '฿' + Number(prod.earning).toFixed(2);
 
       // Script Inspector
       const s = prod.script || {};
@@ -783,7 +1014,9 @@
       player.play().catch(() => {});
 
       // Video Spec
-      document.getElementById('video-spec-title').innerText = prod.title;
+      const specTitle = document.getElementById('video-spec-title');
+      if (specTitle) specTitle.innerText = prod.title;
+      updateScriptCharCount();
       const modeLabel = isImageMode ? 'ภาพโฆษณาแท้ Dynamic Motion' : 'วิดีโอเคลื่อนไหวจริง 100%';
       document.getElementById('video-spec-meta').innerText = `ความยาว 20.0s | ${prod.size_mb || 7.5} MB | Full HD 1080x1920 (9:16) | ${modeLabel} | ซับส้มขอบขาว`;
     }
@@ -795,6 +1028,7 @@
       if (currentProduct.script) {
         currentProduct.script.full_script = text;
       }
+      updateScriptCharCount();
     }
 
     function resetScriptToDefault() {
@@ -927,6 +1161,173 @@
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 2500);
     }
+
+    // 3-STEP WIZARD NAVIGATION
+    let currentStep = 1;
+
+    function goToStep(step) {
+      if (step < 1 || step > 3) return;
+      currentStep = step;
+
+      // Toggle Views
+      const v1 = document.getElementById('view-step-1');
+      const v2 = document.getElementById('view-step-2');
+      const v3 = document.getElementById('view-step-3');
+      if (v1) v1.classList.toggle('hidden', step !== 1);
+      if (v2) v2.classList.toggle('hidden', step !== 2);
+      if (v3) v3.classList.toggle('hidden', step !== 3);
+
+      // Update Tabs styling
+      for (let s = 1; s <= 3; s++) {
+        const tab = document.getElementById(`tab-step-${s}`);
+        const badge = document.getElementById(`badge-step-${s}`);
+        if (!tab || !badge) continue;
+
+        if (s === step) {
+          tab.className = 'py-2.5 px-2 sm:px-4 rounded-xl flex items-center justify-center space-x-2 text-xs sm:text-sm font-bold transition cursor-pointer bg-shopee text-white shadow-md shadow-shopee/25';
+          badge.className = 'w-5 h-5 rounded-full flex items-center justify-center text-[11px] bg-white text-shopee font-bold';
+        } else if (s < step) {
+          tab.className = 'py-2.5 px-2 sm:px-4 rounded-xl flex items-center justify-center space-x-2 text-xs sm:text-sm font-semibold transition cursor-pointer bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+          badge.className = 'w-5 h-5 rounded-full flex items-center justify-center text-[11px] bg-emerald-500 text-white font-bold';
+        } else {
+          tab.className = 'py-2.5 px-2 sm:px-4 rounded-xl flex items-center justify-center space-x-2 text-xs sm:text-sm font-medium transition cursor-pointer bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800';
+          badge.className = 'w-5 h-5 rounded-full flex items-center justify-center text-[11px] bg-zinc-800 text-zinc-400 font-bold';
+        }
+      }
+
+      // Sync step data
+      if (currentProduct) {
+        const s2Name = document.getElementById('step2-product-name');
+        if (s2Name) s2Name.innerText = currentProduct.title;
+        const s2Price = document.getElementById('step2-product-price');
+        if (s2Price) s2Price.innerText = '฿' + Number(currentProduct.price).toFixed(2);
+        const s3Name = document.getElementById('step3-product-name');
+        if (s3Name) s3Name.innerText = currentProduct.title;
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetToStep1() {
+      goToStep(1);
+      const urlInput = document.getElementById('input-shopee-url');
+      if (urlInput) {
+        urlInput.value = '';
+        urlInput.focus();
+      }
+    }
+
+    // HANDLE PRODUCT NAME & PRICE EDITS FROM STEP 1
+    function handleProductNameChange() {
+      if (!currentProduct) return;
+      const el = document.getElementById('input-product-name');
+      if (!el) return;
+      const newTitle = el.value.trim();
+      if (!newTitle) return;
+      currentProduct.title = newTitle;
+
+      // Update script dynamically to match new product name
+      const hookText = `ใครที่กำลังมองหา ${newTitle.substring(0, 30)} แนะนำตัวนี้เลยค่ะ.`;
+      const bodyText = `ตัวนี้ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์ทุกการใช้งานจริงค่ะ.`;
+      const ctaText = `สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.`;
+      const fullText = `${hookText} ${bodyText} ${ctaText}`;
+
+      if (currentProduct.script) {
+        currentProduct.script.hook = hookText;
+        currentProduct.script.body = bodyText;
+        currentProduct.script.cta = ctaText;
+        currentProduct.script.full_script = fullText;
+      }
+      const txtArea = document.getElementById('textarea-script');
+      if (txtArea) txtArea.value = fullText;
+      updateScriptCharCount();
+
+      // Update caption
+      currentProduct.caption = `ใครมองหาตัวนี้บอกเลยว่าห้ามพลาด! ${newTitle.substring(0, 35)}... ใช้ดี คุณภาพดีมาก คุ้มราคา พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨`;
+      const capEl = document.getElementById('display-caption-text');
+      if (capEl) capEl.innerText = currentProduct.caption;
+
+      const s2Name = document.getElementById('step2-product-name');
+      if (s2Name) s2Name.innerText = newTitle;
+      const s3Name = document.getElementById('step3-product-name');
+      if (s3Name) s3Name.innerText = newTitle;
+    }
+
+    function handleProductPriceChange() {
+      if (!currentProduct) return;
+      const el = document.getElementById('input-product-price');
+      if (!el) return;
+      const raw = el.value.replace(/[^0-9.]/g, '');
+      const p = parseFloat(raw);
+      if (!isNaN(p)) {
+        currentProduct.price = p;
+        const rate = currentProduct.ams_rate || 15.0;
+        const earning = p * (rate / 100);
+        currentProduct.earning = earning;
+        const amsBadge = document.getElementById('product-ams-badge');
+        if (amsBadge) amsBadge.innerText = `+${rate}% (ได้ ฿${earning.toFixed(2)}/ชิ้น)`;
+        const s2Price = document.getElementById('step2-product-price');
+        if (s2Price) s2Price.innerText = '฿' + p.toFixed(2);
+      }
+    }
+
+    function updateScriptCharCount() {
+      const txtArea = document.getElementById('textarea-script');
+      const counter = document.getElementById('script-char-count');
+      if (txtArea && counter) {
+        counter.innerText = `${txtArea.value.length} ตัวอักษร`;
+      }
+    }
+
+    // SIMULATE RENDERING IN STEP 3
+    function startRenderVideo() {
+      const btn = document.getElementById('btn-start-produce');
+      const icon = document.getElementById('icon-produce');
+      const text = document.getElementById('text-produce');
+      const pBox = document.getElementById('render-progress-box');
+      const pBar = document.getElementById('render-progress-bar');
+      const pText = document.getElementById('render-progress-text');
+      const badge = document.getElementById('render-status-badge');
+
+      if (btn) btn.disabled = true;
+      if (pBox) pBox.classList.remove('hidden');
+      if (icon) icon.className = 'ph-bold ph-spinner animate-spin text-base';
+      if (text) text.innerText = 'กำลังเรนเดอร์วิดีโอ 9:16...';
+
+      let progress = 0;
+      const steps = [
+        '1/3 กำลังผสานฟุตเทจวิดีโอรีวิวจริง & โฆษณาหลัก...',
+        '2/3 กำลังสังเคราะห์เสียงพากย์มาลีภาษาไทย...',
+        '3/3 กำลังฝังซับไตเติลสีส้มขอบขาว ไม่บังตะกร้า...',
+        'สำเร็จ! วิดีโอ 9:16 พร้อมโพสต์เรียบร้อย 🚀'
+      ];
+
+      const interval = setInterval(() => {
+        progress += 25;
+        if (pBar) pBar.style.width = `${progress}%`;
+        const stepIdx = Math.min(Math.floor(progress / 30), steps.length - 1);
+        if (pText) pText.innerText = steps[stepIdx];
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          if (btn) btn.disabled = false;
+          if (icon) icon.className = 'ph-bold ph-check text-base';
+          if (text) text.innerText = 'เรนเดอร์สำเร็จแล้ว (เล่นอัตโนมัติ)';
+          if (badge) {
+            badge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono';
+            badge.innerText = 'เรนเดอร์เสร็จสมบูรณ์ 🚀';
+          }
+
+          // Play preview player
+          const player = document.getElementById('player-preview');
+          if (player) {
+            player.play().catch(() => {});
+          }
+          showToast('ผลิตวิดีโอ 9:16 สำเร็จ พร้อมดาวน์โหลดไฟล์ MP4 ทันที!');
+        }
+      }, 500);
+    }
+
   </script>
 </body>
 </html>

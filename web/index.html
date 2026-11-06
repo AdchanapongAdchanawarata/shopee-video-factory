@@ -541,7 +541,7 @@
               </div>
 
               <!-- ANIMATED THAI SUBTITLES OVERLAY IN SAFE ZONE -->
-              <div id="overlay-subtitles" class="absolute bottom-20 inset-x-3 z-20 text-center pointer-events-none transition-all duration-200">
+              <div id="overlay-subtitles" class="absolute bottom-24 inset-x-3 z-20 text-center pointer-events-none transition-all duration-200">
                 <div class="inline-block max-w-[95%] px-3.5 py-2 rounded-xl bg-black/80 backdrop-blur-md border border-orange-500/50 shadow-2xl">
                   <span id="overlay-subtitle-text" class="text-xs sm:text-sm font-extrabold text-white tracking-wide leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                     <span class="text-orange-400">สนใจกดสั่งที่ตะกร้าสีส้ม</span> มุมซ้ายล่างได้เลยนะคะ ✨
@@ -899,6 +899,7 @@
       document.getElementById('input-product-name').value = '';
       document.getElementById('input-product-price').value = '';
       document.getElementById('input-review-url').value = '';
+      setupVideoSubtitleSync();
     });
 
     // LOAD SAMPLE BY ID
@@ -1264,29 +1265,65 @@
       });
     }
 
-    // PLAY/STOP VOICE SAMPLE (MALI)
-    function togglePlayVoiceSample() {
-      const audio = document.getElementById('audio-sample-mali');
+    // PLAY/STOP VOICE SAMPLE (MALI REAL-TIME AI)
+    async function togglePlayVoiceSample() {
       const icon = document.getElementById('icon-voice-sample');
       const text = document.getElementById('text-voice-sample');
+      const sampleAudio = document.getElementById('audio-sample-mali');
 
-      if (!isPlayingSample) {
-        audio.play().then(() => {
-          isPlayingSample = true;
-          icon.className = 'ph-fill ph-pause text-xs';
-          text.innerText = 'หยุดเสียง';
-        }).catch(err => {
-          showToast('ไม่สามารถเล่นเสียงตัวอย่างได้');
-        });
-      } else {
-        audio.pause();
-        audio.currentTime = 0;
+      if (isPlayingSample) {
+        if (activeMaliAudio) {
+          activeMaliAudio.pause();
+          activeMaliAudio.currentTime = 0;
+        }
+        if (sampleAudio) {
+          sampleAudio.pause();
+          sampleAudio.currentTime = 0;
+        }
         isPlayingSample = false;
         icon.className = 'ph-fill ph-play text-xs';
         text.innerText = 'ฟังเสียงมาลี';
+        return;
       }
 
-      audio.onended = () => {
+      const txtArea = document.getElementById('textarea-script');
+      const scriptText = (txtArea && txtArea.value.trim()) ? txtArea.value.trim() :
+        (currentProduct && currentProduct.script ? currentProduct.script.full_script : '');
+
+      icon.className = 'ph-bold ph-spinner animate-spin text-xs';
+      text.innerText = 'กำลังเตรียมเสียงมาลี...';
+
+      let audioSrc = null;
+      if (scriptText && scriptText.length > 5) {
+        audioSrc = await fetchMaliVoiceAudio(scriptText);
+      }
+      if (!audioSrc) {
+        audioSrc = '/assets/sample_elevenlabs_mali.mp3';
+      }
+
+      if (activeMaliAudio) {
+        activeMaliAudio.pause();
+      }
+      activeMaliAudio = new Audio(audioSrc);
+      activeMaliAudio.play().then(() => {
+        isPlayingSample = true;
+        icon.className = 'ph-fill ph-pause text-xs';
+        text.innerText = 'หยุดเสียง';
+        showToast('กำลังเล่นเสียงพากย์มาลีภาษาไทย...');
+      }).catch(err => {
+        if (sampleAudio) {
+          sampleAudio.play().catch(() => {});
+          isPlayingSample = true;
+          icon.className = 'ph-fill ph-pause text-xs';
+          text.innerText = 'หยุดเสียง';
+        } else {
+          showToast('ไม่สามารถเล่นเสียงได้ กรุณาลองใหม่อีกครั้ง');
+          icon.className = 'ph-fill ph-play text-xs';
+          text.innerText = 'ฟังเสียงมาลี';
+        }
+      });
+
+      activeMaliAudio.onended = () => {
         isPlayingSample = false;
         icon.className = 'ph-fill ph-play text-xs';
         text.innerText = 'ฟังเสียงมาลี';
@@ -1554,25 +1591,27 @@
     let activeMaliAudio = null;
 
     // Real-Time Subtitle & Audio Synchronization on Video Play
+    let isSubtitleSyncAttached = false;
     function setupVideoSubtitleSync() {
       const player = document.getElementById('player-preview');
-      if (!player) return;
+      if (!player || isSubtitleSyncAttached) return;
+      isSubtitleSyncAttached = true;
 
       player.addEventListener('timeupdate', () => {
         if (!currentProduct || !currentProduct.script) return;
         const s = currentProduct.script;
-        const dur = player.duration || 20.0;
+        const dur = (player.duration && !isNaN(player.duration)) ? player.duration : 20.0;
         const progress = player.currentTime / dur;
 
         const subEl = document.getElementById('overlay-subtitle-text');
         if (!subEl) return;
 
-        if (progress < 0.28) {
-          subEl.innerHTML = `<span class="text-amber-300 font-bold">${s.hook || 'ใครที่กำลังมองหาสินค้าตัวนี้ แนะนำเลยค่ะ!'}</span>`;
+        if (progress < 0.30) {
+          subEl.innerHTML = `<span class="text-amber-300 font-extrabold">${s.hook || 'ใครที่กำลังมองหาสินค้าตัวนี้ แนะนำเลยค่ะ!'}</span>`;
         } else if (progress < 0.75) {
           subEl.innerHTML = `<span class="text-white font-bold">${s.body || 'ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์การใช้งานจริงค่ะ!'}</span>`;
         } else {
-          subEl.innerHTML = `<span class="text-orange-400 font-bold">${s.cta || 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ!'}</span>`;
+          subEl.innerHTML = `<span class="text-orange-400 font-extrabold">${s.cta || 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ!'}</span>`;
         }
       });
 
@@ -1585,6 +1624,12 @@
       player.addEventListener('play', () => {
         if (activeMaliAudio && activeMaliAudio.paused) {
           activeMaliAudio.play().catch(() => {});
+        }
+      });
+
+      player.addEventListener('seeked', () => {
+        if (activeMaliAudio) {
+          activeMaliAudio.currentTime = player.currentTime;
         }
       });
     }

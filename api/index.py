@@ -244,19 +244,19 @@ PRODUCT_SCRIPTS = {
 }
 
 AVAILABLE_VIDEOS = {
-    "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s", 10.07),
-    "master_art_colored_pencils": ("/videos/master_art_colored_pencils.mp4", 0.78),
-    "kettlebell_soft_pvc": ("/videos/kettlebell_soft_pvc.mp4", 0.80),
-    "sanmax_earphones_i14b": ("/videos/sanmax_earphones_i14b.mp4", 8.37),
-    "toothbrush_zdx3": ("/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s", 5.56),
+    "fanlife_tumbler_710ml": ("/videos/fanlife_tumbler_710ml.mp4?v=mali_sub_v1", 5.63),
+    "master_art_colored_pencils": ("/videos/master_art_colored_pencils.mp4?v=mali_sub_v1", 0.47),
+    "kettlebell_soft_pvc": ("/videos/kettlebell_soft_pvc.mp4?v=mali_sub_v1", 0.48),
+    "sanmax_earphones_i14b": ("/videos/sanmax_earphones_i14b.mp4?v=mali_sub_v1", 4.68),
+    "toothbrush_zdx3": ("/videos/sonic_electric_toothbrush.mp4?v=mali_sub_v1", 3.48),
     "cat_fountain_01": ("/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s", 10.09),
-    "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s", 8.07),
+    "gan_charger_65w": ("/videos/gan_charger_65w.mp4?v=mali_sub_v1", 7.16),
     "uv_dust_mite_vacuum": ("/videos/uv_dust_mite_vacuum.mp4?v=v4_perfect_brand_20s", 8.58),
     "tyeso_tumbler_304": ("/videos/tyeso_tumbler_304.mp4?v=v4_perfect_brand_20s", 11.35),
     "spray_mop_360": ("/videos/spray_mop_360.mp4?v=v4_perfect_brand_20s", 11.81),
     "solar_sensor_light": ("/videos/solar_sensor_light.mp4?v=v4_perfect_brand_20s", 9.92),
     "air_fryer_visual": ("/videos/air_fryer_visual.mp4?v=v4_perfect_brand_20s", 7.89),
-    "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s", 5.56),
+    "sonic_electric_toothbrush": ("/videos/sonic_electric_toothbrush.mp4?v=mali_sub_v1", 3.48),
     "kitchen_dish_rack_stainless": ("/videos/kitchen_dish_rack_stainless.mp4?v=v4_perfect_brand_20s", 7.76),
     "wireless_earbuds_anc": ("/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s", 6.31),
 }

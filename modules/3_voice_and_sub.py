@@ -234,9 +234,9 @@ def synthesize_elevenlabs(
     text: str,
     output_path: Path,
     voice_id: str = None,
-    model_id: str = "eleven_v3"
+    model_id: str = "eleven_multilingual_v2"
 ) -> bool:
-    """Synthesize studio-grade Thai speech via ElevenLabs API (eleven_v3 native Thai)."""
+    """Synthesize studio-grade Thai speech via ElevenLabs API (genuine Mali voice with natural human inflection)."""
     try:
         from dotenv import load_dotenv
         load_dotenv(dotenv_path=config.BASE_DIR / ".env", override=True)
@@ -250,7 +250,7 @@ def synthesize_elevenlabs(
             target_vid = "OB8jPhZsR8bpZJnVSkvQ"
 
         clean_text = format_conversational_thai_script(text)
-        print(f"🎙️ Generating natural Thai voiceover via ElevenLabs API (voice_id: {target_vid}, model: {model_id}, lang: th)...")
+        print(f"🎙️ Generating genuine Thai voiceover via ElevenLabs API (voice_id: {target_vid}, model: {model_id})...")
 
         temp_raw = output_path.parent / f"temp_{output_path.stem}_elevenlabs.mp3"
         try:
@@ -260,10 +260,9 @@ def synthesize_elevenlabs(
                 json={
                     "text": clean_text,
                     "model_id": model_id,
-                    "language_code": "th",
                     "voice_settings": {
-                        "stability": 1.0,
-                        "similarity_boost": 1.0,
+                        "stability": 0.45,
+                        "similarity_boost": 0.75,
                         "style": 0.0
                     }
                 },

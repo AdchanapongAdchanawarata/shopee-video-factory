@@ -1182,6 +1182,17 @@
         return 'หูฟังบลูทูธไร้สายตัวนี้';
       }
 
+      // 6. Fishing Lure (เหยื่อตกปลา / หนอนยาง / กบยาง)
+      if (low.includes('หนอนยาง') || low.includes('เหยื่อ') || low.includes('กบยาง') || low.includes('hunsabait') || low.includes('ตกปลา')) {
+        return 'เหยื่อหนอนยางตัวนี้';
+      }
+
+      // 7. Fashion (กางเกง / เสื้อ / กระโปรง / เดรส)
+      if (low.includes('กางเกง')) return 'กางเกงทรงสวยตัวนี้';
+      if (low.includes('เสื้อ')) return 'เสื้อผ้าสวยๆ ชิ้นนี้';
+      if (low.includes('กระโปรง')) return 'กระโปรงทรงสวยตัวนี้';
+      if (low.includes('เดรส')) return 'ชุดเดรสสวยๆ ตัวนี้';
+
       // Fallback: extract short title cleanly
       const parts = norm.split(/[,，、\-–—]/);
       let short = (parts[0] || norm).trim();
@@ -1351,13 +1362,33 @@
         ]
       },
       {
+        id: "fishing",
+        keywords: ["เหยื่อ", "ตกปลา", "หนอนยาง", "กบยาง", "คันเบ็ด", "รอก", "hunsabait", "lure"],
+        angles: [
+          {
+            type: "discovery",
+            headline: "เหยื่อยางแอคชั่นเนียน ปลากัดเต็มคำ",
+            hook: "สายตกปลาคนไหนมองหาเหยื่อเด็ดๆ, แนะนำตัวนี้เลยค่ะ!",
+            body: "{name} เนื้อยางเหนียวนุ่มทนทาน, แอคชั่นพลิ้วสมจริงในน้ำ, เรียกปลานักล่ากัดเต็มคำแน่นอนค่ะ.",
+            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง, จิ้มสั่งก่อนของหมดนะคะ."
+          },
+          {
+            type: "benefit",
+            headline: "ปลาช่อนกระพงกัดดุ กรอเนียนๆ",
+            hook: "ใครที่กำลังเล็งตัวนี้อยู่, บอกเลยว่าต้องมีติดกล่องเหยื่อไว้ค่ะ!",
+            body: "{name} แอคชั่นดีมาก, ลากผ่านสวะได้เนียน, ตีไกลแม่นยำ, ปลากัดไม่มีระแวงเลยค่ะ.",
+            cta: "จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ, ส่งไวมากค่ะ."
+          }
+        ]
+      },
+      {
         id: "fashion",
         keywords: ["กางเกง", "เสื้อ", "กระโปรง", "เดรส", "รองเท้า", "กระเป๋า", "ยีนส์"],
         angles: [
           {
             type: "discovery",
             headline: "ใส่แล้วทรงสวย พรางหุ่นเป๊ะ",
-            hook: "ใครอยากแต่งตัวแล้วดูเพรียวสวยเป๊ะ, แนะนำชิ้นนี้เลยค่ะ สวยตรงปกมาก!",
+            hook: "ใครอยากแต่งตัวแล้วดูเพรียวสวยเป๊ะ, แนะนำชิ้นนี้เลยค่ะ, สวยตรงปกมาก!",
             body: "{name} คัตติ้งเนี้ยบ, เนื้อผ้าใส่สบาย, ระบายอากาศดี, แมตช์กับชุดไหนก็รอด, สาวๆ ต้องมีติดตู้ไว้ค่ะ.",
             cta: "มีครบทุกไซซ์, จิ้มเลือกที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ."
           }
@@ -2365,11 +2396,48 @@
       showToast(enabled ? 'เปิดโหมดครอปหลบซับเดิม (Smart Crop 1.30x)' : 'ปิดโหมดครอป (แสดงสัดส่วนปกติ)');
     }
 
-    // Real-Time Subtitle & Audio Synchronization on Video Play (Safe Zone max 14-16 chars/line)
+    // Real-Time Subtitle & Audio Synchronization on Video Play (Safe Zone max 22-24 chars/line)
     function isCombiningMark(char) {
       if (!char) return false;
       const code = char.charCodeAt(0);
       return (code === 0x0E31) || (code >= 0x0E34 && code <= 0x0E3A) || (code >= 0x0E47 && code <= 0x0E4E);
+    }
+
+    // Merge broken sub-tokens from ICU / Intl.Segmenter (e.g. ['เพ', 'รี', 'ยว'] -> 'เพรียว')
+    function mergeThaiTokens(tokens) {
+      const isMark = (ch) => isCombiningMark(ch);
+      const isVowelSign = (ch) => ['ะ', 'า', 'ำ', 'ๅ', 'ๆ'].includes(ch);
+      const impossibleStarts = ['ยว', 'รียว', 'ติ้ง', 'ส้ม', 'ง', 'ก', 'บ', 'ด', 'น', 'ม', 'ย', 'ว'];
+
+      let merged = [];
+      for (let i = 0; i < tokens.length; i++) {
+        let tok = tokens[i];
+        if (merged.length > 0) {
+          const prev = merged[merged.length - 1];
+          if (isMark(tok[0]) || isVowelSign(tok[0])) {
+            merged[merged.length - 1] += tok;
+            continue;
+          }
+          if (impossibleStarts.includes(tok)) {
+            merged[merged.length - 1] += tok;
+            continue;
+          }
+          if (prev.endsWith('เพ') && tok === 'รี') {
+            merged[merged.length - 1] += tok;
+            continue;
+          }
+          if (prev.endsWith('เพรี') && tok === 'ยว') {
+            merged[merged.length - 1] += tok;
+            continue;
+          }
+          if (tok.length === 1 && !['ก็', 'ณ', 'ธ'].includes(tok)) {
+            merged[merged.length - 1] += tok;
+            continue;
+          }
+        }
+        merged.push(tok);
+      }
+      return merged;
     }
 
     function formatSingleOrTwoLines(text) {
@@ -2380,53 +2448,52 @@
         .replace(/\s+/g, ' ')
         .trim();
 
-      // If 15 characters or less, it's 1 perfect clean centered line
-      if (clean.length <= 15) return clean;
+      // RULE 1: If 24 characters or less, KEEP ON 1 SINGLE CLEAN LINE!
+      // In 9:16 safe-zone (84% width), 24 Thai chars is ~180px, well within 268px!
+      // Prevents ANY sub-word splitting for complete phrases (e.g. "แล้วดูเพรียวสวยเป๊ะ", "กางเกงคัตติ้งเนี้ยบ")
+      if (clean.length <= 24) return clean;
 
-      // If between 16 and 28 characters, split into 2 balanced lines
-      const naturalBreakWords = [
-        ' รุ่น', ' สไปค์', ' สไปค์ตัวนี้', ' ตัวนี้', ' ใช้งานง่าย', ' ดีไซน์',
-        ' ฟังก์ชัน', ' คุ้มราคา', ' พิกัด', ' ตะกร้าส้ม', ' ตะกร้าสีส้ม',
-        ' มุมซ้ายล่าง', ' แนะนำ', ' ปลอดภัย', ' สะอาด'
-      ];
-
-      for (const bw of naturalBreakWords) {
-        if (clean.includes(bw)) {
-          const idx = clean.indexOf(bw);
-          const l1 = clean.substring(0, idx).trim();
-          const l2 = clean.substring(idx).trim();
-          if (l1.length >= 4 && l2.length >= 4 && l1.length <= 18 && l2.length <= 18) {
-            return `${l1}<br>${l2}`;
-          }
-        }
-      }
-
+      // RULE 2: If contains spaces, split on the space closest to the middle
       if (clean.includes(' ')) {
         const parts = clean.split(' ').filter(Boolean);
-        if (parts.length === 2 && parts[0].length <= 18 && parts[1].length <= 18) {
-          return `${parts[0]}<br>${parts[1]}`;
-        }
         let bestDiff = 999;
         let bestIdx = 1;
         for (let i = 1; i < parts.length; i++) {
           const l1 = parts.slice(0, i).join(' ');
           const l2 = parts.slice(i).join(' ');
           const diff = Math.abs(l1.length - l2.length);
-          if (diff < bestDiff && l1.length <= 18 && l2.length <= 18) {
+          if (diff < bestDiff) {
             bestDiff = diff;
             bestIdx = i;
           }
         }
         const l1 = parts.slice(0, bestIdx).join(' ').trim();
         const l2 = parts.slice(bestIdx).join(' ').trim();
-        if (l1 && l2 && l1.length <= 18 && l2.length <= 18) {
+        if (l1 && l2) return `${l1}<br>${l2}`;
+      }
+
+      // RULE 3: Break at natural Thai compound word/conjunction boundaries
+      const naturalBreakWords = [
+        'และ', 'หรือ', 'กับ', 'เพื่อ', 'ที่', 'ของ', 'ใน', 'จาก',
+        'บอกเลย', 'ตัวนี้', 'รุ่นนี้', 'ชิ้นนี้', 'ไอเทมนี้',
+        'ใช้งานง่าย', 'ใช้งาน', 'ดีไซน์', 'ฟังก์ชัน', 'คุ้มค่า', 'คุ้มราคา',
+        'สวยตรงปก', 'พิกัด', 'มุมซ้ายล่าง', 'ตะกร้าส้ม', 'ตะกร้าสีส้ม',
+        'กดสั่ง', 'จิ้มสั่ง', 'สั่งเลย', 'ส่งไว', 'ใส่แล้ว', 'ลองแล้ว', 'ใช้แล้ว'
+      ];
+      for (const bw of naturalBreakWords) {
+        const idx = clean.indexOf(bw);
+        if (idx >= 6 && idx <= clean.length - 6) {
+          const l1 = clean.substring(0, idx).trim();
+          const l2 = clean.substring(idx).trim();
           return `${l1}<br>${l2}`;
         }
       }
 
+      // RULE 4: Intl.Segmenter with cluster merging so Thai consonants/vowels are NEVER split
       if (typeof Intl !== 'undefined' && Intl.Segmenter) {
         const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
-        const words = Array.from(segmenter.segment(clean)).map(s => s.segment);
+        const rawWords = Array.from(segmenter.segment(clean)).map(s => s.segment);
+        const words = mergeThaiTokens(rawWords);
         const half = Math.floor(clean.length / 2);
         let cur = 0;
         let splitIdx = 0;
@@ -2445,7 +2512,7 @@
           l1 += l2[0];
           l2 = l2.substring(1).trim();
         }
-        if (l1 && l2 && l2.length >= 4) return `${l1}<br>${l2}`;
+        if (l1 && l2) return `${l1}<br>${l2}`;
       }
 
       return clean;
@@ -2453,6 +2520,33 @@
 
     function formatViralSubtitle(phrase) {
       return formatSingleOrTwoLines(phrase);
+    }
+
+    // Split space-separated word list cleanly without orphaned 1-word fragments
+    function chunkSpacedWords(words, maxLen = 24) {
+      if (words.join(' ').length <= maxLen) return [words.join(' ')];
+      
+      const chunks = [];
+      let cur = [];
+      for (let i = 0; i < words.length; i++) {
+        const w = words[i];
+        const candidate = [...cur, w].join(' ');
+        if (candidate.length <= maxLen) {
+          cur.push(w);
+        } else {
+          const rem = words.slice(i);
+          if (cur.length > 1 && rem.length === 1 && rem[0].length < 8 && (cur[cur.length - 1].length + 1 + rem[0].length) <= maxLen) {
+            const moved = cur.pop();
+            chunks.push(cur.join(' '));
+            cur = [moved, w];
+          } else {
+            if (cur.length > 0) chunks.push(cur.join(' '));
+            cur = [w];
+          }
+        }
+      }
+      if (cur.length > 0) chunks.push(cur.join(' '));
+      return chunks;
     }
 
     function buildTimedSubtitleCues(text) {
@@ -2468,53 +2562,94 @@
         .map(s => s.trim().replace(/\.{2,}/g, ''))
         .filter(s => s.length > 0);
 
-      // Sub-divide long clauses into fast-paced bite-sized phrases (max 22 chars each)
+      // Sub-divide long clauses into fast-paced bite-sized phrases (max 24 chars each)
       let microPhrases = [];
       for (const cl of rawClauses) {
-        if (cl.length <= 22) {
+        if (cl.length <= 24) {
           microPhrases.push(cl);
         } else {
-          const breakPoints = ['ใช้งานง่าย', 'ดีไซน์สวย', 'ฟังก์ชันครบ', 'คุ้มค่า', 'ใครสนใจ', 'พิกัดที่', 'ตะกร้าส้ม', 'กางเป็น', 'มีรีโมท', 'เก็บกลิ่น', 'จับตัวเป็น'];
-          let splitDone = false;
-          for (const bp of breakPoints) {
-            if (cl.includes(bp)) {
-              const idx = cl.indexOf(bp);
-              const p1 = cl.substring(0, idx).trim();
-              const p2 = cl.substring(idx).trim();
-              if (p1.length >= 6 && p2.length >= 6) {
-                microPhrases.push(p1);
-                microPhrases.push(p2);
-                splitDone = true;
-                break;
-              }
-            }
-          }
-          if (!splitDone) {
-            if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-              const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
-              const words = Array.from(segmenter.segment(cl)).map(s => s.segment);
-              const half = Math.floor(cl.length / 2);
-              let cur = 0;
-              let splitIdx = 0;
-              let minDiff = 999;
-              for (let i = 0; i < words.length; i++) {
-                cur += words[i].length;
-                const diff = Math.abs(cur - half);
-                if (diff < minDiff) {
-                  minDiff = diff;
-                  splitIdx = i + 1;
+          // If clause has space, split at balanced spaces
+          if (cl.includes(' ')) {
+            const spacedChunks = chunkSpacedWords(cl.split(' ').filter(Boolean), 24);
+            microPhrases.push(...spacedChunks);
+          } else {
+            // Continuous Thai > 24 chars: find natural breakpoint
+            const breakPoints = [
+              'มุมซ้ายล่าง', 'ตะกร้าสีส้ม', 'ตะกร้าส้ม', 'แล้วดู', 'ใครที่', 'ใครอยาก',
+              'ใช้งานง่าย', 'ดีไซน์สวย', 'ฟังก์ชันครบ', 'คุ้มค่า', 'คุ้มราคา',
+              'ใครสนใจ', 'พิกัดที่', 'กางเป็น', 'มีรีโมท', 'เก็บกลิ่น', 'จับตัวเป็น', 'ใส่แล้ว'
+            ];
+            let splitDone = false;
+            for (const bp of breakPoints) {
+              if (cl.includes(bp)) {
+                const idx = cl.indexOf(bp);
+                const p1 = cl.substring(0, idx).trim();
+                const p2 = cl.substring(idx).trim();
+                if (p1.length >= 6 && p2.length >= 6) {
+                  microPhrases.push(p1);
+                  microPhrases.push(p2);
+                  splitDone = true;
+                  break;
                 }
               }
-              microPhrases.push(words.slice(0, splitIdx).join('').trim());
-              microPhrases.push(words.slice(splitIdx).join('').trim());
-            } else {
-              microPhrases.push(cl);
+            }
+            if (!splitDone) {
+              if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+                const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+                const words = mergeThaiTokens(Array.from(segmenter.segment(cl)).map(s => s.segment));
+                const half = Math.floor(cl.length / 2);
+                let cur = 0;
+                let splitIdx = 0;
+                let minDiff = 999;
+                for (let i = 0; i < words.length; i++) {
+                  cur += words[i].length;
+                  const diff = Math.abs(cur - half);
+                  if (diff < minDiff) {
+                    minDiff = diff;
+                    splitIdx = i + 1;
+                  }
+                }
+                microPhrases.push(words.slice(0, splitIdx).join('').trim());
+                microPhrases.push(words.slice(splitIdx).join('').trim());
+              } else {
+                microPhrases.push(cl);
+              }
             }
           }
         }
       }
 
-      // Fast-paced dynamic timing: 8 to 10 cues across 20 seconds (~1.8s - 2.4s per cue)
+      // POST-PROCESSING 1: NEVER START A CUE WITH A POLITE PARTICLE OR ORPHANED WORD
+      // E.g. "ค่ะ สวยตรงปกมาก" -> attach "ค่ะ" to previous phrase ("แนะนำชิ้นนี้เลยค่ะ")
+      const POLITE_LEADING = /^(ค่ะ|คะ|นะคะ|ครับ|จ้า|นะจ๊ะ|เลยค่ะ|เลยนะคะ|มากค่ะ|จริงๆค่ะ|จริงๆ\s*ค่ะ)\s*/;
+      for (let i = 1; i < microPhrases.length; i++) {
+        const match = microPhrases[i].match(POLITE_LEADING);
+        if (match) {
+          const particle = match[1];
+          microPhrases[i - 1] = (microPhrases[i - 1] + ' ' + particle).trim();
+          microPhrases[i] = microPhrases[i].replace(POLITE_LEADING, '').trim();
+        }
+      }
+      microPhrases = microPhrases.filter(p => p.length > 0);
+      if (microPhrases.length > 0 && microPhrases[0].match(POLITE_LEADING)) {
+        microPhrases[0] = microPhrases[0].replace(POLITE_LEADING, '').trim();
+      }
+
+      // POST-PROCESSING 2: Merge orphaned tiny phrases (< 6 chars) into neighboring phrase
+      let mergedPhrases = [];
+      for (let i = 0; i < microPhrases.length; i++) {
+        let p = microPhrases[i];
+        if (p.length < 6 && mergedPhrases.length > 0 && (mergedPhrases[mergedPhrases.length - 1].length + 1 + p.length) <= 25) {
+          mergedPhrases[mergedPhrases.length - 1] = (mergedPhrases[mergedPhrases.length - 1] + ' ' + p).trim();
+        } else if (p.length < 6 && i < microPhrases.length - 1 && (p.length + 1 + microPhrases[i + 1].length) <= 25) {
+          microPhrases[i + 1] = (p + ' ' + microPhrases[i + 1]).trim();
+        } else {
+          mergedPhrases.push(p);
+        }
+      }
+      microPhrases = mergedPhrases.filter(p => p.length > 0);
+
+      // Fast-paced dynamic timing: 8 to 12 cues across 20 seconds (~1.6s - 2.4s per cue)
       const totalChars = microPhrases.reduce((acc, p) => acc + p.length, 0);
       const totalDuration = 20.0;
 

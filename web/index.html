@@ -6,7 +6,7 @@
   <title>Shopee AI Video Factory | สตูดิโอผลิตวิดีโอรีวิวสินค้าจริง 9:16</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script>
@@ -38,6 +38,32 @@
     .subtle-card {
       background: #141517;
       border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .thai-viral-sub {
+      font-family: 'Kanit', sans-serif;
+      font-weight: 900;
+      font-size: 1.65rem;
+      line-height: 1.15;
+      color: #ff5400;
+      paint-order: stroke fill;
+      -webkit-text-stroke: 4.5px #ffffff;
+      text-shadow:
+        -2px -2px 0 #ffffff,
+         2px -2px 0 #ffffff,
+        -2px  2px 0 #ffffff,
+         2px  2px 0 #ffffff,
+        -3.5px 0    0 #ffffff,
+         3.5px 0    0 #ffffff,
+         0    -3.5px 0 #ffffff,
+         0     3.5px 0 #ffffff,
+         0 4px 10px rgba(0, 0, 0, 0.7);
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.65));
+      letter-spacing: -0.01em;
+      text-align: center;
+      display: inline-block;
+      user-select: none;
+      max-width: 95%;
+      word-break: break-word;
     }
     .subtle-card:hover {
       border-color: rgba(255, 255, 255, 0.14);
@@ -532,20 +558,13 @@
                 loop
               ></video>
 
-              <!-- TOP HEADLINE BRANDING OVERLAY -->
-              <div id="overlay-headline" class="absolute top-8 inset-x-2 z-20 text-center pointer-events-none transition-all duration-300">
-                <div class="inline-block max-w-[95%] px-3 py-1.5 rounded-xl bg-black/65 backdrop-blur-md border border-white/15 shadow-xl">
-                  <p id="overlay-headline-text" class="text-xs sm:text-sm font-bold text-white leading-tight drop-shadow-md truncate">...</p>
-                  <p id="overlay-subheadline-text" class="text-[10px] text-amber-300 font-semibold mt-0.5">ยอดนิยมใน Shopee • รับประกันตรงปก</p>
-                </div>
-              </div>
+              <!-- TOP HEADLINE BRANDING OVERLAY (HIDDEN FOR CLEAN VIRAL ORIGINAL LOOK) -->
+              <div id="overlay-headline" class="hidden"></div>
 
-              <!-- ANIMATED THAI SUBTITLES OVERLAY (UPPER-MIDDLE POSITION AS REQUESTED) -->
-              <div id="overlay-subtitles" class="absolute top-20 inset-x-2 z-20 text-center pointer-events-none transition-all duration-200">
-                <div class="inline-block max-w-[96%] px-3.5 py-2 rounded-2xl bg-black/85 backdrop-blur-md border-2 border-orange-500/80 shadow-2xl">
-                  <span id="overlay-subtitle-text" class="text-xs sm:text-sm font-black text-white tracking-wide leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">
-                    <span class="text-amber-300 font-black">ใครที่กำลังมองหาตัวนี้</span> แนะนำเลยค่ะ! ✨
-                  </span>
+              <!-- ANIMATED THAI VIRAL SUBTITLES (ORIGINAL STYLE: VIBRANT ORANGE + THICK WHITE STROKE, NO BOX) -->
+              <div id="overlay-subtitles" class="absolute top-[22%] inset-x-2 z-20 text-center pointer-events-none transition-all duration-150">
+                <div id="overlay-subtitle-text" class="thai-viral-sub">
+                  ไม่ต้องหิ้ว<br>ถังน้ำถูบ้าน
                 </div>
               </div>
 
@@ -1311,7 +1330,9 @@
       const ovHead = document.getElementById('overlay-headline-text');
       if (ovHead) ovHead.innerText = prod.title;
       const ovSub = document.getElementById('overlay-subtitle-text');
-      if (ovSub && prod.script) ovSub.innerHTML = `<span class="text-amber-300 font-bold">${prod.script.hook || 'ใครที่กำลังมองหาตัวนี้ แนะนำเลยค่ะ!'}</span>`;
+      if (ovSub && prod.script) {
+        ovSub.innerHTML = formatShortSub(prod.script.hook || 'ใครที่กำลังมองหา ตัวนี้แนะนำเลยค่ะ');
+      }
       updateScriptCharCount();
       const modeLabel = isImageMode ? 'ภาพโฆษณาแท้ Dynamic Motion' : 'วิดีโอเคลื่อนไหวจริง 100%';
       document.getElementById('video-spec-meta').innerText = `ความยาว 20.0s | ${prod.size_mb || 7.5} MB | Full HD 1080x1920 (9:16) | ${modeLabel} | ซับส้มขอบขาว`;
@@ -1701,6 +1722,20 @@
     let activeMaliAudio = null;
 
     // Real-Time Subtitle & Audio Synchronization on Video Play
+    function formatShortSub(text) {
+      if (!text) return '';
+      let clean = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '').replace(/[.,!?;:✨🛒🔥🧡]/g, '').trim();
+      if (clean.length > 13) {
+        const mid = Math.floor(clean.length / 2);
+        const spaceIdx = clean.indexOf(' ', mid - 4);
+        if (spaceIdx > 0 && spaceIdx < mid + 8) {
+          return clean.substring(0, spaceIdx) + '<br>' + clean.substring(spaceIdx + 1);
+        }
+        return clean.substring(0, mid) + '<br>' + clean.substring(mid);
+      }
+      return clean;
+    }
+
     let isSubtitleSyncAttached = false;
     function setupVideoSubtitleSync() {
       const player = document.getElementById('player-preview');
@@ -1716,12 +1751,23 @@
         const subEl = document.getElementById('overlay-subtitle-text');
         if (!subEl) return;
 
-        if (progress < 0.30) {
-          subEl.innerHTML = `<span class="text-amber-300 font-extrabold">${s.hook || 'ใครที่กำลังมองหาสินค้าตัวนี้ แนะนำเลยค่ะ!'}</span>`;
-        } else if (progress < 0.75) {
-          subEl.innerHTML = `<span class="text-white font-bold">${s.body || 'ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์การใช้งานจริงค่ะ!'}</span>`;
+        // If pre-rendered video already has burnt-in subtitles in this exact style, hide overlay
+        const isPreRendered = currentProduct.video_url && currentProduct.video_url.includes('/videos/') && !currentProduct.is_raw_footage;
+        if (isPreRendered) {
+          subEl.style.display = 'none';
+          return;
         } else {
-          subEl.innerHTML = `<span class="text-orange-400 font-extrabold">${s.cta || 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ!'}</span>`;
+          subEl.style.display = 'inline-block';
+        }
+
+        if (progress < 0.28) {
+          subEl.innerHTML = formatShortSub(s.hook || 'ใครที่กำลังมองหา ตัวนี้แนะนำเลยค่ะ');
+        } else if (progress < 0.52) {
+          subEl.innerHTML = 'ตัวนี้ใช้งานดีมาก<br>วัสดุดีคุ้มราคา';
+        } else if (progress < 0.76) {
+          subEl.innerHTML = 'ใครที่กำลังเล็งอยู่<br>บอกเลยไม่ผิดหวัง';
+        } else {
+          subEl.innerHTML = formatShortSub(s.cta || 'พิกัดตะกร้าส้ม มุมซ้ายล่างเลยนะคะ');
         }
       });
 

@@ -551,68 +551,46 @@
               <span class="w-1 h-1 rounded-full bg-blue-950/60"></span>
             </div>
 
-            <!-- SAFE ZONE TOGGLE PILL -->
-            <button
-              type="button"
-              onclick="toggleSafeZone()"
-              id="btn-safezone"
-              class="absolute top-7 right-3 z-30 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-950/80 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-white transition flex items-center space-x-1 cursor-pointer"
-              title="เปิด/ปิด เส้นบอกโซนตะกร้าส้ม TikTok & Shopee Video"
-            >
-              <i class="ph-bold ph-bounding-box text-xs text-shopee"></i>
-              <span>โซนตะกร้า</span>
-            </button>
 
-            <!-- VIDEO CONTAINER -->
-            <div class="relative w-full h-full rounded-[26px] overflow-hidden bg-zinc-950 flex items-center justify-center">
 
-              <!-- ACTUAL VIDEO PLAYER -->
+            <!-- VIDEO CONTAINER (CLEAN 9:16 PREVIEW - NO UNNECESSARY GRAPHICS) -->
+            <div class="relative w-full h-full rounded-[26px] overflow-hidden bg-zinc-950 flex items-center justify-center select-none" onclick="handleVideoAreaClick(event)">
+
+              <!-- ACTUAL VIDEO PLAYER (MUTED RAW VIDEO TO ISOLATE CRISP MALI AI VOICEOVER) -->
               <video
                 id="player-preview"
-                class="w-full h-full object-cover"
-                controls
+                class="w-full h-full object-cover cursor-pointer"
                 playsinline
-                loop
+                muted
               ></video>
 
               <!-- DEDICATED MALI AI VOICE AUDIO (SYNCHRONIZED REAL-TIME) -->
               <audio id="player-mali-audio" preload="auto"></audio>
 
-              <!-- MALI AUDIO STATUS PILL -->
-              <button
-                type="button"
-                id="btn-mali-audio-sync"
-                onclick="toggleMaliAudioSync()"
-                class="absolute top-3 left-3 z-30 flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-black/80 hover:bg-black text-amber-300 font-bold text-[11px] border border-amber-400/40 shadow-xl backdrop-blur-md cursor-pointer transition transform active:scale-95"
-                title="คลิกเพื่อเปิด/ปิดเสียงพากย์มาลี"
-              >
-                <i class="ph-fill ph-speaker-high text-xs text-amber-400" id="icon-mali-sync"></i>
-                <span id="text-mali-sync">เสียงมาลี AI: กำลังเล่น</span>
-              </button>
-
-              <!-- TOP HEADLINE BRANDING OVERLAY (HIDDEN FOR CLEAN VIRAL ORIGINAL LOOK) -->
+              <!-- TOP HEADLINE BRANDING OVERLAY (HIDDEN FOR CLEAN VIRAL LOOK) -->
               <div id="overlay-headline" class="hidden"></div>
 
-              <!-- ANIMATED THAI VIRAL SUBTITLES (ORIGINAL STYLE: VIBRANT ORANGE + THICK WHITE STROKE, NO BOX) -->
-              <div id="overlay-subtitles" class="absolute top-[15%] inset-x-2 z-20 text-center pointer-events-none transition-all duration-150">
+              <!-- ANIMATED THAI VIRAL SUBTITLES (ORIGINAL VIRAL STYLE: VIBRANT ORANGE + THICK WHITE STROKE) -->
+              <div id="overlay-subtitles" class="absolute top-[14%] inset-x-2 z-20 text-center pointer-events-none transition-all duration-150">
                 <div id="overlay-subtitle-text" class="thai-viral-sub">
-                  ไม่ต้องหิ้ว<br>ถังน้ำถูบ้าน
+                  ใครที่กำลังมองหา
                 </div>
               </div>
 
-              <!-- SAFE ZONE BASKET BADGE -->
-              <div class="absolute bottom-5 left-3 z-20 pointer-events-none">
-                <div class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-shopee text-white font-bold text-[11px] shadow-lg animate-bounce">
-                  <i class="ph-fill ph-shopping-bag text-xs"></i>
-                  <span>ตะกร้าส้ม</span>
+              <!-- SLEEK MINIMAL TIKTOK-STYLE 20-SECOND CONTROLS -->
+              <div id="custom-video-controls" class="absolute bottom-2.5 inset-x-3 z-30 flex items-center space-x-2.5 px-3 py-1.5 rounded-xl bg-black/65 backdrop-blur-md border border-white/10 text-white" onclick="event.stopPropagation()">
+                <button type="button" id="btn-custom-play" onclick="togglePlayVideo()" class="text-white hover:text-amber-400 transition cursor-pointer text-xs" title="เล่น/หยุด">
+                  <i class="ph-fill ph-pause text-xs" id="icon-custom-play"></i>
+                </button>
+                <div class="flex-1 relative flex items-center cursor-pointer py-1.5" onclick="seekCustomTimeline(event)" id="custom-timeline-bar" title="เลื่อนแถบเวลาคลิป">
+                  <div class="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+                    <div id="custom-progress-fill" class="h-full bg-shopee rounded-full transition-all duration-75" style="width: 0%;"></div>
+                  </div>
                 </div>
-              </div>
-
-              <!-- SAFE ZONE OVERLAY -->
-              <div id="safe-zone-overlay" class="tiktok-safe-zone hidden z-20">
-                <div class="safe-basket-marker">
-                  <i class="ph-fill ph-shopping-bag mr-1"></i> ตะกร้าส้ม
-                </div>
+                <span id="custom-time-display" class="font-mono text-[10px] text-zinc-300 shrink-0 font-semibold tracking-tight">0:00 / 0:20</span>
+                <button type="button" id="btn-custom-audio" onclick="toggleMuteVoice()" class="text-zinc-300 hover:text-white transition cursor-pointer text-xs" title="เปิด/ปิดเสียงมาลี">
+                  <i class="ph-fill ph-speaker-high text-xs text-amber-400" id="icon-custom-audio"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -1365,6 +1343,7 @@
       // Video Player & Synchronized Mali Voiceover
       const player = document.getElementById('player-preview');
       player.src = prod.video_url;
+      player.muted = true;
       player.load();
       player.play().catch(() => {});
 
@@ -1653,7 +1632,7 @@
           const player = document.getElementById('player-preview');
           const maliAudio = document.getElementById('player-mali-audio');
           if (player) {
-            player.volume = 0.15;
+            player.muted = true;
             player.currentTime = 0;
             player.play().catch(() => {});
           }
@@ -1661,6 +1640,8 @@
             maliAudio.currentTime = 0;
             maliAudio.play().catch(e => console.log('Mali audio auto-play:', e));
           }
+          const iconPlay = document.getElementById('icon-custom-play');
+          if (iconPlay) iconPlay.className = 'ph-fill ph-pause text-xs';
         }
       }
 
@@ -1934,25 +1915,65 @@
     }
 
     let isMaliMuted = false;
-    function toggleMaliAudioSync() {
+    const MAX_TARGET_VIDEO_DURATION = 20.0; // Strictly 20.0 seconds
+
+    function togglePlayVideo() {
+      const player = document.getElementById('player-preview');
       const maliAudio = document.getElementById('player-mali-audio');
-      const icon = document.getElementById('icon-mali-sync');
-      const text = document.getElementById('text-mali-sync');
+      const icon = document.getElementById('icon-custom-play');
+      if (!player) return;
+      if (player.paused) {
+        player.muted = true; // Mute raw video to eliminate ambient background noise
+        player.play().catch(() => {});
+        if (maliAudio && !isMaliMuted) {
+          maliAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
+          maliAudio.play().catch(() => {});
+        }
+        if (icon) icon.className = 'ph-fill ph-pause text-xs';
+      } else {
+        player.pause();
+        if (maliAudio) maliAudio.pause();
+        if (icon) icon.className = 'ph-fill ph-play text-xs';
+      }
+    }
+
+    function handleVideoAreaClick(e) {
+      // Toggle play/pause when user clicks anywhere on mobile screen preview
+      togglePlayVideo();
+    }
+
+    function toggleMuteVoice() {
+      const maliAudio = document.getElementById('player-mali-audio');
+      const icon = document.getElementById('icon-custom-audio');
       isMaliMuted = !isMaliMuted;
       if (maliAudio) {
         maliAudio.muted = isMaliMuted;
         if (!isMaliMuted && maliAudio.paused) {
           const player = document.getElementById('player-preview');
-          maliAudio.currentTime = player ? player.currentTime : 0;
+          maliAudio.currentTime = player ? Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION) : 0;
           maliAudio.play().catch(() => {});
         }
       }
-      if (isMaliMuted) {
-        if (icon) icon.className = 'ph-fill ph-speaker-slash text-xs text-zinc-400';
-        if (text) text.innerText = 'เสียงมาลี AI: ปิดเสียง';
-      } else {
-        if (icon) icon.className = 'ph-fill ph-speaker-high text-xs text-amber-400';
-        if (text) text.innerText = 'เสียงมาลี AI: กำลังเล่น';
+      if (icon) {
+        icon.className = isMaliMuted ? 'ph-fill ph-speaker-slash text-xs text-zinc-500' : 'ph-fill ph-speaker-high text-xs text-amber-400';
+      }
+    }
+
+    function seekCustomTimeline(e) {
+      const bar = document.getElementById('custom-timeline-bar');
+      if (!bar) return;
+      const rect = bar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+      const targetTime = ratio * MAX_TARGET_VIDEO_DURATION;
+
+      const player = document.getElementById('player-preview');
+      const maliAudio = document.getElementById('player-mali-audio');
+      if (player) {
+        player.currentTime = targetTime;
+      }
+      if (maliAudio) {
+        maliAudio.currentTime = targetTime;
       }
     }
 
@@ -1967,25 +1988,40 @@
         const subEl = document.getElementById('overlay-subtitle-text');
         if (!subEl) return;
 
-        // If pre-rendered video already has burnt-in subtitles, hide overlay
-        const isPreRendered = currentProduct.video_url && currentProduct.video_url.includes('/videos/') && !currentProduct.is_raw_footage;
-        if (isPreRendered) {
-          subEl.style.display = 'none';
+        // Strictly enforce 20.0 seconds limit (Never let video run to 31s)
+        if (player.currentTime >= MAX_TARGET_VIDEO_DURATION) {
+          player.currentTime = 0;
+          const maliAudio = document.getElementById('player-mali-audio');
+          if (maliAudio) {
+            maliAudio.currentTime = 0;
+            if (!isMaliMuted) maliAudio.play().catch(() => {});
+          }
+          player.play().catch(() => {});
           return;
-        } else {
-          subEl.style.display = 'inline-block';
         }
 
-        const dur = (player.duration && !isNaN(player.duration) && player.duration > 0) ? player.duration : 20.0;
-        const cur = player.currentTime;
+        const cur = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
 
+        // Update custom sleek timeline (0:00 / 0:20)
+        const progressFill = document.getElementById('custom-progress-fill');
+        if (progressFill) {
+          progressFill.style.width = ((cur / MAX_TARGET_VIDEO_DURATION) * 100) + '%';
+        }
+        const timeDisplay = document.getElementById('custom-time-display');
+        if (timeDisplay) {
+          const curSec = Math.floor(cur);
+          const curStr = `0:${curSec < 10 ? '0' : ''}${curSec}`;
+          timeDisplay.innerText = `${curStr} / 0:20`;
+        }
+
+        // Subtitle display (divided evenly across 20s)
         if (!currentProduct._cachedCues) {
           currentProduct._cachedCues = generateSubtitleCues(currentProduct.script);
         }
         const cues = currentProduct._cachedCues;
         if (!cues || cues.length === 0) return;
 
-        const timePerCue = dur / cues.length;
+        const timePerCue = MAX_TARGET_VIDEO_DURATION / cues.length;
         const activeIdx = Math.min(cues.length - 1, Math.max(0, Math.floor(cur / timePerCue)));
 
         const activeText = cues[activeIdx];
@@ -1997,17 +2033,20 @@
       });
 
       player.addEventListener('play', () => {
+        player.muted = true; // Always mute raw camera footage so Mali voice is 100% crisp & clear
         const maliAudio = document.getElementById('player-mali-audio');
-        if (maliAudio) {
-          // If video is raw Shopee video, lower raw background volume so Mali voice is crisp and clear
-          player.volume = 0.15;
-          maliAudio.currentTime = player.currentTime;
+        const icon = document.getElementById('icon-custom-play');
+        if (icon) icon.className = 'ph-fill ph-pause text-xs';
+        if (maliAudio && !isMaliMuted) {
+          maliAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
           maliAudio.play().catch(e => console.log('Mali audio auto-play:', e));
         }
       });
 
       player.addEventListener('pause', () => {
         const maliAudio = document.getElementById('player-mali-audio');
+        const icon = document.getElementById('icon-custom-play');
+        if (icon) icon.className = 'ph-fill ph-play text-xs';
         if (maliAudio && !maliAudio.paused) {
           maliAudio.pause();
         }
@@ -2016,7 +2055,7 @@
       player.addEventListener('seeked', () => {
         const maliAudio = document.getElementById('player-mali-audio');
         if (maliAudio) {
-          maliAudio.currentTime = player.currentTime;
+          maliAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
         }
       });
     }
@@ -2101,10 +2140,12 @@
         }
 
         if (player) {
-          player.volume = 0.15;
+          player.muted = true;
           player.currentTime = 0;
           player.play().catch(() => {});
         }
+        const iconPlay = document.getElementById('icon-custom-play');
+        if (iconPlay) iconPlay.className = 'ph-fill ph-pause text-xs';
 
         showToast('ผลิตวิดีโอ 9:16 สำเร็จ พร้อมเสียงมาลีและซับส้มตรงสินค้า 100%!');
       }, 600);

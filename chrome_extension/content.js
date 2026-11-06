@@ -320,7 +320,12 @@
         }
 
         // Open Shopee Video Factory with payload
-        const payload = encodeURIComponent(JSON.stringify(data));
+        let payload = '';
+        try {
+          payload = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+        } catch (e) {
+          payload = encodeURIComponent(JSON.stringify(data));
+        }
         const targetUrl = `${FACTORY_URL}/#import=${payload}`;
         
         window.open(targetUrl, '_blank');

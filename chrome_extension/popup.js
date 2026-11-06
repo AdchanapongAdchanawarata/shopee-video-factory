@@ -150,7 +150,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       const baseUrl = (envSelect && envSelect.value) ? envSelect.value : 'https://shopee-video-factory.vercel.app';
-      const payload = encodeURIComponent(JSON.stringify(currentData));
+      let payload = '';
+      try {
+        payload = btoa(unescape(encodeURIComponent(JSON.stringify(currentData))));
+      } catch (e) {
+        payload = encodeURIComponent(JSON.stringify(currentData));
+      }
       const targetUrl = `${baseUrl}/#import=${payload}`;
       
       if (chrome && chrome.tabs && chrome.tabs.create) {

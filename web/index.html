@@ -1024,23 +1024,94 @@
 
     // INIT PAGE
         // 0. CHROME EXTENSION 1-CLICK PRODUCT IMPORT HANDLER
+    function safeParseImportPayload(rawStr) {
+      if (!rawStr) return null;
+      let str = rawStr.trim();
+      if ((str.startsWith('"') && str.endsWith('"')) || (str.startsWith("'") && str.endsWith("'"))) {
+        str = str.slice(1, -1);
+      }
+
+      // 1. Try Base64 decode
+      try {
+        const b64Decoded = decodeURIComponent(escape(atob(str)));
+        const obj = JSON.parse(b64Decoded);
+        if (obj && (obj.title || obj.shopee_url)) return obj;
+      } catch (e) {}
+
+      // 2. Try raw atob
+      try {
+        const b64Decoded = atob(str);
+        const obj = JSON.parse(b64Decoded);
+        if (obj && (obj.title || obj.shopee_url)) return obj;
+      } catch (e) {}
+
+      // 3. Try standard decodeURIComponent
+      try {
+        const uriDecoded = decodeURIComponent(str);
+        const obj = JSON.parse(uriDecoded);
+        if (obj && (obj.title || obj.shopee_url)) return obj;
+      } catch (e) {}
+
+      // 4. Try fixing loose % characters then decodeURIComponent
+      try {
+        const fixed = str.replace(/%(?![0-9A-Fa-f]{2})/g, '%25');
+        const uriDecoded = decodeURIComponent(fixed);
+        const obj = JSON.parse(uriDecoded);
+        if (obj && (obj.title || obj.shopee_url)) return obj;
+      } catch (e) {}
+
+      // 5. Try direct JSON parse
+      try {
+        const obj = JSON.parse(str);
+        if (obj && (obj.title || obj.shopee_url)) return obj;
+      } catch (e) {}
+
+      // 6. Try unescape
+      try {
+        const unesc = unescape(str);
+        const obj = JSON.parse(unesc);
+        if (obj && (obj.title || obj.shopee_url)) return obj;
+      } catch (e) {}
+
+      return null;
+    }
+
     function checkExtensionImportPayload() {
-      if (window.location.hash && window.location.hash.startsWith('#import=')) {
+      let raw = null;
+
+      // Check URL Hash (#import= or #import_b64=)
+      if (window.location.hash) {
+        if (window.location.hash.startsWith('#import=')) {
+          raw = window.location.hash.substring(8);
+        } else if (window.location.hash.startsWith('#import_b64=')) {
+          raw = window.location.hash.substring(12);
+        }
+      }
+
+      // Check Query Parameter (?import= or ?import_b64=)
+      if (!raw && window.location.search) {
+        const params = new URLSearchParams(window.location.search);
+        raw = params.get('import') || params.get('import_b64');
+      }
+
+      if (raw) {
         try {
-          const raw = window.location.hash.substring(8);
-          const data = JSON.parse(decodeURIComponent(raw));
+          const data = safeParseImportPayload(raw);
           if (data && (data.title || data.shopee_url)) {
-            console.log('⚡ Received product import from Extension:', data);
+            console.log('⚡ Successfully imported product from Extension:', data);
             applyImportedProduct(data);
-            history.replaceState(null, null, window.location.pathname);
+            try { history.replaceState(null, null, window.location.pathname); } catch (e) {}
             return true;
           }
         } catch (err) {
-          console.warn('Error parsing extension import:', err);
+          console.warn('Error applying extension import:', err);
         }
       }
       return false;
     }
+
+    // Also listen for hash changes if user imports while tab is open
+    window.addEventListener('hashchange', checkExtensionImportPayload);
 
     
     // INTELLIGENT PRODUCT-SPECIFIC SCRIPT ENGINE (NEVER REPETITIVE)
@@ -2299,8 +2370,7 @@
 
       // 3. Generic / Custom Script Timing across 16.0s Speech Window
       const rawSentences = clean
-        .split(/[,.!?;]|
-?\n/)
+        .split(/[,.!?;]|\r?\n/)
         .map(s => s.trim())
         .filter(s => s.length > 0);
 

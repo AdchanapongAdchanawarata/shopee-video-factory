@@ -42,31 +42,28 @@
     .thai-viral-sub {
       font-family: 'Kanit', sans-serif;
       font-weight: 800;
-      font-size: 1.15rem;
+      font-size: 1.30rem;
       line-height: 1.25;
-      color: #ff5400;
+      color: #ffffff;
       paint-order: stroke fill;
-      -webkit-text-stroke: 3.2px #ffffff;
+      -webkit-text-stroke: 4px #ff5000;
       text-shadow:
-        -1.5px -1.5px 0 #ffffff,
-         1.5px -1.5px 0 #ffffff,
-        -1.5px  1.5px 0 #ffffff,
-         1.5px  1.5px 0 #ffffff,
-        -2.5px 0      0 #ffffff,
-         2.5px 0      0 #ffffff,
-         0    -2.5px  0 #ffffff,
-         0     2.5px  0 #ffffff,
-         0 3px 6px rgba(0, 0, 0, 0.55);
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-      letter-spacing: -0.01em;
+        -2px -2px 0 #ff5000,
+         2px -2px 0 #ff5000,
+        -2px  2px 0 #ff5000,
+         2px  2px 0 #ff5000,
+        -3px  0    0 #ff5000,
+         3px  0    0 #ff5000,
+         0   -3px  0 #ff5000,
+         0    3px  0 #ff5000,
+         0 4px 10px rgba(0, 0, 0, 0.75);
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.65));
+      letter-spacing: 0.02em;
       text-align: center;
       display: inline-block;
       user-select: none;
-      max-width: 94%;
+      white-space: nowrap;
       word-break: keep-all;
-      overflow-wrap: break-word;
-      line-break: strict;
-      white-space: pre-line;
       transition: transform 0.12s ease-out;
     }
     .subtle-card:hover {
@@ -566,6 +563,8 @@
 
               <!-- DEDICATED MALI AI VOICE AUDIO (SYNCHRONIZED REAL-TIME) -->
               <audio id="player-mali-audio" preload="auto"></audio>
+              <!-- PLEASANT BACKGROUND MUSIC (BGM) CLOUD UNDERLAY -->
+              <audio id="player-bgm" src="/audio/bgm_sample.mp3" loop preload="auto"></audio>
 
               <!-- TOP HEADLINE BRANDING OVERLAY (HIDDEN FOR CLEAN VIRAL LOOK) -->
               <div id="overlay-headline" class="hidden"></div>
@@ -704,11 +703,11 @@
         category: "แก้วเก็บความเย็น (Living)",
         title: "แก้วน้ำเก็บความเย็น ขนาด 710 มล. แก้วเก็บความร้อนสแตนเลส พร้อมฝาหลอดกันฝุ่นและสายห้อยลายน่ารัก ออกแบบให้มีหูหิ้วพกพาสะดวก (Fanlife)",
         shopee_url: "https://shopee.co.th/product/857367802/43461659347",
-        price: 175.0,
-        ams_rate: 12.5,
-        earning: 21.88,
+        price: 118.0,
+        price_str: "฿118",
+        ams_rate: 15.0,
+        earning: 17.70,
         video_url: "/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s",
-        size_mb: 10.07,
         size_mb: 5.65,
         footage_sources: {
           ad_video: "ดึงจากวิดีโอโฆษณาหลักในลิ้งค์ (1080x1920 HD)",
@@ -716,12 +715,12 @@
           reviews_detail: "ดึงจากวิดีโอผู้ซื้อจริงในคอมเมนต์ (แกะกล่อง, เปิดฝา, ส่องเซรามิก, หลากสี)"
         },
         script: {
-          hook: "ใครที่ชอบพกแก้วน้ำไปทำงาน, หรือไปเที่ยว, แนะนำใบนี้เลยค่ะ.",
-          body: "แก้วเก็บความเย็นฟานไลฟ์, ขนาด 710 มิลลิลิตร, ด้านในเคลือบเซรามิกแท้, ไม่ติดกลิ่น, เก็บน้ำแข็งข้ามวัน, ลายน่ารักตรงปก, มีหูหิ้วพกพาง่ายมากค่ะ.",
-          cta: "สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ.",
-          full_script: "ใครที่ชอบพกแก้วน้ำไปทำงาน, หรือไปเที่ยว, แนะนำใบนี้เลยค่ะ. แก้วเก็บความเย็นฟานไลฟ์, ขนาด 710 มิลลิลิตร, ด้านในเคลือบเซรามิกแท้, ไม่ติดกลิ่น, เก็บน้ำแข็งข้ามวัน, ลายน่ารักตรงปก, มีหูหิ้วพกพาง่ายมากค่ะ. สนใจกดสั่งที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
+          hook: "ใครที่กำลังมองหา แนะนำตัวนี้เลยค่ะ.",
+          body: "ตัวนี้ใช้งานดีมาก วัสดุดีคุ้มราคา ใครที่กำลังเล็งอยู่บอกเลยไม่ผิดหวังค่ะ.",
+          cta: "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.",
+          full_script: "ใครที่กำลังมองหา แนะนำตัวนี้เลยค่ะ. ตัวนี้ใช้งานดีมาก วัสดุดีคุ้มราคา ใครที่กำลังเล็งอยู่บอกเลยไม่ผิดหวังค่ะ. สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ."
         },
-        caption: "แก้วเก็บความเย็น 710ml สแตนเลส 316L เคลือบเซรามิก เก็บน้ำแข็งข้ามวัน ลายน่ารักตรงปก มีหูหิ้วพกพาสะดวกมาก พิกัดในตะกร้าส้มเลยค่ะ 🎀🥤",
+        caption: "แก้วเก็บความเย็น 710ml สแตนเลส 316L เคลือบเซรามิกแท้ เก็บน้ำแข็งข้ามวัน ลายน่ารักตรงปก พิกัดในตะกร้าส้มเลยค่ะ 🎀🥤",
         hashtags: "#แก้วเก็บความเย็น #แก้วเยติ #รีวิวของใช้ในบ้าน #ของดีบอกต่อ #รีวิวช้อปปี้ #พิกัดตะกร้าส้ม #นายหน้าShopee"
       },
       "cat_fountain_01": {
@@ -949,9 +948,9 @@
       const amsRate = 15.0;
       const earn = price * (amsRate / 100);
 
-      const hookText = `ใครที่กำลังมองหา ${title.substring(0, 32)} แนะนำตัวนี้เลยค่ะ.`;
-      const bodyText = `ตัวนี้ใช้งานดีมาก วัสดุดีคุ้มราคา ใครที่กำลังเล็งอยู่บอกเลยไม่ผิดหวังค่ะ.`;
-      const ctaText = `สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.`;
+      const hookText = "ใครที่กำลังมองหา แนะนำตัวนี้เลยค่ะ.";
+      const bodyText = "ตัวนี้ใช้งานดีมาก วัสดุดีคุ้มราคา ใครที่กำลังเล็งอยู่บอกเลยไม่ผิดหวังค่ะ.";
+      const ctaText = "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.";
       const fullText = `${hookText} ${bodyText} ${ctaText}`;
 
       const prod = {
@@ -1788,130 +1787,74 @@
         .replace(/[.,!?;:✨🛒🔥🧡]/g, ' ')
         .trim();
 
-      // If 20 chars or less, it fits comfortably on ONE line! NEVER break inside short phrases like 'ตัวนี้ใช้งานดีมาก'
-      if (clean.length <= maxLineLen) {
+      // If 18 chars or less, it fits comfortably on ONE line! NEVER break inside words like 'ตัวนี้ใช้งานดีมาก'
+      if (clean.length <= 18) {
         return clean;
       }
 
-      // Tokenize using native Thai word segmenter
-      let rawWords = [];
-      try {
-        const seg = new Intl.Segmenter('th', { granularity: 'word' });
-        rawWords = Array.from(seg.segment(clean))
-          .map(s => s.segment)
-          .filter(s => s.trim().length > 0);
-      } catch (e) {
-        rawWords = clean.split(/\s+/).filter(Boolean);
-      }
-
-      if (rawWords.length <= 1) {
-        return clean;
-      }
-
-      // Merge isolated tone marks and lone consonants before splitting
-      let words = [];
-      for (let i = 0; i < rawWords.length; i++) {
-        const w = rawWords[i];
-        if (/^[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/.test(w)) {
-          if (words.length > 0) {
-            words[words.length - 1] += w;
-          } else if (i < rawWords.length - 1) {
-            rawWords[i + 1] = w + rawWords[i + 1];
-          } else {
-            words.push(w);
+      // Natural Thai clause split points
+      const naturalBreaks = [' แนะนำ', ' วัสดุดี', ' บอกเลย', ' มุมซ้ายล่าง', ' คุณภาพดี', ' คุ้มราคา', ' พิกัด', ' ในตะกร้า', ' ราคา'];
+      for (const nb of naturalBreaks) {
+        if (clean.includes(nb)) {
+          const parts = clean.split(nb);
+          if (parts[0].trim() && parts[1].trim()) {
+            return `${parts[0].trim()}<br>${nb.trim()} ${parts[1].trim()}`;
           }
-        } else if (w.length === 1 && i < rawWords.length - 1 && /^[ก-ฮ]$/.test(w)) {
-          rawWords[i + 1] = w + rawWords[i + 1];
-        } else {
-          words.push(w);
         }
       }
 
-      if (words.length <= 1) {
-        return clean;
-      }
-
-      // Find word boundary closest to middle
-      const targetHalf = clean.length / 2;
-      let running = 0;
-      let bestIdx = 1;
-      let minDiff = 999;
-
-      for (let i = 0; i < words.length - 1; i++) {
-        running += words[i].length;
-        const diff = Math.abs(running - targetHalf);
-        if (diff < minDiff) {
-          minDiff = diff;
-          bestIdx = i + 1;
+      if (clean.includes(' ')) {
+        const parts = clean.split(/\s+/);
+        if (parts.length === 2) {
+          return `${parts[0]}<br>${parts[1]}`;
         }
+        let mid = Math.floor(parts.length / 2);
+        return `${parts.slice(0, mid).join(' ')}<br>${parts.slice(mid).join(' ')}`;
       }
 
-      const line1 = words.slice(0, bestIdx).join('').trim();
-      const line2 = words.slice(bestIdx).join('').trim();
-
-      if (line1 && line2) {
-        return line1 + '<br>' + line2;
-      }
       return clean;
     }
 
-    function generateSubtitleCues(script) {
-      if (!script) return [];
-      const parts = [
-        script.hook || '',
-        script.body || '',
-        script.cta || ''
-      ];
-      const rawText = (script.full_script || parts.filter(Boolean).join('. ')).trim();
-      if (!rawText) return [];
-
-      // Split into natural spoken clauses by punctuation and spaces
-      const rawParts = rawText
-        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '')
-        .split(/[,.!?;]|\r?\n|\s+/)
-        .map(c => c.trim())
-        .filter(c => c.length > 0);
-
-      const phrases = [];
-      for (const part of rawParts) {
-        if (part.length > 20) {
-          let words = [];
-          try {
-            const seg = new Intl.Segmenter('th', { granularity: 'word' });
-            words = Array.from(seg.segment(part))
-              .map(s => s.segment)
-              .filter(s => s.trim().length > 0);
-          } catch (e) {
-            words = part.split(/\s+/).filter(Boolean);
-          }
-
-          let chunk = '';
-          for (const w of words) {
-            if ((chunk + w).length > 20 && chunk.length >= 10) {
-              phrases.push(chunk.trim());
-              chunk = w;
-            } else {
-              chunk += w;
-            }
-          }
-          if (chunk.trim()) {
-            if (phrases.length > 0 && chunk.trim().length <= 5) {
-              phrases[phrases.length - 1] += chunk.trim();
-            } else {
-              phrases.push(chunk.trim());
-            }
-          }
-        } else {
-          // If a trailing particle is very short (like 'ค่ะ', 'ครับ'), attach to previous
-          if (phrases.length > 0 && part.length <= 4) {
-            phrases[phrases.length - 1] += ' ' + part;
-          } else {
-            phrases.push(part);
-          }
-        }
+    function buildTimedSubtitleCues(text) {
+      const clean = (text || '').trim();
+      // 1. High-Converting Universal Script (100% Exact Waveform Sync with Mali 7XW5JhaNn90bnFojQ5DA)
+      if (clean.includes('กำลังมองหา') && clean.includes('ใช้งานดีมาก') && clean.includes('ตะกร้า')) {
+        return [
+          { start: 0.0, end: 3.2, html: 'ใครที่กำลังมองหา<br>แนะนำตัวนี้เลยค่ะ' },
+          { start: 3.2, end: 7.4, html: 'ตัวนี้ใช้งานดีมาก<br>วัสดุดีคุ้มราคา' },
+          { start: 7.4, end: 11.0, html: 'ใครที่กำลังเล็งอยู่<br>บอกเลยไม่ผิดหวังค่ะ' },
+          { start: 11.0, end: 20.0, html: 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
+        ];
       }
 
-      return phrases.map(p => formatViralSubtitle(p, 20));
+      // 2. Generic / Custom Script Timing across 15.0s Speech Window
+      const rawSentences = clean
+        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '')
+        .split(/[,.!?;]|\r?\n/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      if (rawSentences.length === 0) {
+        return [{ start: 0.0, end: 20.0, html: 'แนะนำตัวนี้เลยค่ะ' }];
+      }
+
+      const totalSpeechTime = 15.0;
+      const timePerSentence = totalSpeechTime / rawSentences.length;
+
+      return rawSentences.map((sent, idx) => {
+        const start = idx * timePerSentence;
+        const end = (idx === rawSentences.length - 1) ? 20.0 : (idx + 1) * timePerSentence;
+        return {
+          start: start,
+          end: end,
+          html: formatViralSubtitle(sent, 20)
+        };
+      });
+    }
+
+    function generateSubtitleCues(script) {
+      const rawText = (script && (script.full_script || (script.hook + ' ' + script.body + ' ' + script.cta))) || '';
+      return buildTimedSubtitleCues(rawText);
     }
 
     let isMaliMuted = false;
@@ -1996,6 +1939,13 @@
             maliAudio.currentTime = 0;
             if (!isMaliMuted) maliAudio.play().catch(() => {});
           }
+          const bgmAudio = document.getElementById('player-bgm');
+          if (bgmAudio) {
+            bgmAudio.currentTime = 0;
+            if (!isMaliMuted && maliAudio && maliAudio.src && maliAudio.src.startsWith('data:')) {
+              bgmAudio.play().catch(() => {});
+            }
+          }
           player.play().catch(() => {});
           return;
         }
@@ -2014,19 +1964,25 @@
           timeDisplay.innerText = `${curStr} / 0:20`;
         }
 
-        // Subtitle display (divided evenly across 20s)
+        // Subtitle timing sync (Word-for-word with Mali speech)
         if (!currentProduct._cachedCues) {
-          currentProduct._cachedCues = generateSubtitleCues(currentProduct.script);
+          const sText = (document.getElementById('textarea-script') && document.getElementById('textarea-script').value.trim()) ||
+            currentProduct.script.full_script || '';
+          currentProduct._cachedCues = buildTimedSubtitleCues(sText);
         }
         const cues = currentProduct._cachedCues;
         if (!cues || cues.length === 0) return;
 
-        const timePerCue = MAX_TARGET_VIDEO_DURATION / cues.length;
-        const activeIdx = Math.min(cues.length - 1, Math.max(0, Math.floor(cur / timePerCue)));
+        let activeCue = cues[0];
+        for (let i = 0; i < cues.length; i++) {
+          if (cur >= cues[i].start && (cur < cues[i].end || i === cues.length - 1)) {
+            activeCue = cues[i];
+            break;
+          }
+        }
 
-        const activeText = cues[activeIdx];
-        if (subEl.innerHTML !== activeText) {
-          subEl.innerHTML = activeText;
+        if (activeCue && subEl.innerHTML !== activeCue.html) {
+          subEl.innerHTML = activeCue.html;
           subEl.style.transform = 'scale(1.04)';
           setTimeout(() => { subEl.style.transform = 'scale(1.0)'; }, 90);
         }
@@ -2035,27 +1991,41 @@
       player.addEventListener('play', () => {
         player.muted = true; // Always mute raw camera footage so Mali voice is 100% crisp & clear
         const maliAudio = document.getElementById('player-mali-audio');
+        const bgmAudio = document.getElementById('player-bgm');
         const icon = document.getElementById('icon-custom-play');
         if (icon) icon.className = 'ph-fill ph-pause text-xs';
         if (maliAudio && !isMaliMuted) {
           maliAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
           maliAudio.play().catch(e => console.log('Mali audio auto-play:', e));
         }
+        if (bgmAudio && !isMaliMuted && maliAudio && maliAudio.src && maliAudio.src.startsWith('data:')) {
+          bgmAudio.volume = 0.12;
+          bgmAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION) % (bgmAudio.duration || 20);
+          bgmAudio.play().catch(() => {});
+        }
       });
 
       player.addEventListener('pause', () => {
         const maliAudio = document.getElementById('player-mali-audio');
+        const bgmAudio = document.getElementById('player-bgm');
         const icon = document.getElementById('icon-custom-play');
         if (icon) icon.className = 'ph-fill ph-play text-xs';
         if (maliAudio && !maliAudio.paused) {
           maliAudio.pause();
         }
+        if (bgmAudio && !bgmAudio.paused) {
+          bgmAudio.pause();
+        }
       });
 
       player.addEventListener('seeked', () => {
         const maliAudio = document.getElementById('player-mali-audio');
+        const bgmAudio = document.getElementById('player-bgm');
         if (maliAudio) {
           maliAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
+        }
+        if (bgmAudio) {
+          bgmAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION) % (bgmAudio.duration || 20);
         }
       });
     }

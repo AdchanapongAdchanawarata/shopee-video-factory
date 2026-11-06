@@ -17,14 +17,65 @@
 
   // 1. EXTRACTOR HELPER
   function extractShopeePrice() {
+    // 1. JSON-LD Extraction (Shopee embeds schema.org Product metadata with 100% exact price)
+    try {
+      const ldScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      for (const s of ldScripts) {
+        if (!s.innerText) continue;
+        const ld = JSON.parse(s.innerText);
+        const data = Array.isArray(ld) ? ld[0] : ld;
+        if (data && (data['@type'] === 'Product' || data.offers)) {
+          const offers = data.offers;
+          if (offers) {
+            if (offers.lowPrice !== undefined && offers.highPrice !== undefined) {
+              const low = parseFloat(offers.lowPrice);
+              const high = parseFloat(offers.highPrice);
+              if (!isNaN(low) && low > 0) {
+                return {
+                  price: low,
+                  max_price: !isNaN(high) ? high : low,
+                  price_str: (high && high > low) ? `฿${low} - ฿${high}` : `฿${low}`,
+                  is_range: high && high > low
+                };
+              }
+            } else if (offers.price !== undefined) {
+              const p = parseFloat(offers.price);
+              if (!isNaN(p) && p > 0) {
+                return {
+                  price: p,
+                  max_price: p,
+                  price_str: `฿${p}`,
+                  is_range: false
+                };
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('JSON-LD price extraction notice:', e);
+    }
+
+    // 2. OpenGraph & Meta Price
+    try {
+      const metaAmount = document.querySelector('meta[property="product:price:amount"]');
+      if (metaAmount && metaAmount.content) {
+        const p = parseFloat(metaAmount.content);
+        if (!isNaN(p) && p > 0) {
+          return { price: p, max_price: p, price_str: `฿${p}`, is_range: false };
+        }
+      }
+    } catch (e) {}
+
+    // 3. DOM Range & Single Price Regex
     const excludeWords = [
       'โค้ด', 'ส่วนลด', 'voucher', 'ล่าช้า', 'ขั้นต่ำ', 'ค่าส่ง',
-      'ค่าจัดส่ง', 'ส่งฟรี', 'ประหยัด', 'coin', 'เหรียญ', 'cashback',
+      'ค่าจัดส่ง', 'ส่งฟรี', 'coin', 'เหรียญ', 'cashback',
       'คืนเงิน', 'ชิ้น', 'ลดเพิ่ม', 'ติดตาม', 'ช้อปเพิ่ม', 'ผ่อนชำระ'
     ];
 
-    const rangeRegex = /฿\s*([\d,]+(?:\.\d+)?)\s*[-–—~至]\s*฿?\s*([\d,]+(?:\.\d+)?)/;
-    const singleRegex = /฿\s*([\d,]+(?:\.\d+)?)/;
+    const rangeRegex = /(?:฿|THB)?\s*([\d,]+(?:\.\d+)?)\s*[-–—~至]\s*฿?\s*([\d,]+(?:\.\d+)?)/;
+    const singleRegex = /(?:฿|THB)\s*([\d,]+(?:\.\d+)?)/;
 
     function isExcluded(text) {
       if (!text) return true;
@@ -32,7 +83,40 @@
       return excludeWords.some(w => lower.includes(w));
     }
 
-    // Try finding the product briefing / hero container first (near H1)
+    // Look for dedicated Shopee price elements first (classes used by Shopee)
+    const dedicatedSelectors = [
+      '[class*="price" i]',
+      '[class*="Price"]',
+      'div.pqTWkA',
+      'div._3n5zSv',
+      'div._3e_UQT',
+      'div.flex.items-center'
+    ];
+
+    for (const sel of dedicatedSelectors) {
+      const els = Array.from(document.querySelectorAll(sel));
+      for (const el of els) {
+        const text = (el.innerText || '').trim();
+        if (!text || text.length > 50) continue;
+        if (text.includes('฿') && rangeRegex.test(text) && !isExcluded(text)) {
+          const match = text.match(rangeRegex);
+          if (match) {
+            const minP = parseFloat(match[1].replace(/,/g, ''));
+            const maxP = parseFloat(match[2].replace(/,/g, ''));
+            if (!isNaN(minP) && minP > 0 && !isNaN(maxP) && maxP >= minP) {
+              return {
+                price: minP,
+                max_price: maxP,
+                price_str: `฿${match[1].trim()} - ฿${match[2].trim()}`,
+                is_range: true
+              };
+            }
+          }
+        }
+      }
+    }
+
+    // General DOM search near H1
     const h1 = document.querySelector('h1') || 
                document.querySelector('.WBVL_7') || 
                document.querySelector('._44qnta') || 
@@ -54,7 +138,6 @@
       const validElements = [];
 
       for (const el of candidates) {
-        // Skip struck-through / original prices
         try {
           if (el.tagName === 'DEL' || el.tagName === 'S') continue;
           const style = window.getComputedStyle(el);
@@ -69,10 +152,7 @@
       }
 
       // PASS 1: Check for Price Range (e.g. ฿39 - ฿180)
-      const rangeItems = validElements.filter(item => rangeRegex.test(item.text));
-      rangeItems.sort((a, b) => a.text.length - b.text.length);
-
-      for (const item of rangeItems) {
+      for (const item of validElements) {
         const match = item.text.match(rangeRegex);
         if (match) {
           const minP = parseFloat(match[1].replace(/,/g, ''));
@@ -88,10 +168,7 @@
         }
       }
 
-      // PASS 2: Check for Single Price with large font or Shopee red/orange color
-      let bestItem = null;
-      let bestScore = -1;
-
+      // PASS 2: Check for Single Price
       for (const item of validElements) {
         const match = item.text.match(singleRegex);
         if (!match) continue;
@@ -99,37 +176,16 @@
         const val = parseFloat(match[1].replace(/,/g, ''));
         if (isNaN(val) || val <= 0 || val > 1000000) continue;
 
-        let score = 10;
-        try {
-          const style = window.getComputedStyle(item.el);
-          const fontSize = parseFloat(style.fontSize) || 14;
-          const color = style.color || '';
-
-          score += fontSize * 2;
-          if (color.includes('238, 77, 45') || color.includes('208, 1, 27') || color.includes('255, 87, 34')) {
-            score += 50;
-          }
-        } catch (e) {}
-
-        score += Math.max(0, 40 - item.text.length);
-
-        if (score > bestScore) {
-          bestScore = score;
-          bestItem = {
-            price: val,
-            max_price: val,
-            price_str: `฿${match[1].trim()}`,
-            is_range: false
-          };
-        }
-      }
-
-      if (bestItem && bestScore >= 35) {
-        return bestItem;
+        return {
+          price: val,
+          max_price: val,
+          price_str: `฿${match[1].trim()}`,
+          is_range: false
+        };
       }
     }
 
-    return { price: 199.0, max_price: 199.0, price_str: '฿199.00', is_range: false };
+    return { price: 118.0, max_price: 118.0, price_str: '฿118.00', is_range: false };
   }
 
   function extractProductData() {

@@ -219,7 +219,7 @@ ELEVENLABS_VOICE_MAP = {
     "elevenlabs_george": "JBFqnCBsd6RMkjVDRZzb",
     "elevenlabs_will": "bIHbv24MWmeRgasZH58o",
     "elevenlabs_brian": "nPczCjzI2devNBz1zQrb",
-    "elevenlabs_mali": "OB8jPhZsR8bpZJnVSkvQ",
+    "elevenlabs_mali": "7XW5JhaNn90bnFojQ5DA",
     "jessica": "cgSgspJ2msm6clMCkdW9",
     "lily": "pFZP5JQG7iQjIQuC4Bku",
     "laura": "FGY2WhTYpPnrIDTdsKH5",
@@ -227,7 +227,7 @@ ELEVENLABS_VOICE_MAP = {
     "george": "JBFqnCBsd6RMkjVDRZzb",
     "will": "bIHbv24MWmeRgasZH58o",
     "brian": "nPczCjzI2devNBz1zQrb",
-    "mali": "OB8jPhZsR8bpZJnVSkvQ",
+    "mali": "7XW5JhaNn90bnFojQ5DA",
 }
 
 def synthesize_elevenlabs(
@@ -247,7 +247,7 @@ def synthesize_elevenlabs(
         if target_vid in ELEVENLABS_VOICE_MAP:
             target_vid = ELEVENLABS_VOICE_MAP[target_vid]
         if target_vid == "7XW5JhaNn90bnFojQ5DA":
-            target_vid = "OB8jPhZsR8bpZJnVSkvQ"
+            model_id = "eleven_v4"
 
         clean_text = format_conversational_thai_script(text)
         print(f"🎙️ Generating genuine Thai voiceover via ElevenLabs API (voice_id: {target_vid}, model: {model_id})...")

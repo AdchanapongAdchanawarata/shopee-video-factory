@@ -114,7 +114,7 @@ TARGET_VIDEO_DURATION = (15.0, 25.0)
 # ==========================================
 # Audio & Subtitle Styling
 TTS_ENGINE = os.getenv("TTS_ENGINE", "elevenlabs_mali")  # Enforced Mali
-ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "OB8jPhZsR8bpZJnVSkvQ")
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "7XW5JhaNn90bnFojQ5DA")
 GOOGLE_TTS_LANG = os.getenv("GOOGLE_TTS_LANG", "th")
 GOOGLE_TTS_SPEED = float(os.getenv("GOOGLE_TTS_SPEED", "1.15"))
 
@@ -127,7 +127,7 @@ GOOGLE_CLOUD_TTS_API_KEY = os.getenv("GOOGLE_CLOUD_TTS_API_KEY", os.getenv("GEMI
 EDGE_TTS_VOICE = os.getenv("EDGE_TTS_VOICE", "th-TH-PremwadeeNeural")
 EDGE_TTS_RATE = os.getenv("EDGE_TTS_RATE", "+0%")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
-ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "OB8jPhZsR8bpZJnVSkvQ")
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "7XW5JhaNn90bnFojQ5DA")
 
 # Subtitle safe margin: Top-Center safe zone below Shopee search bar (Alignment=8, MarginV = 280px from top)
 SUBTITLE_TOP_MARGIN = 280

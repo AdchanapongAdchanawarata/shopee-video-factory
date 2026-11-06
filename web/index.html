@@ -42,11 +42,11 @@
     .thai-viral-sub {
       font-family: 'Kanit', sans-serif;
       font-weight: 800;
-      font-size: 1.30rem;
-      line-height: 1.25;
+      font-size: clamp(1.02rem, 4.2vw, 1.22rem);
+      line-height: 1.32;
       color: #ffffff;
       paint-order: stroke fill;
-      -webkit-text-stroke: 4px #ff5000;
+      -webkit-text-stroke: 3.5px #ff5000;
       text-shadow:
         -2px -2px 0 #ff5000,
          2px -2px 0 #ff5000,
@@ -54,17 +54,27 @@
          2px  2px 0 #ff5000,
         -3px  0    0 #ff5000,
          3px  0    0 #ff5000,
-         0   -3px  0 #ff5000,
-         0    3px  0 #ff5000,
-         0 4px 10px rgba(0, 0, 0, 0.75);
+          0   -3px  0 #ff5000,
+          0    3px  0 #ff5000,
+          0 4px 10px rgba(0, 0, 0, 0.75);
       filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.65));
       letter-spacing: 0.02em;
       text-align: center;
       display: inline-block;
       user-select: none;
-      white-space: nowrap;
+      white-space: normal;
       word-break: keep-all;
+      overflow-wrap: break-word;
+      text-wrap: balance;
+      max-width: 100%;
+      padding: 0 4px;
+      box-sizing: border-box;
       transition: transform 0.12s ease-out;
+    }
+    .video-smart-crop {
+      transform: scale(1.18) translateY(-4%);
+      transform-origin: center center;
+      transition: transform 0.3s ease-out;
     }
     .subtle-card:hover {
       border-color: rgba(255, 255, 255, 0.14);
@@ -327,6 +337,21 @@
             </div>
             <span class="text-[10px] text-emerald-400 font-mono shrink-0 ml-2">พร้อมใช้งาน</span>
           </div>
+        </div>
+
+        <!-- SMART CROP & SUBTITLE REMOVAL TOGGLE -->
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80">
+          <div class="flex items-center space-x-2 truncate">
+            <i class="ph-bold ph-crop text-shopee text-base"></i>
+            <div>
+              <div class="text-xs font-bold text-zinc-200">ครอปหลบซับไตเติลเดิม (Smart Crop 1.18x)</div>
+              <div class="text-[10px] text-zinc-400">ซูมและครอปหลบซับเดิมที่ติดมากับคลิปรีวิวร้านค้า พร้อมมาสก์ขอบล่างอัตโนมัติ</div>
+            </div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+            <input type="checkbox" id="toggle-smart-crop-s1" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
+            <div class="w-8 h-4 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-shopee"></div>
+          </label>
         </div>
 
         <p class="text-[11px] text-zinc-400 pt-1 flex items-center space-x-1">
@@ -592,31 +617,53 @@
             <!-- VIDEO CONTAINER (CLEAN 9:16 PREVIEW - NO UNNECESSARY GRAPHICS) -->
             <div class="relative w-full h-full rounded-[26px] overflow-hidden bg-zinc-950 flex items-center justify-center select-none" onclick="handleVideoAreaClick(event)">
 
+              <!-- EMPTY / IDLE STATE (STARTS CLEAN WITH NO PREMATURE AUDIO OR VIDEO) -->
+              <div id="preview-empty-state" class="absolute inset-0 z-20 flex flex-col items-center justify-center p-5 text-center bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 select-none">
+                <div class="w-14 h-14 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-center mb-3 text-zinc-500 shadow-inner">
+                  <i class="ph-duotone ph-video-camera text-2xl text-shopee"></i>
+                </div>
+                <p class="text-xs font-bold text-white mb-1">ยังไม่มีวิดีโอ 9:16 ที่ผลิต</p>
+                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-800/80 text-zinc-400 border border-zinc-700/60 mb-2">หน้าจอพรีวิวว่าง</span>
+                <p class="text-[10px] text-zinc-400 leading-relaxed max-w-[190px]">
+                  กรุณาวางลิงก์ในขั้นตอนที่ 1 แล้วกดปุ่ม <span class="text-shopee font-semibold">"⚡ กดผลิตวิดีโอ 9:16"</span> ด้านซ้ายเพื่อเริ่ม
+                </p>
+              </div>
+
+              <!-- RENDERING IN-PROGRESS STATE -->
+              <div id="preview-rendering-state" class="absolute inset-0 z-25 flex flex-col items-center justify-center p-4 text-center bg-black/85 backdrop-blur-sm select-none hidden">
+                <div class="w-12 h-12 rounded-full border-2 border-shopee/20 border-t-shopee animate-spin mb-3 flex items-center justify-center">
+                  <i class="ph-bold ph-lightning text-shopee text-base"></i>
+                </div>
+                <p class="text-xs font-bold text-white mb-1" id="preview-render-title">กำลังผลิตวิดีโอ 9:16...</p>
+                <p class="text-[10px] text-zinc-400 font-mono" id="preview-render-sub">ผสานเสียงมาลี + วิดีโอรีวิว</p>
+              </div>
+
               <!-- ACTUAL VIDEO PLAYER (MUTED RAW VIDEO TO ISOLATE CRISP MALI AI VOICEOVER) -->
               <video
                 id="player-preview"
-                class="w-full h-full object-cover cursor-pointer"
+                class="w-full h-full object-cover cursor-pointer video-smart-crop hidden"
                 playsinline
                 muted
               ></video>
 
-              <!-- DEDICATED MALI AI VOICE AUDIO (SYNCHRONIZED REAL-TIME) -->
-              <audio id="player-mali-audio" preload="auto"></audio>
+              <!-- SMART BOTTOM SUBTITLE MASK (MASKS ANY BURNED-IN SELLER SUBTITLES CLEANLY) -->
+              <div id="bottom-sub-mask" class="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none z-10 transition-opacity duration-300"></div>
+
+              <!-- DEDICATED MALI AI VOICE AUDIO (SYNCHRONIZED REAL-TIME, PRELOAD NONE TO PREVENT PREMATURE AUDIO) -->
+              <audio id="player-mali-audio" preload="none"></audio>
               <!-- PLEASANT BACKGROUND MUSIC (BGM) CLOUD UNDERLAY -->
-              <audio id="player-bgm" src="/audio/bgm_sample.mp3" loop preload="auto"></audio>
+              <audio id="player-bgm" src="/audio/bgm_sample.mp3" loop preload="none"></audio>
 
               <!-- TOP HEADLINE BRANDING OVERLAY (HIDDEN FOR CLEAN VIRAL LOOK) -->
               <div id="overlay-headline" class="hidden"></div>
 
-              <!-- ANIMATED THAI VIRAL SUBTITLES (ORIGINAL VIRAL STYLE: VIBRANT ORANGE + THICK WHITE STROKE) -->
-              <div id="overlay-subtitles" class="absolute top-[14%] inset-x-2 z-20 text-center pointer-events-none transition-all duration-150">
-                <div id="overlay-subtitle-text" class="thai-viral-sub">
-                  ใครที่กำลังมองหา
-                </div>
+              <!-- ANIMATED THAI VIRAL SUBTITLES (STRICT 84% SAFE ZONE, LEFT/RIGHT 8%, NEVER CLIPS) -->
+              <div id="overlay-subtitles" class="absolute top-[16%] left-[8%] right-[8%] z-20 text-center pointer-events-none transition-all duration-150 flex flex-col items-center justify-center hidden" style="max-width: 84%; margin: 0 auto; box-sizing: border-box;">
+                <div id="overlay-subtitle-text" class="thai-viral-sub"></div>
               </div>
 
               <!-- SLEEK MINIMAL TIKTOK-STYLE 20-SECOND CONTROLS -->
-              <div id="custom-video-controls" class="absolute bottom-2.5 inset-x-3 z-30 flex items-center space-x-2.5 px-3 py-1.5 rounded-xl bg-black/65 backdrop-blur-md border border-white/10 text-white" onclick="event.stopPropagation()">
+              <div id="custom-video-controls" class="absolute bottom-2.5 inset-x-3 z-30 flex items-center space-x-2.5 px-3 py-1.5 rounded-xl bg-black/65 backdrop-blur-md border border-white/10 text-white hidden" onclick="event.stopPropagation()">
                 <button type="button" id="btn-custom-play" onclick="togglePlayVideo()" class="text-white hover:text-amber-400 transition cursor-pointer text-xs" title="เล่น/หยุด">
                   <i class="ph-fill ph-pause text-xs" id="icon-custom-play"></i>
                 </button>
@@ -631,6 +678,18 @@
                 </button>
               </div>
             </div>
+          </div>
+
+          <!-- SMART CROP & PREVIEW CONTROLS UNDER PHONE -->
+          <div class="w-full max-w-[260px] p-2 rounded-xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-1.5 truncate">
+              <i class="ph-bold ph-crop text-shopee"></i>
+              <span class="text-[11px] font-medium text-zinc-300">ครอปหลบซับเดิม (Smart Crop 1.18x)</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+              <input type="checkbox" id="toggle-smart-crop" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
+              <div class="w-8 h-4 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-shopee"></div>
+            </label>
           </div>
 
           <p class="text-[10px] text-zinc-500 font-mono">หน้าจอพรีวิว 9:16 (TikTok & Shopee Video)</p>
@@ -1322,12 +1381,28 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Start clean - no fake pre-fills
+      // Start clean - no fake pre-fills, completely silent
       currentProduct = null;
+      isVideoRendered = false;
       document.getElementById('input-shopee-url').value = '';
       document.getElementById('input-product-name').value = '';
       document.getElementById('input-product-price').value = '';
       document.getElementById('input-review-url').value = '';
+
+      // Guarantee all audio and video elements are silenced
+      const p = document.getElementById('player-preview');
+      if (p) { p.pause(); p.currentTime = 0; p.src = ''; p.classList.add('hidden'); }
+      const m = document.getElementById('player-mali-audio');
+      if (m) { m.pause(); m.currentTime = 0; m.src = ''; }
+      const b = document.getElementById('player-bgm');
+      if (b) { b.pause(); b.currentTime = 0; }
+      const subOv = document.getElementById('overlay-subtitles');
+      if (subOv) subOv.classList.add('hidden');
+      const ctrlOv = document.getElementById('custom-video-controls');
+      if (ctrlOv) ctrlOv.classList.add('hidden');
+      const emptyState = document.getElementById('preview-empty-state');
+      if (emptyState) emptyState.classList.remove('hidden');
+
       setupVideoSubtitleSync();
       checkExtensionImportPayload();
     });
@@ -1653,16 +1728,22 @@
         if (adDesc) adDesc.innerText = 'วิดีโอหลักจากแกลเลอรีร้าน (1080x1920 HD)';
       }
 
-      // Video Player & Synchronized Mali Voiceover
+      // Video Player & Synchronized Mali Voiceover (PRELOAD READY, SILENCED UNTIL RENDER 1-CLICK)
+      isVideoRendered = false;
       const player = document.getElementById('player-preview');
-      player.src = prod.video_url;
-      player.muted = true;
-      player.load();
-      player.play().catch(() => {});
+      if (player) {
+        player.pause();
+        player.currentTime = 0;
+        player.src = prod.video_url || '';
+        player.muted = true;
+        player.classList.add('hidden');
+      }
 
-      // Load genuine ElevenLabs Mali Audio for this product
+      // Reset audio to completely silent on product change / load
       const maliAudio = document.getElementById('player-mali-audio');
       if (maliAudio) {
+        maliAudio.pause();
+        maliAudio.currentTime = 0;
         let audioSrc = prod.audio_url || '';
         if (!audioSrc) {
           if (prod.product_id === 'fanlife_tumbler_710ml') {
@@ -1672,9 +1753,22 @@
           }
         }
         maliAudio.src = audioSrc;
-        maliAudio.load();
-        maliAudio.currentTime = 0;
       }
+      const bgmAudio = document.getElementById('player-bgm');
+      if (bgmAudio) {
+        bgmAudio.pause();
+        bgmAudio.currentTime = 0;
+      }
+
+      // Restore Empty State in Step 3 until explicit Render click
+      const emptyState = document.getElementById('preview-empty-state');
+      const renderState = document.getElementById('preview-rendering-state');
+      const subOv = document.getElementById('overlay-subtitles');
+      const ctrlOv = document.getElementById('custom-video-controls');
+      if (emptyState) emptyState.classList.remove('hidden');
+      if (renderState) renderState.classList.add('hidden');
+      if (subOv) subOv.classList.add('hidden');
+      if (ctrlOv) ctrlOv.classList.add('hidden');
 
       // Video Spec
       const specTitle = document.getElementById('video-spec-title');
@@ -2103,37 +2197,74 @@
     
     let activeMaliAudio = null;
 
-    // Real-Time Subtitle & Audio Synchronization on Video Play
-    function formatViralSubtitle(phrase, maxLineLen = 20) {
+    // Global render state & Smart Crop tracking
+    let isVideoRendered = false;
+    let isSmartCropEnabled = true;
+
+    function handleSmartCropToggle(enabled) {
+      isSmartCropEnabled = enabled;
+      const player = document.getElementById('player-preview');
+      const mask = document.getElementById('bottom-sub-mask');
+      const t1 = document.getElementById('toggle-smart-crop');
+      const t2 = document.getElementById('toggle-smart-crop-s1');
+
+      if (t1) t1.checked = enabled;
+      if (t2) t2.checked = enabled;
+
+      if (player) {
+        if (enabled) {
+          player.classList.add('video-smart-crop');
+        } else {
+          player.classList.remove('video-smart-crop');
+        }
+      }
+      if (mask) {
+        mask.style.opacity = enabled ? '1' : '0';
+      }
+      showToast(enabled ? 'เปิดโหมดครอปหลบซับเดิม (Smart Crop 1.18x)' : 'ปิดโหมดครอป (แสดงสัดส่วนปกติ)');
+    }
+
+    // Real-Time Subtitle & Audio Synchronization on Video Play (Safe Zone max 14-16 chars/line)
+    function formatViralSubtitle(phrase) {
       if (!phrase) return '';
       let clean = phrase
-        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '')
         .replace(/[.,!?;:✨🛒🔥🧡]/g, ' ')
+        .replace(/\s+/g, ' ')
         .trim();
 
-      // If 18 chars or less, it fits comfortably on ONE line! NEVER break inside words like 'ตัวนี้ใช้งานดีมาก'
-      if (clean.length <= 18) {
+      // If 14 chars or less, fits cleanly on 1 line within safe zone
+      if (clean.length <= 14) {
         return clean;
       }
 
-      // Natural Thai clause split points
-      const naturalBreaks = [' แนะนำ', ' วัสดุดี', ' บอกเลย', ' มุมซ้ายล่าง', ' คุณภาพดี', ' คุ้มราคา', ' พิกัด', ' ในตะกร้า', ' ราคา'];
-      for (const nb of naturalBreaks) {
-        if (clean.includes(nb)) {
-          const parts = clean.split(nb);
-          if (parts[0].trim() && parts[1].trim()) {
-            return `${parts[0].trim()}<br>${nb.trim()} ${parts[1].trim()}`;
+      // Natural Thai clause split points for balance
+      const splitKeywords = [
+        ' แนะนำ', ' ตัวนี้', ' วัสดุดี', ' บอกเลย', ' ไม่ผิดหวัง',
+        ' มุมซ้ายล่าง', ' คุณภาพดี', ' คุ้มราคา', ' พิกัด', ' ในตะกร้า',
+        ' กดสั่ง', ' ตะกร้าส้ม', ' ตะกร้าสีส้ม', ' ราคา', ' ใครที่'
+      ];
+      for (const kw of splitKeywords) {
+        if (clean.includes(kw)) {
+          const idx = clean.indexOf(kw);
+          const p1 = clean.substring(0, idx).trim();
+          const p2 = clean.substring(idx).trim();
+          if (p1.length >= 4 && p2.length >= 4) {
+            return `${p1}<br>${p2}`;
           }
         }
       }
 
       if (clean.includes(' ')) {
-        const parts = clean.split(/\s+/);
+        const parts = clean.split(' ');
         if (parts.length === 2) {
           return `${parts[0]}<br>${parts[1]}`;
         }
-        let mid = Math.floor(parts.length / 2);
+        let mid = Math.ceil(parts.length / 2);
         return `${parts.slice(0, mid).join(' ')}<br>${parts.slice(mid).join(' ')}`;
+      }
+
+      if (clean.length > 15) {
+        return `${clean.substring(0, 14)}<br>${clean.substring(14)}`;
       }
 
       return clean;
@@ -2141,30 +2272,30 @@
 
     function buildTimedSubtitleCues(text) {
       const clean = (text || '').trim();
-      // 1. Natural Tumbler Script (Exact Waveform Sync with Mali 7XW5JhaNn90bnFojQ5DA: 0-18.7s)
+      // 1. Natural Tumbler Script (Safe Zone: 2 compact balanced lines)
       if (clean.includes('แก้ว') || clean.includes('พกแก้วน้ำ') || clean.includes('ฟานไลฟ์') || clean.includes('เซรามิก')) {
         return [
-          { start: 0.0, end: 4.4, html: 'ใครชอบพกแก้วน้ำไปทำงาน<br>หรือไปเที่ยว แนะนำใบนี้เลยค่ะ' },
-          { start: 4.4, end: 9.5, html: 'แก้วเก็บความเย็นฟานไลฟ์<br>710 มล. เคลือบเซรามิกแท้' },
-          { start: 9.5, end: 14.8, html: 'เก็บน้ำแข็งข้ามวัน ลายน่ารัก<br>มีหูหิ้วพกพาง่ายมากค่ะ' },
+          { start: 0.0, end: 4.4, html: 'ใครชอบพกแก้วน้ำไปทำงาน<br>แนะนำใบนี้เลยค่ะ' },
+          { start: 4.4, end: 9.5, html: 'แก้วเก็บความเย็นฟานไลฟ์<br>เคลือบเซรามิกแท้' },
+          { start: 9.5, end: 14.8, html: 'เก็บน้ำแข็งข้ามวัน ลายน่ารัก<br>มีหูหิ้วพกพาง่าย' },
           { start: 14.8, end: 20.0, html: 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
         ];
       }
 
-      // 2. High-Converting Universal Script
-      if (clean.includes('กำลังมองหา') && clean.includes('ใช้งานดีมาก') && clean.includes('ตะกร้า')) {
+      // 2. High-Converting Universal Script (Strictly stays inside Safe Zone)
+      if (clean.includes('กำลังมองหา') && (clean.includes('ใช้งานดีมาก') || clean.includes('รีวิวดีมาก') || clean.includes('ตะกร้า'))) {
         return [
           { start: 0.0, end: 3.2, html: 'ใครที่กำลังมองหา<br>แนะนำตัวนี้เลยค่ะ' },
           { start: 3.2, end: 7.4, html: 'ตัวนี้ใช้งานดีมาก<br>วัสดุดีคุ้มราคา' },
-          { start: 7.4, end: 11.0, html: 'ใครที่กำลังเล็งอยู่<br>บอกเลยไม่ผิดหวังค่ะ' },
-          { start: 11.0, end: 20.0, html: 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
+          { start: 7.4, end: 11.2, html: 'ใครที่กำลังเล็งอยู่<br>บอกเลยไม่ผิดหวังค่ะ' },
+          { start: 11.2, end: 20.0, html: 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
         ];
       }
 
       // 3. Generic / Custom Script Timing across 16.0s Speech Window
       const rawSentences = clean
-        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '')
-        .split(/[,.!?;]|\r?\n/)
+        .split(/[,.!?;]|
+?\n/)
         .map(s => s.trim())
         .filter(s => s.length > 0);
 
@@ -2181,7 +2312,7 @@
         return {
           start: start,
           end: end,
-          html: formatViralSubtitle(sent, 20)
+          html: formatViralSubtitle(sent)
         };
       });
     }
@@ -2215,7 +2346,10 @@
     }
 
     function handleVideoAreaClick(e) {
-      // Toggle play/pause when user clicks anywhere on mobile screen preview
+      if (!isVideoRendered) {
+        startRenderVideo();
+        return;
+      }
       togglePlayVideo();
     }
 
@@ -2452,15 +2586,22 @@
           }
         }
 
+        // Mark as rendered and reveal player + controls + subtitles
+        isVideoRendered = true;
+        const emptyState = document.getElementById('preview-empty-state');
+        const renderState = document.getElementById('preview-rendering-state');
+        const subOv = document.getElementById('overlay-subtitles');
+        const ctrlOv = document.getElementById('custom-video-controls');
+        if (emptyState) emptyState.classList.add('hidden');
+        if (renderState) renderState.classList.add('hidden');
+        if (player) player.classList.remove('hidden');
+        if (subOv) subOv.classList.remove('hidden');
+        if (ctrlOv) ctrlOv.classList.remove('hidden');
+
         if (player) {
-          player.muted = false; // Video file now contains muxed pristine Mali voice + BGM!
+          player.muted = true; // Keep raw camera muted so synthesized Mali voice is 100% crystal clear
           player.currentTime = 0;
-          player.play().catch(() => {
-            // Autoplay fallback with mute if browser restricts unmuted video autoplay
-            player.muted = true;
-            player.play().catch(() => {});
-            if (maliAudio) maliAudio.play().catch(() => {});
-          });
+          player.play().catch(() => {});
         }
         const iconPlay = document.getElementById('icon-custom-play');
         if (iconPlay) iconPlay.className = 'ph-fill ph-pause text-xs';

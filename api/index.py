@@ -406,9 +406,10 @@ def synthesize_mali_voice(req: VoiceSynthesizeRequest):
                 "text": text,
                 "model_id": model_id,
                 "voice_settings": {
-                    "stability": 0.50,
-                    "similarity_boost": 0.80,
-                    "speed": 1.08
+                    "stability": 0.82,
+                    "similarity_boost": 0.85,
+                    "speed": 1.04,
+                    "style": 0.0
                 }
             },
             timeout=30
@@ -430,7 +431,8 @@ def synthesize_mali_voice(req: VoiceSynthesizeRequest):
                 json={
                     "text": text,
                     "model_id": "eleven_v4_turbo",
-                    "voice_settings": {"stability": 0.50, "similarity_boost": 0.80, "speed": 1.08}
+                    "voice_settings": {"stability": 0.82, "similarity_boost": 0.85, "speed": 1.04,
+                    "style": 0.0}
                 },
                 timeout=30
             )

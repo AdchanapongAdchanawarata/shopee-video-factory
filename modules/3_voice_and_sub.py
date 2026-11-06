@@ -261,8 +261,8 @@ def synthesize_elevenlabs(
                     "text": clean_text,
                     "model_id": model_id,
                     "voice_settings": {
-                        "stability": 0.45,
-                        "similarity_boost": 0.75,
+                        "stability": 0.82,
+                        "similarity_boost": 0.85,
                         "style": 0.0
                     }
                 },

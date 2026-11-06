@@ -42,8 +42,8 @@
     .thai-viral-sub {
       font-family: 'Kanit', sans-serif;
       font-weight: 800;
-      font-size: clamp(1.02rem, 4.2vw, 1.22rem);
-      line-height: 1.32;
+      font-size: clamp(0.96rem, 3.8vw, 1.16rem);
+      line-height: 1.30;
       color: #ffffff;
       paint-order: stroke fill;
       -webkit-text-stroke: 3.5px #ff5000;
@@ -60,19 +60,24 @@
       filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.65));
       letter-spacing: 0.02em;
       text-align: center;
-      display: inline-block;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      max-height: 2.85em;
+      overflow: hidden;
       user-select: none;
       white-space: normal;
       word-break: keep-all;
       overflow-wrap: break-word;
       text-wrap: balance;
-      max-width: 100%;
+      max-width: 90%;
+      margin: 0 auto;
       padding: 0 4px;
       box-sizing: border-box;
       transition: transform 0.12s ease-out;
     }
     .video-smart-crop {
-      transform: scale(1.18) translateY(-4%);
+      transform: scale(1.30) translateY(3.5%);
       transform-origin: center center;
       transition: transform 0.3s ease-out;
     }
@@ -349,7 +354,7 @@
           <div class="flex items-center space-x-2 truncate">
             <i class="ph-bold ph-crop text-shopee text-base"></i>
             <div>
-              <div class="text-xs font-bold text-zinc-200">ครอปหลบซับไตเติลเดิม (Smart Crop 1.18x)</div>
+              <div class="text-xs font-bold text-zinc-200">ครอปหลบซับไตเติลเดิม (Smart Crop 1.30x)</div>
               <div class="text-[10px] text-zinc-400">ซูมและครอปหลบซับเดิมที่ติดมากับคลิปรีวิวร้านค้า พร้อมมาสก์ขอบล่างอัตโนมัติ</div>
             </div>
           </div>
@@ -652,7 +657,7 @@
               ></video>
 
               <!-- SMART BOTTOM SUBTITLE MASK (MASKS ANY BURNED-IN SELLER SUBTITLES CLEANLY) -->
-              <div id="bottom-sub-mask" class="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none z-10 transition-opacity duration-300"></div>
+              <div id="bottom-sub-mask" class="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black/95 via-black/70 to-transparent pointer-events-none z-10 transition-opacity duration-300"></div>
 
               <!-- DEDICATED MALI AI VOICE AUDIO (SYNCHRONIZED REAL-TIME, PRELOAD NONE TO PREVENT PREMATURE AUDIO) -->
               <audio id="player-mali-audio" preload="none"></audio>
@@ -689,7 +694,7 @@
           <div class="w-full max-w-[260px] p-2 rounded-xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
             <div class="flex items-center space-x-1.5 truncate">
               <i class="ph-bold ph-crop text-shopee"></i>
-              <span class="text-[11px] font-medium text-zinc-300">ครอปหลบซับเดิม (Smart Crop 1.18x)</span>
+              <span class="text-[11px] font-medium text-zinc-300">ครอปหลบซับเดิม (Smart Crop 1.30x)</span>
             </div>
             <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
               <input type="checkbox" id="toggle-smart-crop" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
@@ -1115,110 +1120,184 @@
 
     
     // INTELLIGENT PRODUCT-SPECIFIC SCRIPT ENGINE (NEVER REPETITIVE)
+    function normalizeThaiProductTitle(rawTitle) {
+      if (!rawTitle) return '';
+      let s = String(rawTitle)
+        .replace(/^\[(Mall|ช้อปปี้|พร้อมส่ง|ของแท้|แท้ 100%|ของแท้ 100%)\]\s*/gi, '')
+        .replace(/\s*\[(Mall|ช้อปปี้|พร้อมส่ง|ของแท้|แท้ 100%|อัตโนมัติ.*?)\]/gi, '')
+        .replace(/\s*\(รับประกัน.*?\)/gi, '')
+        .replace(/\s*\(พร้อมส่ง.*?\)/gi, '')
+        .replace(/\s*\(ของแท้.*?\)/gi, '')
+        .replace(/\s*【.*?】/g, '')
+        .replace(/\s*\[.*?\]/g, '')
+        .trim();
+
+      // Convert unit abbreviations to clear spoken Thai words without breaking decimals
+      s = s.replace(/(\d+(?:\.\d+)?)\s*(?:m|เมตร|ม\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 เมตร');
+      s = s.replace(/(\d+(?:\.\d+)?)\s*(?:ml|มล|มล\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 มิลลิลิตร');
+      s = s.replace(/(\d+(?:\.\d+)?)\s*(?:w|วัตต์)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 วัตต์');
+      s = s.replace(/(\d+(?:\.\d+)?)\s*(?:kg|กก|กก\.|กิโล|กิโลกรัม)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 กิโลกรัม');
+      s = s.replace(/(\d+(?:\.\d+)?)\s*(?:l|ลิตร)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 ลิตร');
+      s = s.replace(/(\d+)\s*(?:mah|มิลลิแอมป์)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 มิลลิแอมป์');
+
+      s = s.replace(/[\/\\|]/g, ' ')
+           .replace(/\s+/g, ' ')
+           .replace(/[.,;]$/, '')
+           .trim();
+
+      return s;
+    }
+
+    function getSpokenProductName(rawTitle) {
+      const norm = normalizeThaiProductTitle(rawTitle);
+      const low = norm.toLowerCase();
+
+      // 1. Cat Litter (ทรายเต้าหู้ / ทรายแมว)
+      if (low.includes('ทราย') || low.includes('cat litter') || low.includes('เต้าหู้')) {
+        const litersMatch = norm.match(/(\d+(?:\.\d+)?)\s*ลิตร/);
+        const vol = litersMatch ? ` ${litersMatch[1]} ลิตร` : '';
+        if (low.includes('เต้าหู้')) return `ทรายแมวเต้าหู้ออร์แกนิค${vol}ตัวนี้`;
+        return `ทรายแมวคุณภาพดี${vol}ตัวนี้`;
+      }
+
+      // 2. Cat Fountain (น้ำพุแมว)
+      if (low.includes('น้ำพุ') || low.includes('drinking fountain')) {
+        return 'น้ำพุแมวไร้สายตัวนี้';
+      }
+
+      // 3. Tripod / Selfie Stick (ไม้เซลฟี่ / ขาตั้งกล้อง)
+      if (low.includes('ขาตั้ง') || low.includes('เซลฟี่') || low.includes('tripod') || low.includes('selfie')) {
+        const meterMatch = norm.match(/(\d+(?:\.\d+)?)\s*เมตร/);
+        const length = meterMatch ? ` ${meterMatch[1]} เมตร` : '';
+        const brand = low.includes('x-it') ? 'X-it ' : '';
+        return `ไม้เซลฟี่และขาตั้งกล้อง ${brand}${length}ตัวนี้`.replace(/\s+/g, ' ');
+      }
+
+      // 4. Tumbler (แก้วเก็บความเย็น)
+      if (low.includes('แก้ว') || low.includes('tumbler') || low.includes('กระบอกน้ำ')) {
+        const mlMatch = norm.match(/(\d+)\s*มิลลิลิตร/);
+        const vol = mlMatch ? ` ${mlMatch[1]} มิลลิลิตร` : '';
+        return `แก้วเก็บความเย็น${vol}ตัวนี้`;
+      }
+
+      // 5. Earbuds (หูฟังบลูทูธ)
+      if (low.includes('หูฟัง') || low.includes('earbud') || low.includes('headphone')) {
+        return 'หูฟังบลูทูธไร้สายตัวนี้';
+      }
+
+      // Fallback: extract short title cleanly
+      const parts = norm.split(/[,，、\-–—]/);
+      let short = (parts[0] || norm).trim();
+      if (short.length > 36) {
+        short = short.substring(0, 34) + 'ตัวนี้';
+      }
+      return short;
+    }
+
     const JS_CATEGORY_RULES = [
       {
-        id: "pet",
-        keywords: ["น้ำพุแมว", "ทรายแมว", "อาหารแมว", "อาหารหมา", "อาหารสัตว์", "ของเล่นแมว", "ที่นอนแมว", "คอนโดแมว", "แมว", "สุนัข", "หมา", "สัตว์เลี้ยง", "pet", "cat fountain"],
+        id: "cat_litter",
+        keywords: ["ทรายแมว", "ทรายเต้าหู้", "cat litter", "tofu cat litter", "เบนโทไนท์", "ห้องน้ำแมว", "กระบะทราย"],
+        angles: [
+          {
+            type: "pain_point",
+            headline: "หมดปัญหากลิ่นและฝุ่นฟุ้ง",
+            hook: "ทาสแมวคนไหน ปวดหัวกับกลิ่นกระบะทราย, หรือฝุ่นฟุ้งติดเท้าน้องบ้างคะ?",
+            body: "พอเปลี่ยนมาใช้ {name}, คือดีขึ้นมาก. จับตัวเป็นก้อนไว, เก็บกลิ่นมิดชิด, ไร้ฝุ่นกวนใจ, ตักทิ้งง่าย, สะอาดปลอดภัยต่อน้องแมวเลยค่ะ.",
+            cta: "อยากให้บ้านหอมสะอาด, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "discovery",
+            headline: "ทรายแมวเต้าหู้ธรรมชาติ 100%",
+            hook: "บอกลากลิ่นฉุนในบ้าน! ทรายแมวที่ทาสแมวยุคนี้ต้องมีติดห้องไว้เลยค่ะ.",
+            body: "{name} ผลิตจากวัตถุดิบธรรมชาติแท้, จับก้อนแน่นตักง่าย, ทิ้งชักโครกได้, ไม่ติดเท้าน้องแมวเลยค่ะ.",
+            cta: "แปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ, รีบไปตำเลย."
+          }
+        ]
+      },
+      {
+        id: "cat_fountain",
+        keywords: ["น้ำพุแมว", "น้ำพุสัตว์เลี้ยง", "เครื่องให้น้ำแมว", "cat fountain", "water fountain"],
         angles: [
           {
             type: "pain_point",
             headline: "แก้ปัญหาน้องแมวดื่มน้ำน้อย",
-            hook: "ทาสแมวคนไหนเจอปัญหาน้องกินน้ำน้อย หรือชอบเล่นน้ำจนเลอะเทอะบ้างคะ?",
-            body: "พอเปลี่ยนมาใช้ {name} น้องชอบมาก วิ่งมากินน้ำทั้งวัน ไร้สายปลอดภัย ไร้กังวลเรื่องไตเลยค่ะ",
-            cta: "เพื่อสุขภาพน้อง จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ"
+            hook: "ทาสแมวคนไหน เจอปัญหาน้องกินน้ำน้อย, หรือชอบเล่นน้ำจนเลอะเทอะบ้างคะ?",
+            body: "พอเปลี่ยนมาใช้ {name}, น้องชอบมาก. วิ่งมากินน้ำทั้งวัน, ไร้สายปลอดภัย, ไร้กังวลเรื่องไตเลยค่ะ.",
+            cta: "เพื่อสุขภาพน้อง, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
           },
           {
             type: "discovery",
             headline: "ไอเทมลับทาสแมวยุคใหม่",
-            hook: "บอกลาสายไฟเกะกะ! ไอเทมลับที่บ้านเลี้ยงแมวต้องมีติดไว้จริงๆ ค่ะ",
-            body: "{name} ตัวถังสแตนเลสฟู้ดเกรด มอเตอร์เสียงเงียบกริบ แบตอึด ล้างง่ายสุดๆ ค่ะ",
-            cta: "แปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ รีบไปตำเลย"
+            hook: "บอกลาสายไฟเกะกะ! ไอเทมลับที่บ้านเลี้ยงแมวต้องมีติดไว้จริงๆ ค่ะ.",
+            body: "{name} ตัวถังสแตนเลสฟู้ดเกรด, มอเตอร์เสียงเงียบกริบ, แบตอึด, ล้างง่ายสุดๆ ค่ะ.",
+            cta: "แปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ, รีบไปตำเลย."
           }
         ]
       },
       {
-        id: "toothbrush",
-        keywords: ["แปรงสีฟัน", "แปรงฟัน", "แปรงไฟฟ้า", "sonic toothbrush", "electric toothbrush"],
+        id: "tripod_selfie",
+        keywords: ["ไม้เซลฟี่", "ขาตั้งกล้อง", "ไม้กันสั่น", "gimbal", "tripod", "selfie", "x-it", "บลูทูธ"],
         angles: [
           {
             type: "benefit",
-            headline: "แปรงฟันสะอาดทั่วถึง ไม่เจ็บเหงือก",
-            hook: "อยากแปรงฟันให้สะอาดลื่นแบบคลินิกทันตกรรม แนะนำตัวนี้เลยค่ะ!",
-            body: "{name} ระบบโซนิคสั่นทรงพลัง ขนแปรงนุ่มละเอียด ถนอมเหงือก กันน้ำ IPX7 ชาร์จครั้งเดียวใช้ยาวเลยค่ะ",
-            cta: "กดสั่งที่ตะกร้าสีส้มมุมซ้ายล่าง แล้วไปยิ้มสวยฟันสะอาดกันนะคะ"
-          },
-          {
-            type: "pain_point",
-            headline: "ลดคราบพลัค ไม่ทำร้ายเหงือก",
-            hook: "ใครแปรงฟันแล้วยังรู้สึกไม่สะอาด หรือเลือดออกตามไรฟันบ่อยๆ ต้องดูตัวนี้ค่ะ!",
-            body: "{name} ขจัดคราบพลัคได้ล้ำลึก สั่นนุ่มนวล ไม่เจ็บเหงือก ฟันสะอาดมั่นใจขึ้นทันทีค่ะ",
-            cta: "พิกัดอยู่ที่ตะกร้าส้มซ้ายล่าง รีบกดสั่งก่อนของหมดนะคะ"
-          }
-        ]
-      },
-      {
-        id: "charger_tech",
-        keywords: ["หัวชาร์จ", "สายชาร์จ", "แบตสำรอง", "พาวเวอร์แบงค์", "ชาร์จเร็ว", "gan charger", "power bank", "ugreen"],
-        angles: [
-          {
-            type: "benefit",
-            headline: "หัวชาร์จเร็วตัวจบ ชาร์จพร้อมกัน 3 เครื่อง",
-            hook: "บอกลาหัวชาร์จหลายอันให้เกะกะ พกตัวนี้ตัวเดียวจบเลยค่ะ!",
-            body: "{name} จ่ายไฟแรงเต็มวัตต์ ชาร์จได้ทั้งมือถือ แท็บเล็ต โน้ตบุ๊ก ระบบป้องกันไฟลัดวงจร ปลอดภัยไม่ร้อนมือค่ะ",
-            cta: "มีประกันศูนย์ไทยครบ จิ้มสั่งที่ตะกร้าส้มซ้ายล่างได้เลยนะคะ"
-          }
-        ]
-      },
-      {
-        id: "earphones_tech",
-        keywords: ["หูฟัง", "บลูทูธ", "เอียร์บัด", "earbuds", "earphone", "headphone", "tws"],
-        angles: [
-          {
-            type: "discovery",
-            headline: "หูฟังเสียงดี เบสแน่น ตัดเสียงรบกวน",
-            hook: "ไม่ต้องจ่ายแพงหลักพัน ก็ได้หูฟังเสียงดีเบสแน่นสะใจแบบนี้แล้วค่ะ!",
-            body: "{name} ดีไซน์สวย สวมใส่สบายหู ไมค์คุยสายชัดเจน แบตเตอรี่อึดฟังได้ทั้งวัน คุ้มราคามากค่ะ",
-            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง รีบกดสั่งก่อนของหมดนะคะ"
-          }
-        ]
-      },
-      {
-        id: "beverage",
-        keywords: ["โซดา", "น้ำผลไม้", "น้ำอัดลม", "ชานม", "ชาเขียว", "กาแฟสด", "เครื่องดื่ม", "น้ำหวาน", "soda", "sparkling"],
-        angles: [
-          {
-            type: "pain_point",
-            headline: "สดชื่นซ่าสะใจแบบไม่ง้อน้ำตาล",
-            hook: "อากาศร้อนๆ แบบนี้ ได้จิบอะไรเย็นๆ ซ่าๆ คือสดชื่นตาสว่างมากกก!",
-            body: "{name} กลิ่นหอมผลไม้ชัด รสชาติกลมกล่อม ซ่ากำลังดี ดื่มตอนบ่ายๆ แก้ง่วงได้ดีสุดๆ ค่ะ",
-            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง ตุนติดตู้เย็นไว้ได้เลยนะคะ"
+            headline: "ถ่ายรูปสวยคนเดียว ไม่ต้องง้อใคร",
+            hook: "สายเที่ยว สายคอนเทนต์คนไหน, ไม่อยากคอยง้อใครให้ช่วยถ่ายรูปให้บ้างคะ?",
+            body: "ตัวนี้คือจบเลยค่ะ, {name} ยืดได้ยาว, กางเป็นขาตั้งกล้องได้มั่นคง, มีรีโมทบลูทูธกดถ่ายเองได้สบาย, พกพาสะดวก, คุ้มราคามากค่ะ.",
+            cta: "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
           },
           {
             type: "discovery",
-            headline: "ของอร่อยดับร้อนใน Shopee",
-            hook: "เพิ่งเจอไอเทมดับร้อนตัวเด็ด ที่ต้องสั่งซ้ำติดตู้เย็นไว้ตลอดเลยค่ะ!",
-            body: "{name} ยกแพ็คสุดคุ้ม รสชาติดี มีความซ่าสดชื่น ดื่มง่าย อร่อยฟินสะใจทุกกระป๋องเลยค่ะ",
-            cta: "จิ้มสั่งตรงตะกร้าส้มด้านล่างนี้ได้เลยนะคะ ส่งตรงถึงหน้าบ้านเลย"
+            headline: "ขาตั้งกล้องและไม้เซลฟี่ตัวจบ",
+            hook: "พกอันเดียวเที่ยวได้รอบโลก! ใครกำลังมองหาขาตั้งกล้องดีๆ แนะนำตัวนี้เลยค่ะ.",
+            body: "{name} กางอัตโนมัติในวินาทีเดียว, ขาตั้งแข็งแรงไม่ล้มง่าย, หมุนได้รอบทิศ, คุ้มค่าสมราคาจริงๆ ค่ะ.",
+            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง, รีบกดสั่งก่อนของหมดนะคะ."
           }
         ]
       },
       {
         id: "tumbler",
-        keywords: ["แก้วน้ำ", "แก้วเก็บความเย็น", "กระติก", "ความเย็น", "เยติ", "tumbler", "tyeso", "stanley", "fanlife"],
+        keywords: ["แก้วเก็บความเย็น", "แก้วน้ำ", "กระบอกน้ำ", "tumbler", "fanlife", "tyeso", "stanley", "แก้ว"],
         angles: [
           {
             type: "discovery",
-            headline: "แก้วน้ำคู่ใจสายเที่ยว & ทำงาน",
-            hook: "ใครชอบพกแก้วน้ำไปทำงาน หรือไปเที่ยว แนะนำใบนี้เลยค่ะ สวยตรงปกมาก!",
-            body: "{name} ด้านในเคลือบเซรามิกแท้ ไม่ติดกลิ่น เก็บน้ำแข็งข้ามวัน ลายน่ารัก มีหูหิ้วพกพาง่ายมากค่ะ",
-            cta: "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ"
+            headline: "แก้วเก็บความเย็นเคลือบเซรามิกแท้",
+            hook: "ใครชอบพกแก้วน้ำไปทำงาน, หรือไปเที่ยว, แนะนำใบนี้เลยค่ะ!",
+            body: "{name} ด้านในเคลือบเซรามิกแท้, ไม่ติดกลิ่น, เก็บน้ำแข็งข้ามวัน, ลายน่ารัก, มีหูหิ้วพกพาง่ายมากค่ะ.",
+            cta: "สนใจกดสั่งซื้อที่ตะกร้าสีส้ม, มุมซ้ายล่างได้เลยนะคะ."
           },
           {
             type: "pain_point",
             headline: "น้ำแข็งไม่ละลายข้ามวัน",
-            hook: "อากาศร้อนขนาดนี้ ถ้าไม่มีแก้วเก็บความเย็นดีๆ คืออยู่ยากจริงๆ ค่ะ!",
-            body: "{name} จุน้ำได้สะใจ สแตนเลสฟู้ดเกรดแท้ เก็บความเย็นได้เช้าจรดค่ำ ไม่ต้องเติมน้ำแข็งบ่อยๆ เลยค่ะ",
-            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง รีบกดสั่งก่อนของหมดนะคะ"
+            hook: "อากาศร้อนขนาดนี้, ถ้าไม่มีแก้วเก็บความเย็นดีๆ คืออยู่ยากจริงๆ ค่ะ!",
+            body: "{name} จุน้ำได้สะใจ, สแตนเลสฟู้ดเกรดแท้, เก็บความเย็นได้เช้าจรดค่ำ, ไม่ต้องเติมน้ำแข็งบ่อยๆ เลยค่ะ.",
+            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง, รีบกดสั่งก่อนของหมดนะคะ."
+          }
+        ]
+      },
+      {
+        id: "earbuds",
+        keywords: ["หูฟัง", "earphone", "headphone", "earbuds", "baseus", "หูฟังบลูทูธ", "ไร้สาย"],
+        angles: [
+          {
+            type: "benefit",
+            headline: "ตัดเสียงรบกวน เบสแน่น คุยชัด",
+            hook: "ใครกำลังหาหูฟังบลูทูธเสียงดีๆ, ราคาจับต้องได้, ต้องดูตัวนี้เลยค่ะ!",
+            body: "{name} ตัดเสียงรอบข้างได้เงียบกริบ, เบสแน่นตึ้บ, ไมค์คุยโทรศัพท์ชัดเจน, แบตอึดใช้ได้ทั้งวันเลยค่ะ.",
+            cta: "กดสั่งที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ, ของแท้แน่นอนค่ะ."
+          }
+        ]
+      },
+      {
+        id: "pet_general",
+        keywords: ["อาหารแมว", "อาหารหมา", "ขนมแมวเลีย", "ของเล่นแมว", "ที่นอนแมว", "คอนโดแมว", "สัตว์เลี้ยง", "pet"],
+        angles: [
+          {
+            type: "benefit",
+            headline: "ของดีบอกต่อสำหรับสัตว์เลี้ยง",
+            hook: "คนรักสัตว์เลี้ยงต้องดูเลยค่ะ! ไอเทมที่ช่วยให้ชีวิตน้องๆ แฮปปี้ขึ้นเยอะมาก.",
+            body: "{name} คุณภาพดี, ปลอดภัย, น้องชอบมาก, คุ้มค่าสมราคาจริงๆ ค่ะ.",
+            cta: "แปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ, รีบกดเลย."
           }
         ]
       },
@@ -1229,48 +1308,48 @@
           {
             type: "pain_point",
             headline: "ไม่ต้องหิ้วถังน้ำ ไม่ปวดหลัง",
-            hook: "มีใครเบื่องานบ้าน ที่ต้องคอยก้มๆ เงยๆ ยกถังน้ำจนปวดหลังบ้างคะ...",
-            body: "ตั้งแต่ได้ {name} มาคือชีวิตสบายขึ้นเยอะ ฉีดพ่นน้ำในตัว เช็ดทำความสะอาดง่าย พื้นแห้งไวมากค่ะ",
-            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง รีบกดสั่งก่อนของหมดนะคะ"
+            hook: "มีใครเบื่องานบ้าน, ที่ต้องคอยก้มๆ เงยๆ ยกถังน้ำจนปวดหลังบ้างคะ?",
+            body: "ตั้งแต่ได้ {name} มาคือชีวิตสบายขึ้นเยอะ, ฉีดพ่นน้ำในตัว, เช็ดทำความสะอาดง่าย, พื้นแห้งไวมากค่ะ.",
+            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง, รีบกดสั่งก่อนของหมดนะคะ."
           }
         ]
       },
       {
-        id: "fitness",
-        keywords: ["เคตเทิลเบล", "ดัมเบล", "ออกกำลังกาย", "ฟิตเนส", "โยคะ", "kettlebell", "dumbbell"],
+        id: "charger_tech",
+        keywords: ["หัวชาร์จ", "สายชาร์จ", "แบตสำรอง", "พาวเวอร์แบงค์", "ชาร์จเร็ว", "gan charger", "power bank", "ugreen"],
         angles: [
           {
-            type: "pain_point",
-            headline: "ออกกำลังกายในห้อง ไม่กลัวพื้นพัง",
-            hook: "ใครชอบออกกำลังกายที่บ้าน แต่กลัวดัมเบลเหล็กกระแทกพื้นพัง ต้องดูตัวนี้เลยค่ะ!",
-            body: "{name} วัสดุนุ่มกระชับมือ ลดแรงกระแทกได้ดี ปลอดภัย เล่นได้สบายใจ ไม่ต้องกลัวพื้นเป็นรอยเลยค่ะ",
-            cta: "อยากฟิตหุ่นรีบกดสั่งที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ"
+            type: "benefit",
+            headline: "หัวชาร์จเร็วตัวจบ พกอันเดียวพอ",
+            hook: "บอกลาหัวชาร์จหลายอันให้เกะกะ! ตัวนี้คือหัวเดียวจบเลยค่ะ.",
+            body: "{name} จ่ายไฟแรงเต็มสปีด, ไม่ร้อน, ขนาดกะทัดรัด, พกไปทำงานหรือเที่ยวคือสบายมากค่ะ.",
+            cta: "รับประกันของแท้, จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
           }
         ]
       },
       {
-        id: "stationery",
-        keywords: ["สีไม้", "ปากกา", "สมุด", "เครื่องเขียน", "วาดรูป", "color pencil", "master art"],
+        id: "air_fryer",
+        keywords: ["หม้อทอด", "หม้อทอดไร้น้ำมัน", "เตาอบ", "air fryer", "หม้ออบลมร้อน"],
         angles: [
           {
-            type: "discovery",
-            headline: "สีไม้เกรดพรีเมียม ระบายลื่นไส้ไม่หัก",
-            hook: "ใครชอบวาดรูป ระบายสี หรือกำลังหาสีดีๆ ให้ลูกหลาน แนะนำรุ่นนี้เลยค่ะ!",
-            body: "{name} ไส้เนียนนุ่ม ระบายลื่น สีสดคมชัด ไส้แข็งแรงไม่หักง่าย ใช้ได้ทั้งเด็กและผู้ใหญ่ คุ้มราคามากค่ะ",
-            cta: "กดสั่งที่ตะกร้าสีส้มมุมซ้ายล่าง แล้วไปสนุกกับการวาดรูปกันนะคะ"
+            type: "benefit",
+            headline: "ทำอาหารคลีนง่ายๆ ไร้น้ำมัน",
+            hook: "สายเฮลตี้ หรือใครที่ชอบทำอาหารง่ายๆ, ต้องมีเครื่องนี้ติดครัวไว้เลยค่ะ!",
+            body: "{name} ทอดกรอบอร่อยโดยไม่ง้อน้ำมัน, ลดไขมันได้เยอะมาก, ร้อนไวสม่ำเสมอ, ล้างทำความสะอาดง่ายสุดๆ ค่ะ.",
+            cta: "อยากทำอาหารอร่อยสุขภาพดี, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
           }
         ]
       },
       {
         id: "beauty_skincare",
-        keywords: ["เซรั่ม", "ครีม", "กันแดด", "หน้าใส", "สกินแคร์", "serum", "skincare"],
+        keywords: ["เซรั่ม", "ครีม", "กันแดด", "หน้าใส", "สกินแคร์", "serum", "skincare", "ลิป"],
         angles: [
           {
             type: "pain_point",
             headline: "กู้ผิวพังให้กลับมาเนียนใส",
-            hook: "ใครมีปัญหาผิวโทรม แต่งหน้าไม่ค่อยติด มามุงทางนี้ด่วนเลยค่ะ!",
-            body: "{name} เนื้อสัมผัสบางเบา ซึมไว ไม่เหนอะหนะ ใช้ต่อเนื่องแล้วผิวดูชุ่มชื้นสุขภาพดีขึ้นชัดเจนค่ะ",
-            cta: "ของแท้แน่นอน กดจิ้มที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ"
+            hook: "ใครมีปัญหาผิวโทรม, แต่งหน้าไม่ค่อยติด, มามุงทางนี้ด่วนเลยค่ะ!",
+            body: "{name} เนื้อสัมผัสบางเบา, ซึมไว, ไม่เหนอะหนะ, ใช้ต่อเนื่องแล้วผิวดูชุ่มชื้นสุขภาพดีขึ้นชัดเจนค่ะ.",
+            cta: "ของแท้แน่นอน, กดจิ้มที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
           }
         ]
       },
@@ -1281,16 +1360,17 @@
           {
             type: "discovery",
             headline: "ใส่แล้วทรงสวย พรางหุ่นเป๊ะ",
-            hook: "ใครอยากแต่งตัวแล้วดูเพรียวสวยเป๊ะ แนะนำชิ้นนี้เลยค่ะ สวยตรงปกมาก!",
-            body: "{name} คัตติ้งเนี้ยบ เนื้อผ้าใส่สบาย ระบายอากาศดี แมตช์กับชุดไหนก็รอด สาวๆ ต้องมีติดตู้ไว้ค่ะ",
-            cta: "มีครบทุกไซซ์ จิ้มเลือกที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ"
+            hook: "ใครอยากแต่งตัวแล้วดูเพรียวสวยเป๊ะ, แนะนำชิ้นนี้เลยค่ะ สวยตรงปกมาก!",
+            body: "{name} คัตติ้งเนี้ยบ, เนื้อผ้าใส่สบาย, ระบายอากาศดี, แมตช์กับชุดไหนก็รอด, สาวๆ ต้องมีติดตู้ไว้ค่ะ.",
+            cta: "มีครบทุกไซซ์, จิ้มเลือกที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ."
           }
         ]
       }
     ];
 
     function generateSmartProductScript(title, styleType = null) {
-      const titleLower = (title || '').toLowerCase();
+      const normalizedTitle = normalizeThaiProductTitle(title);
+      const titleLower = normalizedTitle.toLowerCase();
       let matchedCat = null;
       for (const cat of JS_CATEGORY_RULES) {
         if (cat.keywords.some(k => titleLower.includes(k))) {
@@ -1299,12 +1379,7 @@
         }
       }
 
-      const cleanName = (title || 'สินค้านี้')
-        .replace(/[\(\)\[\]\{\}\/\\,.]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-      const words = cleanName.split(' ');
-      const shortName = words.length >= 4 ? words.slice(0, 4).join(' ') : cleanName;
+      const spokenName = getSpokenProductName(title);
 
       let chosen = null;
       if (!matchedCat) {
@@ -1312,16 +1387,16 @@
           {
             type: "discovery",
             headline: "ไอเทมเด็ดที่รีวิวเยอะจนต้องสั่ง",
-            hook: "เห็นคนรีวิวกันเยอะมาก จนต้องสั่งมาลองเอง แล้วคือดีจริงค่ะ!",
-            body: `${shortName} ใช้งานง่าย ดีไซน์สวยตรงปก ฟังก์ชันครบ คุ้มค่าสมราคาจริงๆ ค่ะ`,
-            cta: "ใครสนใจแปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ"
+            hook: "เห็นคนรีวิวกันเยอะมาก, จนต้องสั่งมาลองเอง แล้วคือดีจริงค่ะ!",
+            body: `${spokenName} ใช้งานง่าย, ดีไซน์สวยตรงปก, ฟังก์ชันครบ, คุ้มค่าสมราคาจริงๆ ค่ะ.`,
+            cta: "ใครสนใจแปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ."
           },
           {
             type: "benefit",
             headline: "ของดีบอกต่อ คุ้มค่าเกินราคา",
-            hook: "ใครที่กำลังเล็งตัวนี้อยู่ บอกเลยว่ากดสั่งได้เลย ไม่ผิดหวังแน่นอนค่ะ!",
-            body: `${shortName} ตอบโจทย์การใช้งานจริง คุณภาพดีเกินราคา ได้ของแท้แน่นอนค่ะ`,
-            cta: "จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ ส่งไวมากค่ะ"
+            hook: "ใครที่กำลังเล็งตัวนี้อยู่, บอกเลยว่ากดสั่งได้เลย ไม่ผิดหวังแน่นอนค่ะ!",
+            body: `${spokenName} ตอบโจทย์การใช้งานจริง, คุณภาพดีเกินราคา, ได้ของแท้แน่นอนค่ะ.`,
+            cta: "จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ, ส่งไวมากค่ะ."
           }
         ];
         chosen = (!styleType || styleType === 'discovery') ? fallbacks[0] : fallbacks[1];
@@ -1335,7 +1410,7 @@
       }
 
       const hook = chosen.hook;
-      const body = chosen.body.replace('{name}', shortName);
+      const body = chosen.body.replace('{name}', spokenName);
       const cta = chosen.cta;
       const fullScript = `${hook} ${body} ${cta}`;
 
@@ -1388,7 +1463,7 @@
     
 
     function applyImportedProduct(data) {
-      const title = data.title || 'สินค้าจาก Shopee';
+      const title = normalizeThaiProductTitle(data.title || 'สินค้าจาก Shopee');
       const price = parseFloat(data.price) || 96.0;
       const priceStr = data.price_str || ('฿' + Number(price).toFixed(2));
       const shopeeUrl = data.shopee_url || '#';
@@ -2155,21 +2230,22 @@
       if (!currentProduct) return;
       const el = document.getElementById('input-product-name');
       if (!el) return;
-      const newTitle = el.value.trim();
-      if (!newTitle) return;
-      currentProduct.title = newTitle;
+      const rawTitle = el.value.trim();
+      if (!rawTitle) return;
+      const normTitle = normalizeThaiProductTitle(rawTitle);
+      currentProduct.title = normTitle;
       const ovHead = document.getElementById('overlay-headline-text');
-      if (ovHead) ovHead.innerText = newTitle;
+      if (ovHead) ovHead.innerText = normTitle;
       const s3 = document.getElementById('step3-product-name');
-      if (s3) s3.innerText = newTitle;
+      if (s3) s3.innerText = normTitle;
       const s2 = document.getElementById('step2-product-name');
-      if (s2) s2.innerText = newTitle;
+      if (s2) s2.innerText = normTitle;
 
-      // Match video by keyword in typed title
-      const tLow = newTitle.toLowerCase();
-      if (tLow.includes('sanmax') || tLow.includes('i14') || tLow.includes('หูฟัง') || tLow.includes('earbud')) {
+      // Match video by keyword in typed title (Carefully separate cat litter from water fountain)
+      const tLow = normTitle.toLowerCase();
+      if (tLow.includes('sanmax') || tLow.includes('i14')) {
         currentProduct.video_url = '/videos/sanmax_earphones_i14b.mp4';
-      } else if (tLow.includes('เคตเทิลเบล') || tLow.includes('kettlebell') || tLow.includes('ดัมเบล') || tLow.includes('ออกกำลังกาย')) {
+      } else if (tLow.includes('เคตเทิลเบล') || tLow.includes('kettlebell') || tLow.includes('ดัมเบล')) {
         currentProduct.video_url = '/videos/kettlebell_soft_pvc.mp4';
       } else if (tLow.includes('แปรงสีฟัน') || tLow.includes('toothbrush') || tLow.includes('sonic')) {
         currentProduct.video_url = '/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s';
@@ -2177,7 +2253,7 @@
         currentProduct.video_url = '/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s';
       } else if (tLow.includes('หูฟัง') || tLow.includes('earbud') || tLow.includes('baseus')) {
         currentProduct.video_url = '/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s';
-      } else if (tLow.includes('น้ำพุ') || tLow.includes('แมว') || tLow.includes('cat')) {
+      } else if (tLow.includes('น้ำพุ') || tLow.includes('drinking fountain')) {
         currentProduct.video_url = '/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s';
       } else if (tLow.includes('หม้อทอด') || tLow.includes('fryer')) {
         currentProduct.video_url = '/videos/air_fryer_visual.mp4?v=v4_perfect_brand_20s';
@@ -2196,31 +2272,23 @@
         player.load();
       }
 
-      // Update script dynamically to match new product name
-      const hookText = `ใครที่กำลังมองหา ${newTitle.substring(0, 32)} แนะนำตัวนี้เลยค่ะ.`;
-      const bodyText = `ตัวนี้ใช้งานดีมาก คุณภาพคุ้มค่าเกินราคา ตอบโจทย์ทุกการใช้งานจริงค่ะ.`;
-      const ctaText = `สนใจกดสั่งที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.`;
-      const fullText = `${hookText} ${bodyText} ${ctaText}`;
-
-      if (currentProduct.script) {
-        currentProduct.script.hook = hookText;
-        currentProduct.script.body = bodyText;
-        currentProduct.script.cta = ctaText;
-        currentProduct.script.full_script = fullText;
-      }
+      // Generate intelligent, category-specific script (Never repetitive!)
+      const smartScript = generateSmartProductScript(normTitle);
+      currentProduct.script = smartScript;
       const txtArea = document.getElementById('textarea-script');
-      if (txtArea) txtArea.value = fullText;
+      if (txtArea) txtArea.value = smartScript.full_script;
       updateScriptCharCount();
 
-      // Update caption
-      currentProduct.caption = `ใครมองหาตัวนี้บอกเลยว่าห้ามพลาด! ${newTitle.substring(0, 35)}... ใช้ดี คุณภาพดีมาก คุ้มราคา พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨`;
+      // Update caption with clean spoken title
+      const spoken = getSpokenProductName(normTitle);
+      currentProduct.caption = `ใครที่กำลังมองหาตัวนี้บอกเลยต้องมี! ${spoken} คุณภาพดี คุ้มราคามาก พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨`;
       const capEl = document.getElementById('display-caption-text');
       if (capEl) capEl.innerText = currentProduct.caption;
 
       const s2Name = document.getElementById('step2-product-name');
-      if (s2Name) s2Name.innerText = newTitle;
+      if (s2Name) s2Name.innerText = normTitle;
       const s3Name = document.getElementById('step3-product-name');
-      if (s3Name) s3Name.innerText = newTitle;
+      if (s3Name) s3Name.innerText = normTitle;
     }
 
     function handleProductPriceChange() {
@@ -2297,7 +2365,7 @@
       if (mask) {
         mask.style.opacity = enabled ? '1' : '0';
       }
-      showToast(enabled ? 'เปิดโหมดครอปหลบซับเดิม (Smart Crop 1.18x)' : 'ปิดโหมดครอป (แสดงสัดส่วนปกติ)');
+      showToast(enabled ? 'เปิดโหมดครอปหลบซับเดิม (Smart Crop 1.30x)' : 'ปิดโหมดครอป (แสดงสัดส่วนปกติ)');
     }
 
     // Real-Time Subtitle & Audio Synchronization on Video Play (Safe Zone max 14-16 chars/line)
@@ -2308,12 +2376,11 @@
         .replace(/\s+/g, ' ')
         .trim();
 
-      // If 14 chars or less, fits cleanly on 1 line within safe zone
-      if (clean.length <= 14) {
+      if (clean.length <= 15) {
         return clean;
       }
 
-      // Natural Thai clause split points for balance
+      // Natural Thai clause split points for strict 2-line safe zone balance
       const splitKeywords = [
         ' แนะนำ', ' ตัวนี้', ' วัสดุดี', ' บอกเลย', ' ไม่ผิดหวัง',
         ' มุมซ้ายล่าง', ' คุณภาพดี', ' คุ้มราคา', ' พิกัด', ' ในตะกร้า',
@@ -2324,7 +2391,7 @@
           const idx = clean.indexOf(kw);
           const p1 = clean.substring(0, idx).trim();
           const p2 = clean.substring(idx).trim();
-          if (p1.length >= 4 && p2.length >= 4) {
+          if (p1.length >= 4 && p2.length >= 4 && p1.length <= 18 && p2.length <= 18) {
             return `${p1}<br>${p2}`;
           }
         }
@@ -2339,16 +2406,14 @@
         return `${parts.slice(0, mid).join(' ')}<br>${parts.slice(mid).join(' ')}`;
       }
 
-      if (clean.length > 15) {
-        return `${clean.substring(0, 14)}<br>${clean.substring(14)}`;
-      }
-
-      return clean;
+      return `${clean.substring(0, 14)}<br>${clean.substring(14, 28)}`;
     }
 
     function buildTimedSubtitleCues(text) {
       const clean = (text || '').trim();
-      // 1. Natural Tumbler Script (Safe Zone: 2 compact balanced lines)
+      if (!clean) return [{ start: 0.0, end: 20.0, html: 'แนะนำตัวนี้เลยค่ะ' }];
+
+      // 1. Tumbler Script (Curated strict 2-line cues)
       if (clean.includes('แก้ว') || clean.includes('พกแก้วน้ำ') || clean.includes('ฟานไลฟ์') || clean.includes('เซรามิก')) {
         return [
           { start: 0.0, end: 4.4, html: 'ใครชอบพกแก้วน้ำไปทำงาน<br>แนะนำใบนี้เลยค่ะ' },
@@ -2358,36 +2423,99 @@
         ];
       }
 
-      // 2. High-Converting Universal Script (Strictly stays inside Safe Zone)
-      if (clean.includes('กำลังมองหา') && (clean.includes('ใช้งานดีมาก') || clean.includes('รีวิวดีมาก') || clean.includes('ตะกร้า'))) {
+      // 2. Cat Litter Script (Curated strict 2-line cues)
+      if (clean.includes('ทรายเต้าหู้') || clean.includes('ทรายแมว') || clean.includes('กระบะทราย')) {
         return [
-          { start: 0.0, end: 3.2, html: 'ใครที่กำลังมองหา<br>แนะนำตัวนี้เลยค่ะ' },
-          { start: 3.2, end: 7.4, html: 'ตัวนี้ใช้งานดีมาก<br>วัสดุดีคุ้มราคา' },
-          { start: 7.4, end: 11.2, html: 'ใครที่กำลังเล็งอยู่<br>บอกเลยไม่ผิดหวังค่ะ' },
-          { start: 11.2, end: 20.0, html: 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
+          { start: 0.0, end: 4.0, html: 'ทาสแมวคนไหน<br>ปวดหัวกับกลิ่นกระบะทรายบ้างคะ' },
+          { start: 4.0, end: 8.0, html: 'พอเปลี่ยนมาใช้<br>ทรายแมวเต้าหู้ออร์แกนิคตัวนี้' },
+          { start: 8.0, end: 12.0, html: 'จับตัวเป็นก้อนไวมาก<br>เก็บกลิ่นมิดชิด ไร้ฝุ่นกวนใจ' },
+          { start: 12.0, end: 16.0, html: 'ตักทิ้งง่ายมาก<br>สะอาดปลอดภัยต่อน้องแมว' },
+          { start: 16.0, end: 20.0, html: 'อยากให้บ้านหอมสะอาด<br>จิ้มสั่งที่ตะกร้าส้มซ้ายล่างได้เลยค่ะ' }
         ];
       }
 
-      // 3. Generic / Custom Script Timing across 16.0s Speech Window
-      const rawSentences = clean
-        .split(/[,.!?;]|\r?\n/)
+      // 3. Tripod / Selfie Script (Curated strict 2-line cues)
+      if (clean.includes('ไม้เซลฟี่') || clean.includes('ขาตั้งกล้อง') || clean.includes('X-it') || clean.includes('1.3 เมตร')) {
+        return [
+          { start: 0.0, end: 4.0, html: 'สายเที่ยว สายคอนเทนต์คนไหน<br>ไม่อยากง้อใครให้ถ่ายรูปให้' },
+          { start: 4.0, end: 8.0, html: 'ตัวนี้คือจบเลยค่ะ<br>ขาตั้งกล้องและไม้เซลฟี่ 1.3 เมตร' },
+          { start: 8.0, end: 12.0, html: 'กางตั้งได้มั่นคงมาก<br>มีรีโมทบลูทูธกดถ่ายเองสบาย' },
+          { start: 12.0, end: 16.0, html: 'พกพาสะดวก น้ำหนักเบา<br>ฟังก์ชันครบ คุ้มราคามากค่ะ' },
+          { start: 16.0, end: 20.0, html: 'สนใจกดสั่งซื้อที่ตะกร้าส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
+        ];
+      }
+
+      // 4. Cat Fountain Script (Curated strict 2-line cues)
+      if (clean.includes('กินน้ำน้อย') || clean.includes('เล่นน้ำจนเลอะเทอะ') || clean.includes('น้ำพุแมว')) {
+        return [
+          { start: 0.0, end: 4.0, html: 'ทาสแมวคนไหนเจอปัญหา<br>น้องกินน้ำน้อยบ้างคะ' },
+          { start: 4.0, end: 8.0, html: 'พอเปลี่ยนมาใช้<br>น้ำพุแมวไร้สายตัวนี้' },
+          { start: 8.0, end: 12.0, html: 'น้องชอบมาก วิ่งมากินทั้งวัน<br>ไร้สาย ไร้กังวลเรื่องไต' },
+          { start: 12.0, end: 16.0, html: 'สแตนเลสแท้ ล้างง่าย<br>เพื่อสุขภาพน้องแมว' },
+          { start: 16.0, end: 20.0, html: 'จิ้มสั่งที่ตะกร้าสีส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
+        ];
+      }
+
+      // 5. Universal Smart 2-line Chunker for Any Script (Strict max 2 lines, never stacks)
+      let clauses = clean
+        .split(/[,.!?;:\r?\n]+/)
         .map(s => s.trim())
         .filter(s => s.length > 0);
 
-      if (rawSentences.length === 0) {
+      if (clauses.length === 0) {
         return [{ start: 0.0, end: 20.0, html: 'แนะนำตัวนี้เลยค่ะ' }];
       }
 
-      const totalSpeechTime = 16.0;
-      const timePerSentence = totalSpeechTime / rawSentences.length;
+      let finalChunks = [];
+      for (const c of clauses) {
+        if (c.length <= 26) {
+          finalChunks.push(c);
+        } else {
+          const words = c.split(' ');
+          if (words.length >= 2) {
+            const mid = Math.ceil(words.length / 2);
+            finalChunks.push(words.slice(0, mid).join(' '));
+            finalChunks.push(words.slice(mid).join(' '));
+          } else {
+            finalChunks.push(c.substring(0, 18));
+            finalChunks.push(c.substring(18));
+          }
+        }
+      }
 
-      return rawSentences.map((sent, idx) => {
-        const start = idx * timePerSentence;
-        const end = (idx === rawSentences.length - 1) ? 20.0 : (idx + 1) * timePerSentence;
+      while (finalChunks.length > 6) {
+        let minIdx = 0;
+        for (let i = 0; i < finalChunks.length - 1; i++) {
+          if (finalChunks[i].length < finalChunks[minIdx].length) {
+            minIdx = i;
+          }
+        }
+        const merged = finalChunks[minIdx] + ' ' + finalChunks[minIdx + 1];
+        finalChunks.splice(minIdx, 2, merged);
+      }
+
+      const dur = 20.0 / finalChunks.length;
+      return finalChunks.map((ch, idx) => {
+        const st = Number((idx * dur).toFixed(1));
+        const en = (idx === finalChunks.length - 1) ? 20.0 : Number(((idx + 1) * dur).toFixed(1));
+
+        let lineHtml = ch;
+        const words = ch.split(' ');
+        if (ch.length <= 15) {
+          lineHtml = ch;
+        } else if (words.length === 2) {
+          lineHtml = `${words[0]}<br>${words[1]}`;
+        } else if (words.length > 2) {
+          const mid = Math.ceil(words.length / 2);
+          lineHtml = `${words.slice(0, mid).join(' ')}<br>${words.slice(mid).join(' ')}`;
+        } else {
+          lineHtml = `${ch.substring(0, 14)}<br>${ch.substring(14, 28)}`;
+        }
+
         return {
-          start: start,
-          end: end,
-          html: formatViralSubtitle(sent)
+          start: st,
+          end: en,
+          html: lineHtml
         };
       });
     }

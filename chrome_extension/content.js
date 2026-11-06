@@ -188,6 +188,32 @@
     return { price: 118.0, max_price: 118.0, price_str: '฿118.00', is_range: false };
   }
 
+  function normalizeThaiProductTitle(rawTitle) {
+    if (!rawTitle) return '';
+    let str = rawTitle
+      .replace(/^\[(Mall|ช้อปปี้|พร้อมส่ง|ของแท้|แท้ 100%)\]\s*/gi, '')
+      .replace(/\s*\[อัตโนมัติ.*?\]/gi, '')
+      .replace(/\s*\(รับประกัน.*?\)/gi, '')
+      .replace(/\s*\(พร้อมส่ง.*?\)/gi, '')
+      .replace(/\s*【.*?】/g, '')
+      .replace(/\s*\[.*?\]/g, '')
+      .trim();
+
+    // Convert unit abbreviations to clear spoken Thai words
+    str = str.replace(/(\d+(?:\.\d+)?)\s*(?:m|เมตร|ม\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 เมตร');
+    str = str.replace(/(\d+(?:\.\d+)?)\s*(?:ml|มล|มล\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 มิลลิลิตร');
+    str = str.replace(/(\d+(?:\.\d+)?)\s*(?:w|วัตต์)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 วัตต์');
+    str = str.replace(/(\d+(?:\.\d+)?)\s*(?:kg|กก|กก\.|กิโล|กิโลกรัม)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 กิโลกรัม');
+    str = str.replace(/(\d+(?:\.\d+)?)\s*(?:l|ลิตร)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 ลิตร');
+
+    str = str.replace(/[\/\|]/g, ' ')
+             .replace(/\s+/g, ' ')
+             .replace(/[.,;]$/, '')
+             .trim();
+
+    return str;
+  }
+
   function extractProductData() {
     // Title Extraction
     let title = '';
@@ -249,7 +275,7 @@
     }
 
     return {
-      title: title,
+      title: normalizeThaiProductTitle(title),
       price: priceData.price,
       max_price: priceData.max_price,
       price_str: priceData.price_str,
@@ -297,39 +323,37 @@
           <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
           <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path>
         </svg>
-        <span>กำลังดึงข้อมูลจริง...</span>
+        <span>กำลังเปิดสตูดิโอ...</span>
       `;
 
-      // Trigger video play if on page to ensure video URL loads
-      const videoThumb = document.querySelector('[class*="video"], [class*="play"]');
-      if (videoThumb) {
-        try { videoThumb.click(); } catch(e) {}
+      // Extract immediately without delay
+      const data = extractProductData();
+      console.log('📦 Extracted Product Data for 9:16 Video:', data);
+
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ last_extracted_product: data });
+      }
+
+      let payload = '';
+      try {
+        payload = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+      } catch (e) {
+        payload = encodeURIComponent(JSON.stringify(data));
+      }
+      const targetUrl = `${FACTORY_URL}/#import=${payload}`;
+
+      // Open tab via background service worker (100% reliable, never blocked by popup blocker)
+      if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({ action: 'open_tab', url: targetUrl }, (res) => {
+          if (chrome.runtime.lastError || !res) {
+            window.open(targetUrl, '_blank');
+          }
+        });
+      } else {
+        window.open(targetUrl, '_blank');
       }
 
       setTimeout(() => {
-        const data = extractProductData();
-        console.log('📦 Extracted Product Data for 9:16 Video:', data);
-
-        // Store in Chrome storage for popup / factory sync safely
-        if (chrome && chrome.storage && chrome.storage.local) {
-          chrome.storage.local.set({ last_extracted_product: data }, () => {
-            if (chrome.runtime && chrome.runtime.lastError) {
-              // ignore
-            }
-          });
-        }
-
-        // Open Shopee Video Factory with payload
-        let payload = '';
-        try {
-          payload = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-        } catch (e) {
-          payload = encodeURIComponent(JSON.stringify(data));
-        }
-        const targetUrl = `${FACTORY_URL}/#import=${payload}`;
-        
-        window.open(targetUrl, '_blank');
-
         trigger.classList.remove('svf-loading');
         trigger.innerHTML = `
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -344,8 +368,8 @@
             </svg>
             <span>ผลิตวิดีโอ 9:16 (1-Click)</span>
           `;
-        }, 3000);
-      }, 500);
+        }, 2500);
+      }, 350);
     });
   }
 

@@ -1,3 +1,30 @@
+function normalizeThaiProductTitle(rawTitle) {
+  if (!rawTitle) return '';
+  let str = String(rawTitle)
+    .replace(/^\[(Mall|ช้อปปี้|พร้อมส่ง|ของแท้|แท้ 100%)\]\s*/gi, '')
+    .replace(/\s*\[(Mall|ช้อปปี้|พร้อมส่ง|ของแท้|แท้ 100%|อัตโนมัติ.*?)\]/gi, '')
+    .replace(/\s*\(รับประกัน.*?\)/gi, '')
+    .replace(/\s*\(พร้อมส่ง.*?\)/gi, '')
+    .replace(/\s*\(ของแท้.*?\)/gi, '')
+    .replace(/\s*【.*?】/g, '')
+    .replace(/\s*\[.*?\]/g, '')
+    .trim();
+
+  // Convert unit abbreviations to clear spoken Thai words without breaking decimals
+  str = str.replace(/(\d+(?:\.\d+)?)\s*(?:m|เมตร|ม\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 เมตร');
+  str = str.replace(/(\d+(?:\.\d+)?)\s*(?:ml|มล|มล\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 มิลลิลิตร');
+  str = str.replace(/(\d+(?:\.\d+)?)\s*(?:w|วัตต์)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 วัตต์');
+  str = str.replace(/(\d+(?:\.\d+)?)\s*(?:kg|กก|กก\.|กิโล|กิโลกรัม)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 กิโลกรัม');
+  str = str.replace(/(\d+(?:\.\d+)?)\s*(?:l|ลิตร)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 ลิตร');
+
+  str = str.replace(/[\/\|]/g, ' ')
+           .replace(/\s+/g, ' ')
+           .replace(/[.,;]$/, '')
+           .trim();
+
+  return str;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const nameEl = document.getElementById('product-name');
   const priceEl = document.getElementById('product-price');
@@ -88,6 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function displayData(data) {
     if (!data) return;
+    if (data.title) data.title = normalizeThaiProductTitle(data.title);
     if (nameEl) nameEl.innerText = data.title || 'ตรวจพบสินค้า';
     
     // Accurate Price & Price Range Display (e.g. ฿39 - ฿180 or ฿96.00)

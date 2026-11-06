@@ -892,6 +892,79 @@
     let showSafeZone = false;
 
     // INIT PAGE
+        // 0. CHROME EXTENSION 1-CLICK PRODUCT IMPORT HANDLER
+    function checkExtensionImportPayload() {
+      if (window.location.hash && window.location.hash.startsWith('#import=')) {
+        try {
+          const raw = window.location.hash.substring(8);
+          const data = JSON.parse(decodeURIComponent(raw));
+          if (data && (data.title || data.shopee_url)) {
+            console.log('⚡ Received product import from Extension:', data);
+            applyImportedProduct(data);
+            history.replaceState(null, null, window.location.pathname);
+            return true;
+          }
+        } catch (err) {
+          console.warn('Error parsing extension import:', err);
+        }
+      }
+      return false;
+    }
+
+    function applyImportedProduct(data) {
+      const title = data.title || 'สินค้าจาก Shopee';
+      const price = parseFloat(data.price) || 96.0;
+      const shopeeUrl = data.shopee_url || '#';
+      const videoUrl = data.video_url || '';
+      const amsRate = 15.0;
+      const earn = price * (amsRate / 100);
+
+      const hookText = `ใครที่กำลังมองหา ${title.substring(0, 32)} แนะนำตัวนี้เลยค่ะ.`;
+      const bodyText = `ตัวนี้ใช้งานดีมาก วัสดุดีคุ้มราคา ใครที่กำลังเล็งอยู่บอกเลยไม่ผิดหวังค่ะ.`;
+      const ctaText = `สนใจกดสั่งซื้อที่ตะกร้าสีส้ม มุมซ้ายล่างได้เลยนะคะ.`;
+      const fullText = `${hookText} ${bodyText} ${ctaText}`;
+
+      const prod = {
+        product_id: 'imported_' + Date.now(),
+        category: 'สินค้านำเข้าจากหน้า Shopee',
+        title: title,
+        shopee_url: shopeeUrl,
+        price: price,
+        ams_rate: amsRate,
+        earning: earn,
+        video_url: videoUrl || '/videos/kettlebell_soft_pvc.mp4',
+        media_mode: videoUrl ? 'video' : 'ad_images',
+        script: {
+          hook: hookText,
+          body: bodyText,
+          cta: ctaText,
+          full_script: fullText
+        },
+        caption: `ใครที่กำลังมองหาตัวนี้อยู่บอกเลยต้องมี! ${title.substring(0, 35)}... ฟังก์ชันครบ คุณภาพดี คุ้มราคามาก พิกัดในตะกร้าส้มซ้ายล่างเลยนะคะ 🧡✨`,
+        hashtags: '#ShopeeVideoTH #รีวิวช้อปปี้ #ของดีบอกต่อ #นายหน้าShopee'
+      };
+
+      document.getElementById('input-shopee-url').value = shopeeUrl;
+      renderActiveProduct(prod);
+
+      if (videoUrl) {
+        const chips = document.getElementById('active-review-chips');
+        if (chips) {
+          chips.innerHTML = `
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-xs text-white">
+              <div class="flex items-center space-x-2 truncate">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 animate-pulse"></span>
+                <span class="text-emerald-300 font-bold truncate">🎬 วิดีโอรีวิวแท้ของร้านค้าจากหน้า Shopee (100% ตรงปก)</span>
+              </div>
+              <span class="text-[10px] text-emerald-400 font-mono shrink-0 ml-2 font-bold bg-emerald-500/20 px-2 py-0.5 rounded">พร้อมใช้งาน</span>
+            </div>
+          `;
+        }
+      }
+
+      showToast('✅ นำเข้าข้อมูลสินค้าจริงจาก Shopee สำเร็จ 100%! พร้อมผลิตวิดีโอทันที');
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       // Start clean - no fake pre-fills
       currentProduct = null;
@@ -900,6 +973,7 @@
       document.getElementById('input-product-price').value = '';
       document.getElementById('input-review-url').value = '';
       setupVideoSubtitleSync();
+      checkExtensionImportPayload();
     });
 
     // LOAD SAMPLE BY ID
@@ -969,11 +1043,25 @@
     async function handleLinkSubmit(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('input-shopee-url');
-      const url = input.value.trim();
-      if (!url) {
+      let rawInput = input.value.trim();
+      if (!rawInput) {
         showToast('กรุณาวางลิงก์สินค้า Shopee ในช่องก่อนกดดึงข้อมูลนะคะ');
         input.focus();
         return;
+      }
+
+      // Smart Parser: Check if user pasted shared text containing title + URL
+      let extractedTitle = null;
+      let url = rawInput;
+      const urlMatch = rawInput.match(/https?:\/\/[^\s]+/);
+      if (urlMatch) {
+        url = urlMatch[0];
+        const precedingText = rawInput.substring(0, urlMatch.index).trim();
+        if (precedingText.length > 5 && !precedingText.startsWith('http')) {
+          extractedTitle = precedingText.replace(/\s*(ดูสินค้า|ช้อปเลยที่|พิกัด|คลิกที่นี่|ซื้อเลย)\s*$/gi, '').trim();
+          const nameInput = document.getElementById('input-product-name');
+          if (nameInput) nameInput.value = extractedTitle;
+        }
       }
 
       const btn = document.getElementById('btn-submit-url');

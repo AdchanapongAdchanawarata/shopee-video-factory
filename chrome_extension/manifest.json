@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Shopee 1-Click Video Maker | ผลิตวิดีโอ 9:16 ด้วย AI",
+  "version": "1.0.0",
+  "description": "ดึงชื่อสินค้า ราคา และคลิปวิดีโอรีวิวแท้จากหน้า Shopee ส่งเข้าสู่ระบบผลิตวิดีโอ 9:16 ด้วย AI ได้ใน 1 คลิก 100%",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.shopee.co.th/*",
+    "*://shopee-video-factory.vercel.app/*",
+    "http://localhost:8000/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://shopee.co.th/*",
+        "*://*.shopee.co.th/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

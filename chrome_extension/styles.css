@@ -1,0 +1,82 @@
+/* Shopee 1-Click Video Maker - Floating Button Styles */
+
+#shopee-video-factory-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 9999999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.svf-floating-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.svf-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(18, 18, 20, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(238, 77, 45, 0.4);
+  border-radius: 20px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.svf-dot {
+  width: 7px;
+  height: 7px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: svf-pulse 1.8s infinite;
+}
+
+.svf-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #EE4D2D 0%, #FF6433 100%);
+  color: #ffffff !important;
+  font-size: 13px;
+  font-weight: 800;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(238, 77, 45, 0.45);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  outline: none;
+}
+
+.svf-action-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(238, 77, 45, 0.6);
+  background: linear-gradient(135deg, #f05435 0%, #ff7547 100%);
+}
+
+.svf-action-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.svf-spin {
+  animation: svf-spin 1s linear infinite;
+}
+
+@keyframes svf-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes svf-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.2); }
+}

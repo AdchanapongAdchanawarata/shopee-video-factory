@@ -43,7 +43,7 @@
       font-family: 'Kanit', sans-serif;
       font-weight: 800;
       font-size: 1.15rem;
-      line-height: 1.2;
+      line-height: 1.25;
       color: #ff5400;
       paint-order: stroke fill;
       -webkit-text-stroke: 3.2px #ffffff;
@@ -62,8 +62,11 @@
       text-align: center;
       display: inline-block;
       user-select: none;
-      max-width: 85%;
-      word-break: break-word;
+      max-width: 94%;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      line-break: strict;
+      white-space: pre-line;
       transition: transform 0.12s ease-out;
     }
     .subtle-card:hover {
@@ -572,6 +575,21 @@
                 loop
               ></video>
 
+              <!-- DEDICATED MALI AI VOICE AUDIO (SYNCHRONIZED REAL-TIME) -->
+              <audio id="player-mali-audio" preload="auto"></audio>
+
+              <!-- MALI AUDIO STATUS PILL -->
+              <button
+                type="button"
+                id="btn-mali-audio-sync"
+                onclick="toggleMaliAudioSync()"
+                class="absolute top-3 left-3 z-30 flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-black/80 hover:bg-black text-amber-300 font-bold text-[11px] border border-amber-400/40 shadow-xl backdrop-blur-md cursor-pointer transition transform active:scale-95"
+                title="คลิกเพื่อเปิด/ปิดเสียงพากย์มาลี"
+              >
+                <i class="ph-fill ph-speaker-high text-xs text-amber-400" id="icon-mali-sync"></i>
+                <span id="text-mali-sync">เสียงมาลี AI: กำลังเล่น</span>
+              </button>
+
               <!-- TOP HEADLINE BRANDING OVERLAY (HIDDEN FOR CLEAN VIRAL ORIGINAL LOOK) -->
               <div id="overlay-headline" class="hidden"></div>
 
@@ -982,6 +1000,18 @@
       document.getElementById('input-shopee-url').value = shopeeUrl;
       renderActiveProduct(prod);
 
+      // Synthesize genuine ElevenLabs Mali voice for this imported product in background
+      fetchMaliVoiceAudio(fullText).then(b64 => {
+        if (b64) {
+          const maliAudio = document.getElementById('player-mali-audio');
+          if (maliAudio) {
+            maliAudio.src = b64;
+            maliAudio.load();
+            console.log('✅ Real ElevenLabs Mali voice ready for imported product');
+          }
+        }
+      });
+
       if (videoUrl) {
         const chips = document.getElementById('active-review-chips');
         if (chips) {
@@ -1332,11 +1362,27 @@
         if (adDesc) adDesc.innerText = 'วิดีโอหลักจากแกลเลอรีร้าน (1080x1920 HD)';
       }
 
-      // Video Player
+      // Video Player & Synchronized Mali Voiceover
       const player = document.getElementById('player-preview');
       player.src = prod.video_url;
       player.load();
       player.play().catch(() => {});
+
+      // Load genuine ElevenLabs Mali Audio for this product
+      const maliAudio = document.getElementById('player-mali-audio');
+      if (maliAudio) {
+        let audioSrc = prod.audio_url || '';
+        if (!audioSrc) {
+          if (prod.product_id === 'fanlife_tumbler_710ml') {
+            audioSrc = '/audio/voiceover_fanlife_tumbler_710ml.mp3';
+          } else {
+            audioSrc = '/audio/voiceover_default_imported.mp3';
+          }
+        }
+        maliAudio.src = audioSrc;
+        maliAudio.load();
+        maliAudio.currentTime = 0;
+      }
 
       // Video Spec
       const specTitle = document.getElementById('video-spec-title');
@@ -1359,6 +1405,7 @@
       if (currentProduct.script) {
         currentProduct.script.full_script = text;
       }
+      currentProduct._cachedCues = null;
       updateScriptCharCount();
     }
 
@@ -1368,6 +1415,7 @@
       if (base && base.script) {
         document.getElementById('textarea-script').value = base.script.full_script;
         currentProduct.script = { ...base.script };
+        currentProduct._cachedCues = null;
         showToast('รีเซ็ตบทพูดเดิมเรียบร้อย');
       }
     }
@@ -1592,12 +1640,28 @@
 
       // Sync step data
       if (currentProduct) {
+        currentProduct._cachedCues = null;
         const s2Name = document.getElementById('step2-product-name');
         if (s2Name) s2Name.innerText = currentProduct.title;
         const s2Price = document.getElementById('step2-product-price');
         if (s2Price) s2Price.innerText = '฿' + Number(currentProduct.price).toFixed(2);
         const s3Name = document.getElementById('step3-product-name');
         if (s3Name) s3Name.innerText = currentProduct.title;
+
+        // Auto-play synced Mali Voice when entering Step 3
+        if (step === 3) {
+          const player = document.getElementById('player-preview');
+          const maliAudio = document.getElementById('player-mali-audio');
+          if (player) {
+            player.volume = 0.15;
+            player.currentTime = 0;
+            player.play().catch(() => {});
+          }
+          if (maliAudio && !isMaliMuted) {
+            maliAudio.currentTime = 0;
+            maliAudio.play().catch(e => console.log('Mali audio auto-play:', e));
+          }
+        }
       }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1736,6 +1800,80 @@
     let activeMaliAudio = null;
 
     // Real-Time Subtitle & Audio Synchronization on Video Play
+    function formatViralSubtitle(phrase, maxLineLen = 20) {
+      if (!phrase) return '';
+      let clean = phrase
+        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '')
+        .replace(/[.,!?;:✨🛒🔥🧡]/g, ' ')
+        .trim();
+
+      // If 20 chars or less, it fits comfortably on ONE line! NEVER break inside short phrases like 'ตัวนี้ใช้งานดีมาก'
+      if (clean.length <= maxLineLen) {
+        return clean;
+      }
+
+      // Tokenize using native Thai word segmenter
+      let rawWords = [];
+      try {
+        const seg = new Intl.Segmenter('th', { granularity: 'word' });
+        rawWords = Array.from(seg.segment(clean))
+          .map(s => s.segment)
+          .filter(s => s.trim().length > 0);
+      } catch (e) {
+        rawWords = clean.split(/\s+/).filter(Boolean);
+      }
+
+      if (rawWords.length <= 1) {
+        return clean;
+      }
+
+      // Merge isolated tone marks and lone consonants before splitting
+      let words = [];
+      for (let i = 0; i < rawWords.length; i++) {
+        const w = rawWords[i];
+        if (/^[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/.test(w)) {
+          if (words.length > 0) {
+            words[words.length - 1] += w;
+          } else if (i < rawWords.length - 1) {
+            rawWords[i + 1] = w + rawWords[i + 1];
+          } else {
+            words.push(w);
+          }
+        } else if (w.length === 1 && i < rawWords.length - 1 && /^[ก-ฮ]$/.test(w)) {
+          rawWords[i + 1] = w + rawWords[i + 1];
+        } else {
+          words.push(w);
+        }
+      }
+
+      if (words.length <= 1) {
+        return clean;
+      }
+
+      // Find word boundary closest to middle
+      const targetHalf = clean.length / 2;
+      let running = 0;
+      let bestIdx = 1;
+      let minDiff = 999;
+
+      for (let i = 0; i < words.length - 1; i++) {
+        running += words[i].length;
+        const diff = Math.abs(running - targetHalf);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestIdx = i + 1;
+        }
+      }
+
+      const line1 = words.slice(0, bestIdx).join('').trim();
+      const line2 = words.slice(bestIdx).join('').trim();
+
+      if (line1 && line2) {
+        return line1 + '<br>' + line2;
+      }
+      return clean;
+    }
+
     function generateSubtitleCues(script) {
       if (!script) return [];
       const parts = [
@@ -1743,45 +1881,79 @@
         script.body || '',
         script.cta || ''
       ];
-      const rawText = parts.filter(Boolean).join(' ');
-      if (!rawText.trim()) return [];
+      const rawText = (script.full_script || parts.filter(Boolean).join('. ')).trim();
+      if (!rawText) return [];
 
-      const clean = rawText
+      // Split into natural spoken clauses by punctuation and spaces
+      const rawParts = rawText
         .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '')
-        .replace(/[.,!?;:✨🛒🔥🧡]/g, ' ')
-        .trim();
+        .split(/[,.!?;]|\r?\n|\s+/)
+        .map(c => c.trim())
+        .filter(c => c.length > 0);
 
-      const words = clean.split(/\s+/).filter(Boolean);
       const phrases = [];
-      let temp = [];
-
-      for (const w of words) {
-        temp.push(w);
-        const joinedLen = temp.join('').length;
-        if (temp.length >= 3 || joinedLen >= 12) {
-          phrases.push(temp.join(' '));
-          temp = [];
-        }
-      }
-      if (temp.length > 0) {
-        if (phrases.length > 0 && temp.join('').length < 6) {
-          phrases[phrases.length - 1] += ' ' + temp.join(' ');
-        } else {
-          phrases.push(temp.join(' '));
-        }
-      }
-
-      return phrases.map(p => {
-        if (p.length > 10) {
-          const mid = Math.floor(p.length / 2);
-          const spaceIdx = p.indexOf(' ', mid - 3);
-          if (spaceIdx > 0 && spaceIdx < mid + 6) {
-            return p.substring(0, spaceIdx) + '<br>' + p.substring(spaceIdx + 1);
+      for (const part of rawParts) {
+        if (part.length > 20) {
+          let words = [];
+          try {
+            const seg = new Intl.Segmenter('th', { granularity: 'word' });
+            words = Array.from(seg.segment(part))
+              .map(s => s.segment)
+              .filter(s => s.trim().length > 0);
+          } catch (e) {
+            words = part.split(/\s+/).filter(Boolean);
           }
-          return p.substring(0, mid) + '<br>' + p.substring(mid);
+
+          let chunk = '';
+          for (const w of words) {
+            if ((chunk + w).length > 20 && chunk.length >= 10) {
+              phrases.push(chunk.trim());
+              chunk = w;
+            } else {
+              chunk += w;
+            }
+          }
+          if (chunk.trim()) {
+            if (phrases.length > 0 && chunk.trim().length <= 5) {
+              phrases[phrases.length - 1] += chunk.trim();
+            } else {
+              phrases.push(chunk.trim());
+            }
+          }
+        } else {
+          // If a trailing particle is very short (like 'ค่ะ', 'ครับ'), attach to previous
+          if (phrases.length > 0 && part.length <= 4) {
+            phrases[phrases.length - 1] += ' ' + part;
+          } else {
+            phrases.push(part);
+          }
         }
-        return p;
-      });
+      }
+
+      return phrases.map(p => formatViralSubtitle(p, 20));
+    }
+
+    let isMaliMuted = false;
+    function toggleMaliAudioSync() {
+      const maliAudio = document.getElementById('player-mali-audio');
+      const icon = document.getElementById('icon-mali-sync');
+      const text = document.getElementById('text-mali-sync');
+      isMaliMuted = !isMaliMuted;
+      if (maliAudio) {
+        maliAudio.muted = isMaliMuted;
+        if (!isMaliMuted && maliAudio.paused) {
+          const player = document.getElementById('player-preview');
+          maliAudio.currentTime = player ? player.currentTime : 0;
+          maliAudio.play().catch(() => {});
+        }
+      }
+      if (isMaliMuted) {
+        if (icon) icon.className = 'ph-fill ph-speaker-slash text-xs text-zinc-400';
+        if (text) text.innerText = 'เสียงมาลี AI: ปิดเสียง';
+      } else {
+        if (icon) icon.className = 'ph-fill ph-speaker-high text-xs text-amber-400';
+        if (text) text.innerText = 'เสียงมาลี AI: กำลังเล่น';
+      }
     }
 
     let isSubtitleSyncAttached = false;
@@ -1824,21 +1996,27 @@
         }
       });
 
-      player.addEventListener('pause', () => {
-        if (activeMaliAudio && !activeMaliAudio.paused) {
-          activeMaliAudio.pause();
+      player.addEventListener('play', () => {
+        const maliAudio = document.getElementById('player-mali-audio');
+        if (maliAudio) {
+          // If video is raw Shopee video, lower raw background volume so Mali voice is crisp and clear
+          player.volume = 0.15;
+          maliAudio.currentTime = player.currentTime;
+          maliAudio.play().catch(e => console.log('Mali audio auto-play:', e));
         }
       });
 
-      player.addEventListener('play', () => {
-        if (activeMaliAudio && activeMaliAudio.paused) {
-          activeMaliAudio.play().catch(() => {});
+      player.addEventListener('pause', () => {
+        const maliAudio = document.getElementById('player-mali-audio');
+        if (maliAudio && !maliAudio.paused) {
+          maliAudio.pause();
         }
       });
 
       player.addEventListener('seeked', () => {
-        if (activeMaliAudio) {
-          activeMaliAudio.currentTime = player.currentTime;
+        const maliAudio = document.getElementById('player-mali-audio');
+        if (maliAudio) {
+          maliAudio.currentTime = player.currentTime;
         }
       });
     }
@@ -1906,17 +2084,24 @@
           badge.innerText = 'เรนเดอร์เสร็จสมบูรณ์ 🚀';
         }
 
-        // Start playback with Mali Voice
+        // Start playback with Mali Voice (Direct Sync to Dedicated Audio Player)
         const player = document.getElementById('player-preview');
-        if (audioBase64) {
-          if (activeMaliAudio) {
-            activeMaliAudio.pause();
-          }
-          activeMaliAudio = new Audio(audioBase64);
-          activeMaliAudio.play().catch(() => {});
+        const maliAudio = document.getElementById('player-mali-audio');
+        if (maliAudio && audioBase64) {
+          maliAudio.src = audioBase64;
+          maliAudio.load();
+          maliAudio.currentTime = 0;
+          isMaliMuted = false;
+          maliAudio.muted = false;
+          const icon = document.getElementById('icon-mali-sync');
+          const textEl = document.getElementById('text-mali-sync');
+          if (icon) icon.className = 'ph-fill ph-speaker-high text-xs text-amber-400';
+          if (textEl) textEl.innerText = 'เสียงมาลี AI: กำลังเล่น';
+          maliAudio.play().catch(e => console.log('Mali audio render play:', e));
         }
 
         if (player) {
+          player.volume = 0.15;
           player.currentTime = 0;
           player.play().catch(() => {});
         }

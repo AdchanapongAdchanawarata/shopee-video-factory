@@ -42,8 +42,8 @@
     .thai-viral-sub {
       font-family: 'Kanit', sans-serif;
       font-weight: 800;
-      font-size: clamp(0.95rem, 3.8vw, 1.15rem);
-      line-height: 1.30;
+      font-size: clamp(0.88rem, 3.4vw, 1.05rem);
+      line-height: 1.28;
       color: #ffffff;
       paint-order: stroke fill;
       -webkit-text-stroke: 3.5px #ff5000;
@@ -60,16 +60,15 @@
       filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.65));
       letter-spacing: 0.01em;
       text-align: center;
-      display: inline-block;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       user-select: none;
-      white-space: pre-line;
-      word-break: keep-all;
-      overflow-wrap: normal;
-      max-width: 90%;
+      max-width: 96%;
       margin: 0 auto;
-      padding: 0 8px;
+      padding: 0 4px;
       box-sizing: border-box;
-      text-overflow: clip;
       transition: transform 0.1s ease-out;
     }
     .video-smart-crop {
@@ -610,7 +609,7 @@
         <div class="lg:col-span-5 flex flex-col items-center space-y-2 sticky top-16">
 
           <!-- PHONE FRAME MOCKUP (COMPACT 9:16) -->
-          <div class="relative w-[240px] sm:w-[260px] aspect-[9/16] max-h-[460px] bg-black rounded-[36px] p-2 shadow-2xl border-4 border-zinc-800 ring-1 ring-zinc-700/50 flex flex-col overflow-hidden">
+          <div class="relative w-[275px] sm:w-[295px] md:w-[315px] aspect-[9/16] max-h-[560px] bg-black rounded-[40px] p-2.5 shadow-2xl border-4 border-zinc-800 ring-1 ring-zinc-700/50 flex flex-col overflow-hidden">
 
             <!-- NOTCH / DYNAMIC ISLAND -->
             <div class="absolute top-3.5 inset-x-0 mx-auto w-20 h-3 bg-zinc-950 rounded-full z-30 flex items-center justify-center space-x-1">
@@ -665,7 +664,7 @@
               <div id="overlay-headline" class="hidden"></div>
 
               <!-- ANIMATED THAI VIRAL SUBTITLES (STRICT 84% SAFE ZONE, LEFT/RIGHT 8%, NEVER CLIPS) -->
-              <div id="overlay-subtitles" class="absolute top-[16%] left-[8%] right-[8%] z-20 text-center pointer-events-none transition-all duration-150 flex flex-col items-center justify-center hidden" style="max-width: 84%; margin: 0 auto; box-sizing: border-box;">
+              <div id="overlay-subtitles" class="absolute top-[14%] inset-x-2 z-20 text-center pointer-events-none transition-all duration-150 flex flex-col items-center justify-center hidden" style="box-sizing: border-box;">
                 <div id="overlay-subtitle-text" class="thai-viral-sub"></div>
               </div>
 
@@ -2448,74 +2447,71 @@
         .replace(/\s+/g, ' ')
         .trim();
 
-      // RULE 1: If 24 characters or less, KEEP ON 1 SINGLE CLEAN LINE!
-      // In 9:16 safe-zone (84% width), 24 Thai chars is ~180px, well within 268px!
-      // Prevents ANY sub-word splitting for complete phrases (e.g. "แล้วดูเพรียวสวยเป๊ะ", "กางเกงคัตติ้งเนี้ยบ")
-      if (clean.length <= 24) return clean;
+      // RULE 1: If 20 chars or less, keep on 1 clean line with strict nowrap!
+      // In Kanit font at ~15px, 20 chars is ~150px, easily fitting inside 270px phone width.
+      // Strict nowrap prevents the browser from dropping words like 'นี้' or 'ค่ะ' to a 2nd line!
+      if (clean.length <= 20) {
+        return `<span class="block whitespace-nowrap">${clean}</span>`;
+      }
 
-      // RULE 2: If contains spaces, split on the space closest to the middle
+      // Strict prohibition: Line 2 can NEVER be an isolated single word or polite particle
+      const forbiddenL2Exact = /^(ค่ะ|คะ|นะคะ|ครับ|จ้า|นะจ๊ะ|เลย|นี้|แล้ว|อยู่|มาก|ได้|เป๊ะ|จัง|ตัวนี้|อันนี้|ชิ้นนี้)$/;
+
+      let candidates = [];
+
+      // Check spaces for natural balanced breaks
       if (clean.includes(' ')) {
         const parts = clean.split(' ').filter(Boolean);
-        let bestDiff = 999;
-        let bestIdx = 1;
         for (let i = 1; i < parts.length; i++) {
           const l1 = parts.slice(0, i).join(' ');
           const l2 = parts.slice(i).join(' ');
-          const diff = Math.abs(l1.length - l2.length);
-          if (diff < bestDiff) {
-            bestDiff = diff;
-            bestIdx = i;
+          if (l1.length >= 6 && l2.length >= 6 && !forbiddenL2Exact.test(l2)) {
+            candidates.push({ l1, l2, diff: Math.abs(l1.length - l2.length) });
           }
         }
-        const l1 = parts.slice(0, bestIdx).join(' ').trim();
-        const l2 = parts.slice(bestIdx).join(' ').trim();
-        if (l1 && l2) return `${l1}<br>${l2}`;
       }
 
-      // RULE 3: Break at natural Thai compound word/conjunction boundaries
-      const naturalBreakWords = [
-        'และ', 'หรือ', 'กับ', 'เพื่อ', 'ที่', 'ของ', 'ใน', 'จาก',
-        'บอกเลย', 'ตัวนี้', 'รุ่นนี้', 'ชิ้นนี้', 'ไอเทมนี้',
-        'ใช้งานง่าย', 'ใช้งาน', 'ดีไซน์', 'ฟังก์ชัน', 'คุ้มค่า', 'คุ้มราคา',
-        'สวยตรงปก', 'พิกัด', 'มุมซ้ายล่าง', 'ตะกร้าส้ม', 'ตะกร้าสีส้ม',
-        'กดสั่ง', 'จิ้มสั่ง', 'สั่งเลย', 'ส่งไว', 'ใส่แล้ว', 'ลองแล้ว', 'ใช้แล้ว'
+      // Check safe phrase break keywords
+      const breakWords = [
+        'ต้องมี', 'ติดตู้', 'ทรงสวย', 'คัตติ้ง', 'เนื้อผ้า', 'ระบายอากาศ',
+        'ตัวนี้', 'รุ่นนี้', 'ชิ้นนี้', 'ใช้งานง่าย', 'ดีไซน์สวย', 'ฟังก์ชันครบ',
+        'คุ้มค่า', 'คุ้มราคา', 'สวยตรงปก', 'พิกัด', 'มุมซ้ายล่าง', 'ตะกร้าส้ม', 'ตะกร้าสีส้ม',
+        'ที่', 'และ', 'หรือ', 'กับ', 'เพื่อ', 'ใน', 'ของ', 'จาก'
       ];
-      for (const bw of naturalBreakWords) {
+
+      for (const bw of breakWords) {
         const idx = clean.indexOf(bw);
-        if (idx >= 6 && idx <= clean.length - 6) {
+        if (idx >= 6 && (clean.length - idx) >= 6) {
           const l1 = clean.substring(0, idx).trim();
           const l2 = clean.substring(idx).trim();
-          return `${l1}<br>${l2}`;
-        }
-      }
-
-      // RULE 4: Intl.Segmenter with cluster merging so Thai consonants/vowels are NEVER split
-      if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-        const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
-        const rawWords = Array.from(segmenter.segment(clean)).map(s => s.segment);
-        const words = mergeThaiTokens(rawWords);
-        const half = Math.floor(clean.length / 2);
-        let cur = 0;
-        let splitIdx = 0;
-        let minDiff = 999;
-        for (let i = 0; i < words.length; i++) {
-          cur += words[i].length;
-          const diff = Math.abs(cur - half);
-          if (diff < minDiff) {
-            minDiff = diff;
-            splitIdx = i + 1;
+          if (!forbiddenL2Exact.test(l2)) {
+            candidates.push({ l1, l2, diff: Math.abs(l1.length - l2.length) });
           }
         }
-        let l1 = words.slice(0, splitIdx).join('').trim();
-        let l2 = words.slice(splitIdx).join('').trim();
-        if (l2 && isCombiningMark(l2[0])) {
-          l1 += l2[0];
-          l2 = l2.substring(1).trim();
-        }
-        if (l1 && l2) return `${l1}<br>${l2}`;
       }
 
-      return clean;
+      // Intl.Segmenter fallback with token merging
+      if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+        const seg = new Intl.Segmenter('th', { granularity: 'word' });
+        const rawWords = Array.from(seg.segment(clean)).map(s => s.segment);
+        const words = mergeThaiTokens(rawWords);
+        for (let i = 1; i < words.length; i++) {
+          const l1 = words.slice(0, i).join('').trim();
+          const l2 = words.slice(i).join('').trim();
+          if (l1.length >= 6 && l2.length >= 6 && !forbiddenL2Exact.test(l2)) {
+            candidates.push({ l1, l2, diff: Math.abs(l1.length - l2.length) });
+          }
+        }
+      }
+
+      if (candidates.length > 0) {
+        // Sort by closest balanced length between l1 and l2 (e.g. 11 & 12 chars)
+        candidates.sort((a, b) => a.diff - b.diff);
+        const best = candidates[0];
+        return `<span class="block whitespace-nowrap">${best.l1}</span><span class="block whitespace-nowrap">${best.l2}</span>`;
+      }
+
+      return `<span class="block whitespace-nowrap">${clean}</span>`;
     }
 
     function formatViralSubtitle(phrase) {

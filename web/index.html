@@ -42,8 +42,8 @@
     .thai-viral-sub {
       font-family: 'Kanit', sans-serif;
       font-weight: 800;
-      font-size: clamp(0.92rem, 3.6vw, 1.12rem);
-      line-height: 1.28;
+      font-size: clamp(0.95rem, 3.8vw, 1.15rem);
+      line-height: 1.30;
       color: #ffffff;
       paint-order: stroke fill;
       -webkit-text-stroke: 3.5px #ff5000;
@@ -60,17 +60,17 @@
       filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.65));
       letter-spacing: 0.01em;
       text-align: center;
-      display: block;
+      display: inline-block;
       user-select: none;
-      white-space: normal;
+      white-space: pre-line;
       word-break: keep-all;
       overflow-wrap: normal;
-      max-width: 92%;
+      max-width: 90%;
       margin: 0 auto;
-      padding: 0 4px;
+      padding: 0 8px;
       box-sizing: border-box;
       text-overflow: clip;
-      transition: transform 0.12s ease-out;
+      transition: transform 0.1s ease-out;
     }
     .video-smart-crop {
       transform: scale(1.42) translateY(3%);
@@ -2372,39 +2372,58 @@
       return (code === 0x0E31) || (code >= 0x0E34 && code <= 0x0E3A) || (code >= 0x0E47 && code <= 0x0E4E);
     }
 
-    function splitThaiIntoTwoLines(text) {
-      if (!text) return '';
-      // 1. Completely strip ellipses, dots (preserving decimal digits), and special symbols
-      let clean = text
+    function formatSingleOrTwoLines(text) {
+      let clean = (text || '')
         .replace(/\.{2,}/g, ' ')
         .replace(/(?<!\d)\.|\.(?!\d)/g, ' ')
         .replace(/[,!?;:✨🛒🔥🧡#]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 
+      // If 15 characters or less, it's 1 perfect clean centered line
       if (clean.length <= 15) return clean;
 
-      // 2. If clean has spaces, split at the best middle space
-      if (clean.includes(' ')) {
-        const parts = clean.split(' ').filter(Boolean);
-        if (parts.length === 2) return `${parts[0]}<br>${parts[1]}`;
-        if (parts.length > 2) {
-          let bestDiff = 999;
-          let bestIdx = 1;
-          for (let i = 1; i < parts.length; i++) {
-            const l1 = parts.slice(0, i).join(' ');
-            const l2 = parts.slice(i).join(' ');
-            const diff = Math.abs(l1.length - l2.length);
-            if (diff < bestDiff) {
-              bestDiff = diff;
-              bestIdx = i;
-            }
+      // If between 16 and 28 characters, split into 2 balanced lines
+      const naturalBreakWords = [
+        ' รุ่น', ' สไปค์', ' สไปค์ตัวนี้', ' ตัวนี้', ' ใช้งานง่าย', ' ดีไซน์',
+        ' ฟังก์ชัน', ' คุ้มราคา', ' พิกัด', ' ตะกร้าส้ม', ' ตะกร้าสีส้ม',
+        ' มุมซ้ายล่าง', ' แนะนำ', ' ปลอดภัย', ' สะอาด'
+      ];
+
+      for (const bw of naturalBreakWords) {
+        if (clean.includes(bw)) {
+          const idx = clean.indexOf(bw);
+          const l1 = clean.substring(0, idx).trim();
+          const l2 = clean.substring(idx).trim();
+          if (l1.length >= 4 && l2.length >= 4 && l1.length <= 18 && l2.length <= 18) {
+            return `${l1}<br>${l2}`;
           }
-          return `${parts.slice(0, bestIdx).join(' ')}<br>${parts.slice(bestIdx).join(' ')}`;
         }
       }
 
-      // 3. Use Intl.Segmenter to find genuine Thai word boundaries (NEVER break in the middle of words)
+      if (clean.includes(' ')) {
+        const parts = clean.split(' ').filter(Boolean);
+        if (parts.length === 2 && parts[0].length <= 18 && parts[1].length <= 18) {
+          return `${parts[0]}<br>${parts[1]}`;
+        }
+        let bestDiff = 999;
+        let bestIdx = 1;
+        for (let i = 1; i < parts.length; i++) {
+          const l1 = parts.slice(0, i).join(' ');
+          const l2 = parts.slice(i).join(' ');
+          const diff = Math.abs(l1.length - l2.length);
+          if (diff < bestDiff && l1.length <= 18 && l2.length <= 18) {
+            bestDiff = diff;
+            bestIdx = i;
+          }
+        }
+        const l1 = parts.slice(0, bestIdx).join(' ').trim();
+        const l2 = parts.slice(bestIdx).join(' ').trim();
+        if (l1 && l2 && l1.length <= 18 && l2.length <= 18) {
+          return `${l1}<br>${l2}`;
+        }
+      }
+
       if (typeof Intl !== 'undefined' && Intl.Segmenter) {
         const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
         const words = Array.from(segmenter.segment(clean)).map(s => s.segment);
@@ -2420,128 +2439,109 @@
             splitIdx = i + 1;
           }
         }
-        let l1 = words.slice(0, splitIdx).join('');
-        let l2 = words.slice(splitIdx).join('');
-
-        // Sanity check: Ensure line 2 never starts with an orphaned vowel or tone mark
+        let l1 = words.slice(0, splitIdx).join('').trim();
+        let l2 = words.slice(splitIdx).join('').trim();
         if (l2 && isCombiningMark(l2[0])) {
-          l1 = l1 + l2[0];
-          l2 = l2.substring(1);
+          l1 += l2[0];
+          l2 = l2.substring(1).trim();
         }
-        if (l1 && l2) return `${l1}<br>${l2}`;
+        if (l1 && l2 && l2.length >= 4) return `${l1}<br>${l2}`;
       }
 
-      // 4. Fallback safe split
-      let mid = Math.floor(clean.length / 2);
-      while (mid > 0 && mid < clean.length && isCombiningMark(clean[mid])) {
-        mid--;
-      }
-      return `${clean.substring(0, mid)}<br>${clean.substring(mid)}`;
+      return clean;
     }
 
     function formatViralSubtitle(phrase) {
-      return splitThaiIntoTwoLines(phrase);
+      return formatSingleOrTwoLines(phrase);
     }
 
     function buildTimedSubtitleCues(text) {
-      const clean = (text || '').replace(/\.{2,}/g, ' ').trim();
+      const clean = (text || '')
+        .replace(/\.{2,}/g, ' ')
+        .replace(/[✨🛒🔥🧡]/g, ' ')
+        .trim();
       if (!clean) return [{ start: 0.0, end: 20.0, html: 'แนะนำตัวนี้เลยค่ะ' }];
 
-      // 1. Tripod / Selfie Script (Curated word-for-word timed cues)
-      if (clean.includes('ไม้เซลฟี่') || clean.includes('ขาตั้งกล้อง') || clean.includes('X-it') || clean.includes('1.3 เมตร') || clean.includes('เซลฟี่')) {
-        return [
-          { start: 0.0, end: 4.2, html: 'สายเที่ยว สายคอนเทนต์คนไหน<br>ไม่อยากง้อใครให้ถ่ายรูปให้' },
-          { start: 4.2, end: 8.2, html: 'ตัวนี้คือจบเลยค่ะ<br>ขาตั้งกล้องและไม้เซลฟี่ 1.3 เมตร' },
-          { start: 8.2, end: 12.2, html: 'กางตั้งได้มั่นคงมาก<br>มีรีโมทบลูทูธกดถ่ายเองสบาย' },
-          { start: 12.2, end: 16.0, html: 'พกพาสะดวก น้ำหนักเบา<br>ฟังก์ชันครบ คุ้มราคามากค่ะ' },
-          { start: 16.0, end: 20.0, html: 'สนใจกดสั่งซื้อที่ตะกร้าส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
-        ];
-      }
-
-      // 2. Cat Litter Script (Curated word-for-word timed cues)
-      if (clean.includes('ทรายเต้าหู้') || clean.includes('ทรายแมว') || clean.includes('กระบะทราย') || clean.includes('เต้าหู้')) {
-        return [
-          { start: 0.0, end: 4.2, html: 'ทาสแมวคนไหน<br>ปวดหัวกับกลิ่นกระบะทรายบ้างคะ' },
-          { start: 4.2, end: 8.2, html: 'พอเปลี่ยนมาใช้<br>ทรายแมวเต้าหู้ออร์แกนิคตัวนี้' },
-          { start: 8.2, end: 12.2, html: 'จับตัวเป็นก้อนไวมาก<br>เก็บกลิ่นมิดชิด ไร้ฝุ่นกวนใจ' },
-          { start: 12.2, end: 16.0, html: 'ตักทิ้งง่ายมาก<br>สะอาดปลอดภัยต่อน้องแมว' },
-          { start: 16.0, end: 20.0, html: 'อยากให้บ้านหอมสะอาด<br>จิ้มสั่งที่ตะกร้าส้มซ้ายล่างได้เลยค่ะ' }
-        ];
-      }
-
-      // 3. Cat Fountain Script (Curated word-for-word timed cues)
-      if (clean.includes('กินน้ำน้อย') || clean.includes('เล่นน้ำจนเลอะเทอะ') || clean.includes('น้ำพุแมว') || clean.includes('น้ำพุ')) {
-        return [
-          { start: 0.0, end: 4.0, html: 'ทาสแมวคนไหนเจอปัญหา<br>น้องกินน้ำน้อยบ้างคะ' },
-          { start: 4.0, end: 8.0, html: 'พอเปลี่ยนมาใช้<br>น้ำพุแมวไร้สายตัวนี้' },
-          { start: 8.0, end: 12.0, html: 'น้องชอบมาก วิ่งมากินทั้งวัน<br>ไร้สาย ไร้กังวลเรื่องไต' },
-          { start: 12.0, end: 16.0, html: 'สแตนเลสแท้ ล้างง่าย<br>เพื่อสุขภาพน้องแมว' },
-          { start: 16.0, end: 20.0, html: 'จิ้มสั่งที่ตะกร้าสีส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
-        ];
-      }
-
-      // 4. Tumbler Script (Curated word-for-word timed cues)
-      if (clean.includes('แก้ว') || clean.includes('พกแก้วน้ำ') || clean.includes('ฟานไลฟ์') || clean.includes('เซรามิก')) {
-        return [
-          { start: 0.0, end: 4.4, html: 'ใครชอบพกแก้วน้ำไปทำงาน<br>แนะนำใบนี้เลยค่ะ' },
-          { start: 4.4, end: 9.5, html: 'แก้วเก็บความเย็นฟานไลฟ์<br>เคลือบเซรามิกแท้' },
-          { start: 9.5, end: 14.8, html: 'เก็บน้ำแข็งข้ามวัน ลายน่ารัก<br>มีหูหิ้วพกพาง่าย' },
-          { start: 14.8, end: 20.0, html: 'สนใจกดสั่งซื้อที่ตะกร้าสีส้ม<br>มุมซ้ายล่างได้เลยนะคะ' }
-        ];
-      }
-
-      // 5. Earbuds Script
-      if (clean.includes('หูฟัง') || clean.includes('earbud') || clean.includes('บลูทูธ')) {
-        return [
-          { start: 0.0, end: 4.5, html: 'ใครกำลังหาหูฟังบลูทูธ<br>เสียงดีๆ คุ้มราคา ต้องดูตัวนี้ค่ะ' },
-          { start: 4.5, end: 10.0, html: 'ตัดเสียงรอบข้างได้เงียบกริบ<br>เบสแน่น ไมค์คุยโทรศัพท์ชัดเจน' },
-          { start: 10.0, end: 15.0, html: 'แบตเตอรี่อึด ใช้ได้ทั้งวัน<br>เชื่อมต่อง่าย สวมใส่สบายหู' },
-          { start: 15.0, end: 20.0, html: 'กดสั่งที่ตะกร้าส้มซ้ายล่าง<br>ของแท้แน่นอนค่ะ' }
-        ];
-      }
-
-      // 6. Universal Proportional Chunker for any other product / custom text
-      let clauses = clean
+      // Split by breath pause punctuation
+      let rawClauses = clean
         .split(/[,.!?;:\r?\n]+/)
         .map(s => s.trim().replace(/\.{2,}/g, ''))
         .filter(s => s.length > 0);
 
-      if (clauses.length === 0) {
-        return [{ start: 0.0, end: 20.0, html: 'แนะนำตัวนี้เลยค่ะ' }];
-      }
-
-      // Group into 4-5 natural cues
-      let finalPhrases = [];
-      for (const cl of clauses) {
-        if (cl.length <= 26) {
-          finalPhrases.push(cl);
+      // Sub-divide long clauses into fast-paced bite-sized phrases (max 22 chars each)
+      let microPhrases = [];
+      for (const cl of rawClauses) {
+        if (cl.length <= 22) {
+          microPhrases.push(cl);
         } else {
-          // split clause safely
-          finalPhrases.push(cl);
-        }
-      }
-
-      while (finalPhrases.length > 5) {
-        let minIdx = 0;
-        for (let i = 0; i < finalPhrases.length - 1; i++) {
-          if (finalPhrases[i].length < finalPhrases[minIdx].length) {
-            minIdx = i;
+          const breakPoints = ['ใช้งานง่าย', 'ดีไซน์สวย', 'ฟังก์ชันครบ', 'คุ้มค่า', 'ใครสนใจ', 'พิกัดที่', 'ตะกร้าส้ม', 'กางเป็น', 'มีรีโมท', 'เก็บกลิ่น', 'จับตัวเป็น'];
+          let splitDone = false;
+          for (const bp of breakPoints) {
+            if (cl.includes(bp)) {
+              const idx = cl.indexOf(bp);
+              const p1 = cl.substring(0, idx).trim();
+              const p2 = cl.substring(idx).trim();
+              if (p1.length >= 6 && p2.length >= 6) {
+                microPhrases.push(p1);
+                microPhrases.push(p2);
+                splitDone = true;
+                break;
+              }
+            }
+          }
+          if (!splitDone) {
+            if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+              const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+              const words = Array.from(segmenter.segment(cl)).map(s => s.segment);
+              const half = Math.floor(cl.length / 2);
+              let cur = 0;
+              let splitIdx = 0;
+              let minDiff = 999;
+              for (let i = 0; i < words.length; i++) {
+                cur += words[i].length;
+                const diff = Math.abs(cur - half);
+                if (diff < minDiff) {
+                  minDiff = diff;
+                  splitIdx = i + 1;
+                }
+              }
+              microPhrases.push(words.slice(0, splitIdx).join('').trim());
+              microPhrases.push(words.slice(splitIdx).join('').trim());
+            } else {
+              microPhrases.push(cl);
+            }
           }
         }
-        const merged = finalPhrases[minIdx] + ' ' + finalPhrases[minIdx + 1];
-        finalPhrases.splice(minIdx, 2, merged);
       }
 
-      const dur = 20.0 / finalPhrases.length;
-      return finalPhrases.map((phrase, idx) => {
-        const st = Number((idx * dur).toFixed(1));
-        const en = (idx === finalPhrases.length - 1) ? 20.0 : Number(((idx + 1) * dur).toFixed(1));
-        return {
-          start: st,
-          end: en,
-          html: splitThaiIntoTwoLines(phrase)
-        };
-      });
+      // Fast-paced dynamic timing: 8 to 10 cues across 20 seconds (~1.8s - 2.4s per cue)
+      const totalChars = microPhrases.reduce((acc, p) => acc + p.length, 0);
+      const totalDuration = 20.0;
+
+      let currentStart = 0.0;
+      const cues = [];
+
+      for (let i = 0; i < microPhrases.length; i++) {
+        const phrase = microPhrases[i];
+        const weight = phrase.length / totalChars;
+        let dur = Math.max(1.6, Number((weight * totalDuration).toFixed(1)));
+        let end = (i === microPhrases.length - 1) ? 20.0 : Number((currentStart + dur).toFixed(1));
+        if (end > 20.0) end = 20.0;
+
+        const formattedHtml = formatSingleOrTwoLines(phrase);
+        cues.push({
+          start: currentStart,
+          end: end,
+          html: formattedHtml
+        });
+        currentStart = end;
+      }
+
+      if (cues.length > 0) {
+        cues[cues.length - 1].end = 20.0;
+      }
+
+      return cues;
     }
 
     function generateSubtitleCues(script) {
@@ -2645,7 +2645,10 @@
           return;
         }
 
-        const cur = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
+        const maliAudio = document.getElementById('player-mali-audio');
+        const cur = (maliAudio && !maliAudio.paused && maliAudio.currentTime > 0) ?
+          Math.min(maliAudio.currentTime, MAX_TARGET_VIDEO_DURATION) :
+          Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
 
         // Update custom sleek timeline (0:00 / 0:20)
         const progressFill = document.getElementById('custom-progress-fill');

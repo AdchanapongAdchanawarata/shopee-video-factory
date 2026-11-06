@@ -16,6 +16,122 @@
   const FACTORY_URL = 'https://shopee-video-factory.vercel.app';
 
   // 1. EXTRACTOR HELPER
+  function extractShopeePrice() {
+    const excludeWords = [
+      'โค้ด', 'ส่วนลด', 'voucher', 'ล่าช้า', 'ขั้นต่ำ', 'ค่าส่ง',
+      'ค่าจัดส่ง', 'ส่งฟรี', 'ประหยัด', 'coin', 'เหรียญ', 'cashback',
+      'คืนเงิน', 'ชิ้น', 'ลดเพิ่ม', 'ติดตาม', 'ช้อปเพิ่ม', 'ผ่อนชำระ'
+    ];
+
+    const rangeRegex = /฿\s*([\d,]+(?:\.\d+)?)\s*[-–—~至]\s*฿?\s*([\d,]+(?:\.\d+)?)/;
+    const singleRegex = /฿\s*([\d,]+(?:\.\d+)?)/;
+
+    function isExcluded(text) {
+      if (!text) return true;
+      const lower = text.toLowerCase();
+      return excludeWords.some(w => lower.includes(w));
+    }
+
+    // Try finding the product briefing / hero container first (near H1)
+    const h1 = document.querySelector('h1') || 
+               document.querySelector('.WBVL_7') || 
+               document.querySelector('._44qnta') || 
+               document.querySelector('[class*="product-briefing"]') || 
+               document.querySelector('[class*="title"]');
+
+    const searchRoots = [];
+    if (h1) {
+      let p = h1.parentElement;
+      for (let i = 0; i < 4 && p && p !== document.body; i++) {
+        searchRoots.push(p);
+        p = p.parentElement;
+      }
+    }
+    searchRoots.push(document.body);
+
+    for (const root of searchRoots) {
+      const candidates = Array.from(root.querySelectorAll('div, span, p, h2, h3'));
+      const validElements = [];
+
+      for (const el of candidates) {
+        // Skip struck-through / original prices
+        try {
+          if (el.tagName === 'DEL' || el.tagName === 'S') continue;
+          const style = window.getComputedStyle(el);
+          if (style.textDecoration && style.textDecoration.includes('line-through')) continue;
+        } catch (e) {}
+
+        const text = (el.innerText || '').trim();
+        if (!text || !text.includes('฿') || text.length > 70) continue;
+        if (isExcluded(text)) continue;
+
+        validElements.push({ el, text });
+      }
+
+      // PASS 1: Check for Price Range (e.g. ฿39 - ฿180)
+      const rangeItems = validElements.filter(item => rangeRegex.test(item.text));
+      rangeItems.sort((a, b) => a.text.length - b.text.length);
+
+      for (const item of rangeItems) {
+        const match = item.text.match(rangeRegex);
+        if (match) {
+          const minP = parseFloat(match[1].replace(/,/g, ''));
+          const maxP = parseFloat(match[2].replace(/,/g, ''));
+          if (!isNaN(minP) && minP > 0 && !isNaN(maxP) && maxP >= minP) {
+            return {
+              price: minP,
+              max_price: maxP,
+              price_str: `฿${match[1].trim()} - ฿${match[2].trim()}`,
+              is_range: true
+            };
+          }
+        }
+      }
+
+      // PASS 2: Check for Single Price with large font or Shopee red/orange color
+      let bestItem = null;
+      let bestScore = -1;
+
+      for (const item of validElements) {
+        const match = item.text.match(singleRegex);
+        if (!match) continue;
+
+        const val = parseFloat(match[1].replace(/,/g, ''));
+        if (isNaN(val) || val <= 0 || val > 1000000) continue;
+
+        let score = 10;
+        try {
+          const style = window.getComputedStyle(item.el);
+          const fontSize = parseFloat(style.fontSize) || 14;
+          const color = style.color || '';
+
+          score += fontSize * 2;
+          if (color.includes('238, 77, 45') || color.includes('208, 1, 27') || color.includes('255, 87, 34')) {
+            score += 50;
+          }
+        } catch (e) {}
+
+        score += Math.max(0, 40 - item.text.length);
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestItem = {
+            price: val,
+            max_price: val,
+            price_str: `฿${match[1].trim()}`,
+            is_range: false
+          };
+        }
+      }
+
+      if (bestItem && bestScore >= 35) {
+        return bestItem;
+      }
+    }
+
+    return { price: 199.0, max_price: 199.0, price_str: '฿199.00', is_range: false };
+  }
+
   function extractProductData() {
     // Title Extraction
     let title = '';
@@ -40,23 +156,8 @@
         .trim();
     }
 
-    // Price Extraction
-    let price = 199.0;
-    const priceCandidates = [
-      document.querySelector('.pqTWkA'),
-      document.querySelector('._3n5NQx'),
-      document.querySelector('._2v0HG1'),
-      document.querySelector('[class*="price"]')
-    ];
-    for (const el of priceCandidates) {
-      if (el && el.innerText) {
-        const match = el.innerText.replace(/,/g, '').match(/\d+(\.\d+)?/);
-        if (match) {
-          price = parseFloat(match[0]);
-          break;
-        }
-      }
-    }
+    // Accurate Price Extraction (Range & Single)
+    const priceData = extractShopeePrice();
 
     // Real Gallery Video Extraction
     let videoUrl = '';
@@ -93,7 +194,10 @@
 
     return {
       title: title,
-      price: price,
+      price: priceData.price,
+      max_price: priceData.max_price,
+      price_str: priceData.price_str,
+      is_range: priceData.is_range,
       video_url: videoUrl,
       images: images.slice(0, 10),
       shopee_url: window.location.href.split('?')[0],

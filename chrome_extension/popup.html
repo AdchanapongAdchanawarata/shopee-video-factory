@@ -18,6 +18,30 @@
     .product-title { font-size: 12px; font-weight: 600; color: #fff; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #27272a; font-size: 11px; }
     .price { color: #f97316; font-weight: 800; font-size: 14px; }
+    .price-input {
+      background: rgba(249, 115, 22, 0.12);
+      border: 1px solid rgba(249, 115, 22, 0.4);
+      color: #f97316;
+      font-weight: 800;
+      font-size: 13px;
+      border-radius: 6px;
+      padding: 3px 8px;
+      text-align: right;
+      width: 145px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .price-input:focus {
+      border-color: #ee4d2d;
+      background: rgba(249, 115, 22, 0.18);
+      box-shadow: 0 0 0 2px rgba(238, 77, 45, 0.25);
+    }
+    .product-title[contenteditable="true"]:focus {
+      outline: 1px solid #ee4d2d;
+      border-radius: 4px;
+      padding: 2px;
+      background: rgba(255, 255, 255, 0.05);
+    }
     .footage-badge { display: flex; align-items: center; gap: 4px; color: #34d399; font-weight: 600; font-size: 10px; }
 
     .btn-produce { width: 100%; padding: 12px; border-radius: 12px; background: linear-gradient(135deg, #ee4d2d 0%, #ff6433 100%); color: #fff; font-size: 13px; font-weight: 800; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 16px rgba(238, 77, 45, 0.4); transition: transform 0.15s; }
@@ -48,8 +72,8 @@
     </div>
     <div id="product-name" class="product-title">กำลังค้นหาข้อมูลสินค้าในหน้านี้...</div>
     <div class="meta-row">
-      <span class="card-label">ราคาขาย:</span>
-      <span id="product-price" class="price">฿--</span>
+      <span class="card-label">ราคาขาย (แก้ไขได้):</span>
+      <input type="text" id="product-price" class="price-input" value="฿--" placeholder="฿0.00" title="แก้ไขราคาได้ตามต้องการ">
     </div>
   </div>
 

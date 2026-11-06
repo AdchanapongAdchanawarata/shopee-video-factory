@@ -60,7 +60,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   function displayData(data) {
     if (!data) return;
     nameEl.innerText = data.title || 'ตรวจพบสินค้า';
-    priceEl.innerText = '฿' + Number(data.price || 0).toFixed(2);
+    
+    // Accurate Price & Price Range Display (e.g. ฿39 - ฿180 or ฿96.00)
+    const displayPrice = data.price_str || ('฿' + Number(data.price || 0).toFixed(2));
+    if (priceEl.tagName === 'INPUT') {
+      priceEl.value = displayPrice;
+    } else {
+      priceEl.innerText = displayPrice;
+    }
+
     if (data.video_url) {
       mediaLabel.innerText = '🎬 พบคลิปวิดีโอแท้ 100%';
       mediaLabel.style.color = '#34d399';
@@ -70,11 +78,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Allow manual edit if user wants to tweak price or title directly in popup
+  if (priceEl.tagName === 'INPUT') {
+    priceEl.addEventListener('input', () => {
+      if (!currentData) currentData = {};
+      currentData.price_str = priceEl.value;
+      const numMatch = priceEl.value.replace(/,/g, '').match(/\d+(\.\d+)?/);
+      if (numMatch) {
+        currentData.price = parseFloat(numMatch[0]);
+      }
+    });
+  }
+
+  nameEl.setAttribute('contenteditable', 'true');
+  nameEl.setAttribute('title', 'คลิกเพื่อแก้ไขชื่อสินค้าได้');
+  nameEl.addEventListener('input', () => {
+    if (!currentData) currentData = {};
+    currentData.title = nameEl.innerText.trim();
+  });
+
   exportBtn.addEventListener('click', () => {
     if (!currentData) {
       alert('ยังไม่พบข้อมูลสินค้า กรุณาเปิดหน้าสินค้า Shopee แล้วลองใหม่อีกครั้ง');
       return;
     }
+
+    // Ensure edited values in popup inputs are included in export payload
+    if (priceEl.tagName === 'INPUT') {
+      currentData.price_str = priceEl.value;
+      const numMatch = priceEl.value.replace(/,/g, '').match(/\d+(\.\d+)?/);
+      if (numMatch) currentData.price = parseFloat(numMatch[0]);
+    }
+    if (nameEl.innerText.trim()) {
+      currentData.title = nameEl.innerText.trim();
+    }
+
     const baseUrl = envSelect.value || 'https://shopee-video-factory.vercel.app';
     const payload = encodeURIComponent(JSON.stringify(currentData));
     const targetUrl = `${baseUrl}/#import=${payload}`;

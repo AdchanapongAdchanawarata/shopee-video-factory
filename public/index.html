@@ -234,7 +234,7 @@
                 type="text"
                 id="input-product-price"
                 oninput="handleProductPriceChange()"
-                placeholder="฿199.00"
+                placeholder="฿39 - ฿180"
                 class="w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-white font-mono text-xs font-bold focus:outline-none focus:border-shopee"
               />
             </div>
@@ -914,6 +914,7 @@
     function applyImportedProduct(data) {
       const title = data.title || 'สินค้าจาก Shopee';
       const price = parseFloat(data.price) || 96.0;
+      const priceStr = data.price_str || ('฿' + Number(price).toFixed(2));
       const shopeeUrl = data.shopee_url || '#';
       const videoUrl = data.video_url || '';
       const amsRate = 15.0;
@@ -930,6 +931,7 @@
         title: title,
         shopee_url: shopeeUrl,
         price: price,
+        price_str: priceStr,
         ams_rate: amsRate,
         earning: earn,
         video_url: videoUrl || '/videos/kettlebell_soft_pvc.mp4',
@@ -1218,7 +1220,7 @@
       const inputName = document.getElementById('input-product-name');
       if (inputName) inputName.value = prod.title || '';
       const inputPrice = document.getElementById('input-product-price');
-      if (inputPrice) inputPrice.value = '฿' + Number(prod.price || 0).toFixed(2);
+      if (inputPrice) inputPrice.value = prod.price_str || ('฿' + Number(prod.price || 0).toFixed(2));
       const linkOpen = document.getElementById('link-open-shopee');
       if (linkOpen) linkOpen.href = prod.shopee_url || '#';
       const amsBadge = document.getElementById('product-ams-badge');
@@ -1232,7 +1234,7 @@
       const s2Name = document.getElementById('step2-product-name');
       if (s2Name) s2Name.innerText = prod.title || '';
       const s2Price = document.getElementById('step2-product-price');
-      if (s2Price) s2Price.innerText = '฿' + Number(prod.price || 0).toFixed(2);
+      if (s2Price) s2Price.innerText = prod.price_str || ('฿' + Number(prod.price || 0).toFixed(2));
 
       // Update Step 3
       const s3Name = document.getElementById('step3-product-name');
@@ -1247,7 +1249,7 @@
       const shopeeLink = document.getElementById('product-shopee-link');
       if (shopeeLink) shopeeLink.href = prod.shopee_url;
       const priceEl = document.getElementById('product-price');
-      if (priceEl) priceEl.innerText = '฿' + Number(prod.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (priceEl) priceEl.innerText = prod.price_str || ('฿' + Number(prod.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
       const amsEl = document.getElementById('product-ams');
       if (amsEl) amsEl.innerText = '+' + prod.ams_rate + '%';
       const earnEl = document.getElementById('product-earning');
@@ -1652,17 +1654,37 @@
       if (!currentProduct) return;
       const el = document.getElementById('input-product-price');
       if (!el) return;
-      const raw = el.value.replace(/[^0-9.]/g, '');
-      const p = parseFloat(raw);
-      if (!isNaN(p)) {
-        currentProduct.price = p;
-        const rate = currentProduct.ams_rate || 15.0;
-        const earning = p * (rate / 100);
-        currentProduct.earning = earning;
-        const amsBadge = document.getElementById('product-ams-badge');
-        if (amsBadge) amsBadge.innerText = `+${rate}% (ได้ ฿${earning.toFixed(2)}/ชิ้น)`;
-        const s2Price = document.getElementById('step2-product-price');
-        if (s2Price) s2Price.innerText = '฿' + p.toFixed(2);
+      const val = el.value.trim();
+      currentProduct.price_str = val;
+
+      const rangeMatch = val.match(/฿?\s*([\d,]+(?:\.\d+)?)\s*[-–—~至]\s*฿?\s*([\d,]+(?:\.\d+)?)/);
+      if (rangeMatch) {
+        const minP = parseFloat(rangeMatch[1].replace(/,/g, ''));
+        if (!isNaN(minP)) {
+          currentProduct.price = minP;
+          const rate = currentProduct.ams_rate || 15.0;
+          const earning = minP * (rate / 100);
+          currentProduct.earning = earning;
+          const amsBadge = document.getElementById('product-ams-badge');
+          if (amsBadge) amsBadge.innerText = `+${rate}% (ได้ ฿${earning.toFixed(2)}/ชิ้น)`;
+          const s2Price = document.getElementById('step2-product-price');
+          if (s2Price) s2Price.innerText = val;
+        }
+      } else {
+        const singleMatch = val.match(/฿?\s*([\d,]+(?:\.\d+)?)/);
+        if (singleMatch) {
+          const p = parseFloat(singleMatch[1].replace(/,/g, ''));
+          if (!isNaN(p)) {
+            currentProduct.price = p;
+            const rate = currentProduct.ams_rate || 15.0;
+            const earning = p * (rate / 100);
+            currentProduct.earning = earning;
+            const amsBadge = document.getElementById('product-ams-badge');
+            if (amsBadge) amsBadge.innerText = `+${rate}% (ได้ ฿${earning.toFixed(2)}/ชิ้น)`;
+            const s2Price = document.getElementById('step2-product-price');
+            if (s2Price) s2Price.innerText = val.startsWith('฿') ? val : ('฿' + p.toFixed(2));
+          }
+        }
       }
     }
 

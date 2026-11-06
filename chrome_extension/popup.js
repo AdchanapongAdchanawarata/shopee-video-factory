@@ -8,78 +8,111 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let currentData = null;
 
-  // Restore env preference
+  // Restore env preference and cached product safely
   if (chrome && chrome.storage && chrome.storage.local) {
-    chrome.storage.local.get(['factory_env', 'last_extracted_product'], (res) => {
-      if (res.factory_env) envSelect.value = res.factory_env;
-      if (res.last_extracted_product) {
-        currentData = res.last_extracted_product;
-        displayData(currentData);
+    try {
+      chrome.storage.local.get(['factory_env', 'last_extracted_product'], (res) => {
+        if (chrome.runtime && chrome.runtime.lastError) {
+          console.warn('Storage get notice:', chrome.runtime.lastError.message);
+          return;
+        }
+        if (res && res.factory_env && envSelect) envSelect.value = res.factory_env;
+        if (res && res.last_extracted_product) {
+          currentData = res.last_extracted_product;
+          displayData(currentData);
+        }
+      });
+    } catch (e) {
+      console.warn('Storage access warning:', e);
+    }
+  }
+
+  if (envSelect) {
+    envSelect.addEventListener('change', () => {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ factory_env: envSelect.value }, () => {
+          if (chrome.runtime && chrome.runtime.lastError) {
+            console.warn(chrome.runtime.lastError.message);
+          }
+        });
       }
     });
   }
 
-  envSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ factory_env: envSelect.value });
-  });
-
-  // Query active tab
+  // Query active tab safely
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tab = tabs && tabs[0];
     if (tab && tab.url && (tab.url.includes('shopee.co.th') || tab.url.includes('shope.ee'))) {
-      statusEl.innerText = 'อยู่ใน Shopee';
+      if (statusEl) statusEl.innerText = 'อยู่ใน Shopee';
+      
       chrome.tabs.sendMessage(tab.id, { action: 'extract_product' }, (response) => {
-        if (chrome.runtime.lastError || !response) {
-          // If script not injected yet, inject programmatically
-          chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ['content.js']
-          }, () => {
-            chrome.tabs.sendMessage(tab.id, { action: 'extract_product' }, (res2) => {
-              if (res2) {
-                currentData = res2;
-                displayData(currentData);
+        const err = chrome.runtime && chrome.runtime.lastError;
+        if (err || !response) {
+          // If script not injected yet, inject programmatically using chrome.scripting
+          if (chrome.scripting && chrome.scripting.executeScript) {
+            chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              files: ['content.js']
+            }, () => {
+              const injectErr = chrome.runtime && chrome.runtime.lastError;
+              if (injectErr) {
+                console.warn('Content script injection notice:', injectErr.message);
+                return;
               }
+              chrome.tabs.sendMessage(tab.id, { action: 'extract_product' }, (res2) => {
+                const msgErr = chrome.runtime && chrome.runtime.lastError;
+                if (!msgErr && res2) {
+                  currentData = res2;
+                  displayData(currentData);
+                }
+              });
             });
-          });
+          }
         } else {
           currentData = response;
           displayData(currentData);
         }
       });
     } else {
-      statusEl.innerText = 'เปิดแท็บ Shopee';
-      statusEl.style.color = '#f59e0b';
-      statusEl.style.borderColor = 'rgba(245, 158, 11, 0.4)';
-      nameEl.innerText = 'กรุณาเปิดแท็บสินค้า Shopee เพื่อดึงข้อมูลอัตโนมัติ';
+      if (statusEl) {
+        statusEl.innerText = 'เปิดแท็บ Shopee';
+        statusEl.style.color = '#f59e0b';
+        statusEl.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+      }
+      if (nameEl) nameEl.innerText = 'กรุณาเปิดแท็บสินค้า Shopee เพื่อดึงข้อมูลอัตโนมัติ';
     }
   } catch (e) {
-    console.error(e);
+    console.warn('Tab query notice:', e);
   }
 
   function displayData(data) {
     if (!data) return;
-    nameEl.innerText = data.title || 'ตรวจพบสินค้า';
+    if (nameEl) nameEl.innerText = data.title || 'ตรวจพบสินค้า';
     
     // Accurate Price & Price Range Display (e.g. ฿39 - ฿180 or ฿96.00)
     const displayPrice = data.price_str || ('฿' + Number(data.price || 0).toFixed(2));
-    if (priceEl.tagName === 'INPUT') {
-      priceEl.value = displayPrice;
-    } else {
-      priceEl.innerText = displayPrice;
+    if (priceEl) {
+      if (priceEl.tagName === 'INPUT') {
+        priceEl.value = displayPrice;
+      } else {
+        priceEl.innerText = displayPrice;
+      }
     }
 
-    if (data.video_url) {
-      mediaLabel.innerText = '🎬 พบคลิปวิดีโอแท้ 100%';
-      mediaLabel.style.color = '#34d399';
-    } else if (data.images && data.images.length > 0) {
-      mediaLabel.innerText = `📸 พบภาพแกลเลอรี ${data.images.length} รูป`;
-      mediaLabel.style.color = '#f59e0b';
+    if (mediaLabel) {
+      if (data.video_url) {
+        mediaLabel.innerText = '🎬 พบคลิปวิดีโอแท้ 100%';
+        mediaLabel.style.color = '#34d399';
+      } else if (data.images && data.images.length > 0) {
+        mediaLabel.innerText = `📸 พบภาพแกลเลอรี ${data.images.length} รูป`;
+        mediaLabel.style.color = '#f59e0b';
+      }
     }
   }
 
   // Allow manual edit if user wants to tweak price or title directly in popup
-  if (priceEl.tagName === 'INPUT') {
+  if (priceEl && priceEl.tagName === 'INPUT') {
     priceEl.addEventListener('input', () => {
       if (!currentData) currentData = {};
       currentData.price_str = priceEl.value;
@@ -90,32 +123,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  nameEl.setAttribute('contenteditable', 'true');
-  nameEl.setAttribute('title', 'คลิกเพื่อแก้ไขชื่อสินค้าได้');
-  nameEl.addEventListener('input', () => {
-    if (!currentData) currentData = {};
-    currentData.title = nameEl.innerText.trim();
-  });
-
-  exportBtn.addEventListener('click', () => {
-    if (!currentData) {
-      alert('ยังไม่พบข้อมูลสินค้า กรุณาเปิดหน้าสินค้า Shopee แล้วลองใหม่อีกครั้ง');
-      return;
-    }
-
-    // Ensure edited values in popup inputs are included in export payload
-    if (priceEl.tagName === 'INPUT') {
-      currentData.price_str = priceEl.value;
-      const numMatch = priceEl.value.replace(/,/g, '').match(/\d+(\.\d+)?/);
-      if (numMatch) currentData.price = parseFloat(numMatch[0]);
-    }
-    if (nameEl.innerText.trim()) {
+  if (nameEl) {
+    nameEl.setAttribute('contenteditable', 'true');
+    nameEl.setAttribute('title', 'คลิกเพื่อแก้ไขชื่อสินค้าได้');
+    nameEl.addEventListener('input', () => {
+      if (!currentData) currentData = {};
       currentData.title = nameEl.innerText.trim();
-    }
+    });
+  }
 
-    const baseUrl = envSelect.value || 'https://shopee-video-factory.vercel.app';
-    const payload = encodeURIComponent(JSON.stringify(currentData));
-    const targetUrl = `${baseUrl}/#import=${payload}`;
-    chrome.tabs.create({ url: targetUrl });
-  });
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      if (!currentData) {
+        alert('ยังไม่พบข้อมูลสินค้า กรุณาเปิดหน้าสินค้า Shopee แล้วลองใหม่อีกครั้ง');
+        return;
+      }
+
+      // Ensure edited values in popup inputs are included in export payload
+      if (priceEl && priceEl.tagName === 'INPUT') {
+        currentData.price_str = priceEl.value;
+        const numMatch = priceEl.value.replace(/,/g, '').match(/\d+(\.\d+)?/);
+        if (numMatch) currentData.price = parseFloat(numMatch[0]);
+      }
+      if (nameEl && nameEl.innerText.trim()) {
+        currentData.title = nameEl.innerText.trim();
+      }
+
+      const baseUrl = (envSelect && envSelect.value) ? envSelect.value : 'https://shopee-video-factory.vercel.app';
+      const payload = encodeURIComponent(JSON.stringify(currentData));
+      const targetUrl = `${baseUrl}/#import=${payload}`;
+      
+      if (chrome && chrome.tabs && chrome.tabs.create) {
+        chrome.tabs.create({ url: targetUrl });
+      } else {
+        window.open(targetUrl, '_blank');
+      }
+    });
+  }
 });

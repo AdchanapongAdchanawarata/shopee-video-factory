@@ -254,9 +254,13 @@
         const data = extractProductData();
         console.log('📦 Extracted Product Data for 9:16 Video:', data);
 
-        // Store in Chrome storage for popup / factory sync
+        // Store in Chrome storage for popup / factory sync safely
         if (chrome && chrome.storage && chrome.storage.local) {
-          chrome.storage.local.set({ last_extracted_product: data });
+          chrome.storage.local.set({ last_extracted_product: data }, () => {
+            if (chrome.runtime && chrome.runtime.lastError) {
+              // ignore
+            }
+          });
         }
 
         // Open Shopee Video Factory with payload
@@ -284,14 +288,19 @@
     });
   }
 
-  // 3. LISTEN TO MESSAGES FROM POPUP
+  // 3. LISTEN TO MESSAGES FROM POPUP SAFELY
   if (chrome && chrome.runtime && chrome.runtime.onMessage) {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.action === 'extract_product') {
-        const data = extractProductData();
-        sendResponse(data);
+      if (request && request.action === 'extract_product') {
+        try {
+          const data = extractProductData();
+          sendResponse(data);
+        } catch (err) {
+          console.warn('Extraction notice:', err);
+          sendResponse({ error: err.message });
+        }
       }
-      return true;
+      return false; // synchronous response
     });
   }
 

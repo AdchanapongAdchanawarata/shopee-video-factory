@@ -5,7 +5,7 @@ import re
 import json
 import asyncio
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -1466,4 +1466,43 @@ def upload_voiceover_cloud(req: VoiceoverUploadRequest):
         "audio_url": "/assets/sample_chirp_aoede.mp3"
     }
 
+
+@app.get("/api/proxy/media")
+def proxy_external_media(url: str, request: Request):
+    """Same-origin CORS media proxy for Shopee VOD videos and images so HTML5 Canvas is NEVER tainted."""
+    if not url or not url.startswith(("http://", "https://")):
+        return JSONResponse({"error": "Invalid media URL"}, status_code=400)
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Referer": "https://shopee.co.th/",
+        "Accept": "*/*"
+    }
+    range_header = request.headers.get("range") or request.headers.get("Range")
+    if range_header:
+        headers["Range"] = range_header
+
+    try:
+        r = requests.get(url, headers=headers, stream=True, timeout=25)
+        resp_headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+            "Access-Control-Allow-Headers": "Range, Content-Type",
+            "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
+            "Accept-Ranges": "bytes",
+            "Cache-Control": "public, max-age=86400"
+        }
+        for h_name in ("Content-Type", "Content-Length", "Content-Range"):
+            if r.headers.get(h_name):
+                resp_headers[h_name] = r.headers[h_name]
+
+        content_type = r.headers.get("Content-Type", "application/octet-stream")
+        return StreamingResponse(
+            r.iter_content(chunk_size=65536),
+            status_code=r.status_code,
+            media_type=content_type,
+            headers=resp_headers
+        )
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=502)
 

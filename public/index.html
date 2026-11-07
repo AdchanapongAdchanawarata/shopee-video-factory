@@ -704,6 +704,7 @@
                 class="w-full h-full object-cover cursor-pointer video-smart-crop hidden"
                 playsinline
                 muted
+                crossorigin="anonymous"
               ></video>
 
               <!-- MOTION IMAGE FALLBACK CANVAS (WHEN VIDEO FINISHES BEFORE 20S OR NO VIDEO) -->
@@ -2032,7 +2033,17 @@
         const txtArea = document.getElementById('textarea-script');
         if (txtArea) txtArea.value = newScript.full_script;
         currentProduct._cachedCues = null;
+        currentProduct._cachedAudioBase64 = null;
+        currentProduct.rendered_blob_url = null;
+        currentProduct.rendered_blob = null;
+        isVideoRendered = false;
         updateScriptCharCount();
+        fetchMaliVoiceAudio(newScript.full_script).then(b64 => {
+          if (b64) {
+            const maliAudio = document.getElementById('player-mali-audio');
+            if (maliAudio) { maliAudio.src = b64; maliAudio.load(); }
+          }
+        });
 
         ['pain', 'discovery', 'benefit'].forEach(a => {
           const btn = document.getElementById(`btn-angle-${a}`);
@@ -2109,14 +2120,18 @@
       document.getElementById('input-shopee-url').value = shopeeUrl;
       renderActiveProduct(prod);
 
-      // Synthesize genuine ElevenLabs Mali voice for this imported product in background
+      // Synthesize genuine ElevenLabs Mali voice for this imported product in background & cache it
       fetchMaliVoiceAudio(fullText).then(b64 => {
         if (b64) {
+          if (currentProduct) {
+            currentProduct._cachedAudioBase64 = b64;
+            currentProduct._cachedAudioScript = fullText.trim();
+          }
           const maliAudio = document.getElementById('player-mali-audio');
           if (maliAudio) {
             maliAudio.src = b64;
             maliAudio.load();
-            console.log('✅ Real ElevenLabs Mali voice ready for imported product');
+            console.log('✅ Real ElevenLabs Mali voice ready & cached for imported product');
           }
         }
       });
@@ -2516,14 +2531,23 @@
       const mCanvasInit = document.getElementById('player-motion-canvas');
       if (mCanvasInit) mCanvasInit.classList.add('hidden');
 
-      // Preload product ad images for Ken-Burns motion fallback
+      // Reset multi-clip & motion state
+      isUserPaused = true;
+      isSwitchingClip = false;
+      previewBrollCutIndex = 0;
+      if (masterPreviewTimer) {
+        clearInterval(masterPreviewTimer);
+        masterPreviewTimer = null;
+      }
+
+      // Preload product ad images via Same-Origin CORS Proxy for Ken-Burns motion fallback
       preloadedPreviewImages = [];
       const prodImgs = (prod.images && prod.images.length > 0) ? prod.images : [];
-      for (const src of prodImgs.slice(0, 10)) {
+      for (const src of prodImgs.slice(0, 12)) {
         try {
           const img = new Image();
           img.crossOrigin = 'anonymous';
-          img.src = src;
+          img.src = toCorsSafeMediaUrl(src);
           preloadedPreviewImages.push(img);
         } catch (e) {}
       }
@@ -2534,8 +2558,9 @@
       if (player) {
         player.pause();
         player.currentTime = 0;
+        player.crossOrigin = 'anonymous';
         const vList = (prod.video_urls && prod.video_urls.length > 0) ? prod.video_urls : (prod.video_url ? [prod.video_url] : []);
-        player.src = vList[0] || '';
+        player.src = vList[0] ? toCorsSafeMediaUrl(vList[0]) : '';
         player.muted = true;
         player.classList.add('hidden');
       }
@@ -2593,6 +2618,10 @@
         currentProduct.script.full_script = text;
       }
       currentProduct._cachedCues = null;
+      currentProduct._cachedAudioBase64 = null;
+      currentProduct.rendered_blob_url = null;
+      currentProduct.rendered_blob = null;
+      isVideoRendered = false;
       updateScriptCharCount();
     }
 
@@ -2747,42 +2776,70 @@
       ctx.restore();
     }
 
+    function toCorsSafeMediaUrl(url, forceProxy = false) {
+      if (!url) return '';
+      const s = String(url).trim();
+      if (!s) return '';
+      if (s.startsWith('/') || s.startsWith('blob:') || s.startsWith('data:')) return s;
+      if (s.startsWith('http://') || s.startsWith('https://')) {
+        if (s.includes('/api/proxy/media?')) return s;
+        if (forceProxy) {
+          return `/api/proxy/media?url=${encodeURIComponent(s)}`;
+        }
+        // Shopee CDN (susercontent.com) natively sends Access-Control-Allow-Origin: *
+        // Appending _cors=v2 busts any non-CORS browser cache so <video crossorigin="anonymous"> is 100% origin-clean without hitting serverless size limits!
+        if (s.includes('susercontent.com')) {
+          if (s.includes('_cors=')) return s;
+          return s + (s.includes('?') ? '&' : '?') + '_cors=v2';
+        }
+        return `/api/proxy/media?url=${encodeURIComponent(s)}`;
+      }
+      return s;
+    }
+
     function drawSubtitlesAtSafeZone(ctx, cues, t, W, H) {
       if (!cues || cues.length === 0) return;
-      const activeCue = cues.find(c => t >= c.start && t < c.end);
-      if (!activeCue || !activeCue.text) return;
+      let activeCue = cues[0];
+      for (let i = 0; i < cues.length; i++) {
+        if (t >= cues[i].start && (t < cues[i].end || i === cues.length - 1)) {
+          activeCue = cues[i];
+          break;
+        }
+      }
+      if (!activeCue) return;
 
-      const raw = activeCue.text;
+      let lines = activeCue.lines;
+      if (!lines || lines.length === 0) {
+        const plain = (activeCue.text || activeCue.html || '')
+          .replace(/<\/span>\s*<span[^>]*>/gi, '\n')
+          .replace(/<[^>]+>/g, '')
+          .trim();
+        if (!plain) return;
+        lines = plain.split('\n').map(s => s.trim()).filter(Boolean);
+      }
+      if (!lines || lines.length === 0) return;
+
       ctx.save();
-      ctx.font = 'bold 50px Kanit, Prompt, sans-serif';
+      ctx.font = '900 54px Kanit, Prompt, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // Safe Area: y = 1420px (above Shopee/TikTok bottom icons and orange cart)
-      const safeY = 1430;
-
-      // Check if text needs 1 or 2 lines
-      let lines = [raw];
-      if (raw.length > 20 && raw.includes(' ')) {
-        const parts = raw.split(' ').filter(Boolean);
-        const mid = Math.ceil(parts.length / 2);
-        lines = [parts.slice(0, mid).join(' '), parts.slice(mid).join(' ')];
-      }
-
-      const lineSpacing = 68;
+      // Match top-[14%] viral subtitle safe zone in phone preview (~290px on 1920px height)
+      const safeY = Math.round(H * 0.155);
+      const lineSpacing = Math.round(H * 0.038);
       const startY = lines.length === 2 ? safeY - lineSpacing / 2 : safeY;
 
       lines.forEach((line, idx) => {
         const curY = startY + idx * lineSpacing;
 
-        // 1. Drop Shadow
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-        ctx.shadowBlur = 14;
+        // 1. Deep Drop Shadow for contrast on any footage
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+        ctx.shadowBlur = 16;
         ctx.shadowOffsetY = 5;
 
         // 2. Thick White Outline
         ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 14;
+        ctx.lineWidth = Math.max(10, Math.round(W * 0.013));
         ctx.lineJoin = 'round';
         ctx.miterLimit = 2;
         ctx.strokeText(line, W / 2, curY);
@@ -2796,58 +2853,68 @@
     }
 
     function drawKenBurnsImage(ctx, images, t, W, H) {
-      if (!images || images.length === 0) {
-        ctx.fillStyle = '#18181b';
-        ctx.fillRect(0, 0, W, H);
-        return;
-      }
-      const durPerImg = 2.8;
-      const imgIdx = Math.floor(t / durPerImg) % images.length;
-      const img = images[imgIdx];
-      if (!img || !img.complete || img.naturalWidth === 0) {
+      const validImages = (images || []).filter(im => im && im.complete && im.naturalWidth > 0);
+      if (validImages.length === 0) {
         ctx.fillStyle = '#18181b';
         ctx.fillRect(0, 0, W, H);
         return;
       }
 
-      const subT = (t % durPerImg) / durPerImg; // 0.0 to 1.0
-      const zoom = 1.0 + subT * 0.12;
+      // 5-Scene Multi-Angle Virtual Camera (even if only 1 image exists, creates 5 distinct dynamic cuts!)
+      const durPerScene = 3.2;
+      const sceneIdx = Math.floor(Math.max(0, t) / durPerScene);
+      const img = validImages[sceneIdx % validImages.length];
+      const subT = (Math.max(0, t) % durPerScene) / durPerScene; // 0.0 -> 1.0
+
+      // Define 5 distinct camera motions (zoom + panX + panY) so it never looks like 1 static image
+      const cameraPresets = [
+        { z0: 1.00, z1: 1.16, px0: 0.00, px1: 0.00, py0: 0.00, py1: -0.03 }, // Scene 1: Hero Zoom-In
+        { z0: 1.22, z1: 1.06, px0: -0.05, px1: 0.05, py0: -0.04, py1: 0.02 }, // Scene 2: Close-up Pan Right
+        { z0: 1.08, z1: 1.25, px0: 0.05, px1: -0.04, py0: 0.04, py1: -0.04 }, // Scene 3: Detail Macro Zoom
+        { z0: 1.24, z1: 1.04, px0: 0.00, px1: 0.00, py0: 0.05, py1: -0.02 }, // Scene 4: Vertical Pull-Back
+        { z0: 1.02, z1: 1.18, px0: -0.04, px1: 0.04, py0: 0.00, py1: 0.00 }  // Scene 5: Showcase Sweep
+      ];
+      const cam = cameraPresets[sceneIdx % cameraPresets.length];
+      const zoom = cam.z0 + (cam.z1 - cam.z0) * subT;
+      const panX = (cam.px0 + (cam.px1 - cam.px0) * subT) * W;
+      const panY = (cam.py0 + (cam.py1 - cam.py0) * subT) * H;
 
       ctx.save();
-      // Draw background cover
       const iw = img.naturalWidth;
       const ih = img.naturalHeight;
       const imgAspect = iw / ih;
       const targetAspect = W / H;
 
+      // 1. Blurred ambient 9:16 backdrop
       let bgW, bgH;
       if (imgAspect > targetAspect) {
-        bgH = H;
+        bgH = H * 1.1;
         bgW = bgH * imgAspect;
       } else {
-        bgW = W;
+        bgW = W * 1.1;
         bgH = bgW / imgAspect;
       }
       const bgX = (W - bgW) / 2;
       const bgY = (H - bgH) / 2;
-      ctx.filter = 'blur(20px) brightness(0.7)';
+      ctx.filter = 'blur(22px) brightness(0.62)';
       ctx.drawImage(img, bgX, bgY, bgW, bgH);
       ctx.filter = 'none';
 
-      // Draw foreground centered with zoom
-      const fgScale = 0.88 * zoom;
-      let fgW = 960 * fgScale;
-      let fgH = (960 / imgAspect) * fgScale;
-      if (fgH > 1300) {
-        fgH = 1300 * fgScale;
+      // 2. Sharp foreground product with multi-scene virtual camera motion (proportional to W & H)
+      const baseBoxW = W * 0.90;
+      const baseBoxH = H * 0.68;
+      let fgW = baseBoxW * zoom;
+      let fgH = (baseBoxW / imgAspect) * zoom;
+      if (fgH > baseBoxH * zoom) {
+        fgH = baseBoxH * zoom;
         fgW = fgH * imgAspect;
       }
-      const fgX = (W - fgW) / 2;
-      const fgY = (H - fgH) / 2;
+      const fgX = ((W - fgW) / 2) + panX;
+      const fgY = ((H - fgH) / 2) + panY;
 
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-      ctx.shadowBlur = 30;
-      ctx.shadowOffsetY = 10;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+      ctx.shadowBlur = Math.round(W * 0.028);
+      ctx.shadowOffsetY = Math.round(H * 0.006);
       ctx.drawImage(img, fgX, fgY, fgW, fgH);
       ctx.restore();
     }
@@ -2859,8 +2926,8 @@
         return;
       }
 
-      // If already rendered: trigger immediate download of real 9:16 MP4
-      if (currentProduct.rendered_blob_url) {
+      // If already rendered and valid non-empty video blob: trigger immediate download of real 9:16 MP4
+      if (currentProduct.rendered_blob_url && currentProduct.rendered_blob && currentProduct.rendered_blob.size > 50000) {
         const link = document.createElement('a');
         link.href = currentProduct.rendered_blob_url;
         link.download = `${currentProduct.product_id}_shopee_916_ready.mp4`;
@@ -2895,13 +2962,23 @@
         return;
       }
 
-      // ATTACH THIS REVIEW VIDEO AS PRIMARY VIDEO 100%
+      // ATTACH THIS REVIEW VIDEO TO PLAYLIST & SET READY
       if (currentProduct) {
-        currentProduct.video_url = url;
+        if (!currentProduct.video_urls) {
+          currentProduct.video_urls = currentProduct.video_url ? [currentProduct.video_url] : [];
+        }
+        if (!currentProduct.video_urls.includes(url)) {
+          currentProduct.video_urls.push(url);
+        }
+        if (!currentProduct.video_url) {
+          currentProduct.video_url = url;
+        }
+        currentProduct.media_mode = 'video';
       }
       const player = document.getElementById('player-preview');
       if (player) {
-        player.src = url;
+        player.crossOrigin = 'anonymous';
+        player.src = toCorsSafeMediaUrl(url);
         player.load();
       }
 
@@ -3050,34 +3127,39 @@
       const s2 = document.getElementById('step2-product-name');
       if (s2) s2.innerText = normTitle;
 
-      // Match video by keyword in typed title (Carefully separate cat litter from water fountain)
-      const tLow = normTitle.toLowerCase();
-      if (tLow.includes('sanmax') || tLow.includes('i14')) {
-        currentProduct.video_url = '/videos/sanmax_earphones_i14b.mp4';
-      } else if (tLow.includes('เคตเทิลเบล') || tLow.includes('kettlebell') || tLow.includes('ดัมเบล')) {
-        currentProduct.video_url = '/videos/kettlebell_soft_pvc.mp4';
-      } else if (tLow.includes('แปรงสีฟัน') || tLow.includes('toothbrush') || tLow.includes('sonic')) {
-        currentProduct.video_url = '/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s';
-      } else if (tLow.includes('แก้ว') || tLow.includes('tumbler') || tLow.includes('fanlife') || tLow.includes('tyeso')) {
-        currentProduct.video_url = '/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s';
-      } else if (tLow.includes('หูฟัง') || tLow.includes('earbud') || tLow.includes('baseus')) {
-        currentProduct.video_url = '/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s';
-      } else if (tLow.includes('น้ำพุ') || tLow.includes('drinking fountain')) {
-        currentProduct.video_url = '/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s';
-      } else if (tLow.includes('หม้อทอด') || tLow.includes('fryer')) {
-        currentProduct.video_url = '/videos/air_fryer_visual.mp4?v=v4_perfect_brand_20s';
-      } else if (tLow.includes('ถูพื้น') || tLow.includes('mop')) {
-        currentProduct.video_url = '/videos/spray_mop_360.mp4?v=v4_perfect_brand_20s';
-      } else if (tLow.includes('ชาร์จ') || tLow.includes('charger') || tLow.includes('ugreen')) {
-        currentProduct.video_url = '/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s';
-      } else if (tLow.includes('ดูดฝุ่น') || tLow.includes('vacuum')) {
-        currentProduct.video_url = '/videos/uv_dust_mite_vacuum.mp4?v=v4_perfect_brand_20s';
+      // Only match sample fallback video if product does NOT already have an imported Shopee video
+      const hasImportedShopeeVideo = (currentProduct.video_url && currentProduct.video_url.includes('susercontent.com')) ||
+        (currentProduct.video_urls && currentProduct.video_urls.some(u => u.includes('susercontent.com')));
+      if (!hasImportedShopeeVideo) {
+        const tLow = normTitle.toLowerCase();
+        if (tLow.includes('sanmax') || tLow.includes('i14')) {
+          currentProduct.video_url = '/videos/sanmax_earphones_i14b.mp4';
+        } else if (tLow.includes('เคตเทิลเบล') || tLow.includes('kettlebell') || tLow.includes('ดัมเบล')) {
+          currentProduct.video_url = '/videos/kettlebell_soft_pvc.mp4';
+        } else if (tLow.includes('แปรงสีฟัน') || tLow.includes('toothbrush') || tLow.includes('sonic')) {
+          currentProduct.video_url = '/videos/sonic_electric_toothbrush.mp4?v=v4_perfect_brand_20s';
+        } else if (tLow.includes('แก้ว') || tLow.includes('tumbler') || tLow.includes('fanlife') || tLow.includes('tyeso')) {
+          currentProduct.video_url = '/videos/fanlife_tumbler_710ml.mp4?v=v2_pure_moving_video_20s';
+        } else if (tLow.includes('หูฟัง') || tLow.includes('earbud') || tLow.includes('baseus')) {
+          currentProduct.video_url = '/videos/wireless_earbuds_anc.mp4?v=v4_perfect_brand_20s';
+        } else if (tLow.includes('น้ำพุ') || tLow.includes('drinking fountain')) {
+          currentProduct.video_url = '/videos/cat_fountain_01.mp4?v=v4_perfect_brand_20s';
+        } else if (tLow.includes('หม้อทอด') || tLow.includes('fryer')) {
+          currentProduct.video_url = '/videos/air_fryer_visual.mp4?v=v4_perfect_brand_20s';
+        } else if (tLow.includes('ถูพื้น') || tLow.includes('mop')) {
+          currentProduct.video_url = '/videos/spray_mop_360.mp4?v=v4_perfect_brand_20s';
+        } else if (tLow.includes('ชาร์จ') || tLow.includes('charger') || tLow.includes('ugreen')) {
+          currentProduct.video_url = '/videos/gan_charger_65w.mp4?v=v4_perfect_brand_20s';
+        } else if (tLow.includes('ดูดฝุ่น') || tLow.includes('vacuum')) {
+          currentProduct.video_url = '/videos/uv_dust_mite_vacuum.mp4?v=v4_perfect_brand_20s';
+        }
       }
 
-      // Update Player
+      // Update Player safely with CORS
       const player = document.getElementById('player-preview');
       if (player && currentProduct.video_url) {
-        player.src = currentProduct.video_url;
+        player.crossOrigin = 'anonymous';
+        player.src = toCorsSafeMediaUrl(currentProduct.video_url);
         player.load();
       }
 
@@ -3165,15 +3247,12 @@
         'video-preview-crop-zoomed-flipped',
         'video-preview-flipped-only'
       );
-      if (isSmartCropEnabled && isFlipEnabled) {
-        player.classList.add('video-preview-crop-zoomed-flipped');
-      } else if (isSmartCropEnabled) {
-        player.classList.add('video-preview-crop-zoomed');
-      } else if (isFlipEnabled) {
-        player.classList.add('video-preview-flipped-only');
-      } else {
-        player.classList.add('video-preview-crop-normal');
-      }
+      const brollBoost = (typeof previewBrollCutIndex !== 'undefined' && previewBrollCutIndex % 2 === 1) ? 1.14 : 1.0;
+      const baseScale = isSmartCropEnabled ? 1.35 : 1.0;
+      const finalScale = Number((baseScale * brollBoost).toFixed(2));
+      const sx = isFlipEnabled ? -finalScale : finalScale;
+      const ty = isSmartCropEnabled ? '-5%' : '0%';
+      player.style.transform = `scale(${sx}, ${finalScale}) translateY(${ty})`;
     }
 
     function handleSmartCropToggle(enabled) {
@@ -3489,9 +3568,17 @@
         if (end > 20.0) end = 20.0;
 
         const formattedHtml = formatSingleOrTwoLines(phrase);
+        const plainLines = formattedHtml
+          .replace(/<\/span>\s*<span[^>]*>/gi, '\n')
+          .replace(/<[^>]+>/g, '')
+          .split('\n')
+          .map(l => l.trim())
+          .filter(Boolean);
         cues.push({
           start: currentStart,
           end: end,
+          text: phrase,
+          lines: plainLines.length > 0 ? plainLines : [phrase],
           html: formattedHtml
         });
         currentStart = end;
@@ -3510,24 +3597,152 @@
     }
 
     let isMaliMuted = false;
+    let isUserPaused = true;
+    let isSwitchingClip = false;
+    let previewBrollCutIndex = 0;
+    let masterPreviewTimer = null;
+    let previewWallStartTime = 0;
     const MAX_TARGET_VIDEO_DURATION = 20.0; // Strictly 20.0 seconds
+
+    function getMasterPreviewTime() {
+      const maliAudio = document.getElementById('player-mali-audio');
+      if (maliAudio && !maliAudio.paused && maliAudio.currentTime > 0) {
+        return Math.min(maliAudio.currentTime, MAX_TARGET_VIDEO_DURATION);
+      }
+      if (previewWallStartTime > 0) {
+        return Math.min((performance.now() - previewWallStartTime) / 1000.0, MAX_TARGET_VIDEO_DURATION);
+      }
+      return 0.0;
+    }
+
+    function startMasterPreviewClock(startFromSec = 0.0) {
+      if (masterPreviewTimer) clearInterval(masterPreviewTimer);
+      previewWallStartTime = performance.now() - (startFromSec * 1000.0);
+
+      masterPreviewTimer = setInterval(() => {
+        if (isUserPaused || isRenderingVideo) return;
+
+        const maliAudio = document.getElementById('player-mali-audio');
+        const bgmAudio = document.getElementById('player-bgm');
+        const player = document.getElementById('player-preview');
+
+        // Guarantee Mali voiceover NEVER stops prematurely before its full duration
+        if (maliAudio && !isMaliMuted && maliAudio.paused && !maliAudio.ended) {
+          const wallElapsed = (performance.now() - previewWallStartTime) / 1000.0;
+          if (wallElapsed < (maliAudio.duration || 19.5) - 0.25) {
+            maliAudio.play().catch(() => {});
+          }
+        }
+        if (bgmAudio && !isMaliMuted && bgmAudio.paused) {
+          bgmAudio.volume = 0.12;
+          bgmAudio.play().catch(() => {});
+        }
+
+        const wallSec = (performance.now() - previewWallStartTime) / 1000.0;
+        const cur = (maliAudio && !maliAudio.paused && !maliAudio.ended && maliAudio.currentTime > 0)
+          ? Math.max(wallSec, maliAudio.currentTime)
+          : wallSec;
+
+        if (cur >= MAX_TARGET_VIDEO_DURATION) {
+          resetPreviewPlayback();
+          return;
+        }
+
+        // Update sleek timeline bar (0:00 / 0:20)
+        const progressFill = document.getElementById('custom-progress-fill');
+        if (progressFill) {
+          progressFill.style.width = Math.min(100, (cur / MAX_TARGET_VIDEO_DURATION) * 100) + '%';
+        }
+        const timeDisplay = document.getElementById('custom-time-display');
+        if (timeDisplay) {
+          const curSec = Math.floor(Math.min(20, cur));
+          const curStr = `0:${curSec < 10 ? '0' : ''}${curSec}`;
+          timeDisplay.innerText = `${curStr} / 0:20`;
+        }
+
+        // Update active viral Thai subtitle cue
+        if (currentProduct && currentProduct.script) {
+          const subEl = document.getElementById('overlay-subtitle-text');
+          if (subEl) {
+            if (!currentProduct._cachedCues) {
+              const sText = (document.getElementById('textarea-script') && document.getElementById('textarea-script').value.trim()) ||
+                currentProduct.script.full_script || '';
+              currentProduct._cachedCues = buildTimedSubtitleCues(sText);
+            }
+            const cues = currentProduct._cachedCues;
+            if (cues && cues.length > 0) {
+              let activeCue = cues[0];
+              for (let i = 0; i < cues.length; i++) {
+                if (cur >= cues[i].start && (cur < cues[i].end || i === cues.length - 1)) {
+                  activeCue = cues[i];
+                  break;
+                }
+              }
+              if (activeCue && subEl.innerHTML !== activeCue.html) {
+                subEl.innerHTML = activeCue.html;
+                subEl.style.transform = 'scale(1.04)';
+                setTimeout(() => { subEl.style.transform = 'scale(1.0)'; }, 90);
+              }
+            }
+          }
+        }
+
+        // If in image-only fallback mode, draw 5-scene Ken-Burns motion on #player-motion-canvas
+        const mCanvas = document.getElementById('player-motion-canvas');
+        if (mCanvas && !mCanvas.classList.contains('hidden')) {
+          if (mCanvas.width !== 720) {
+            mCanvas.width = 720;
+            mCanvas.height = 1280;
+          }
+          const mCtx = mCanvas.getContext('2d');
+          drawKenBurnsImage(mCtx, preloadedPreviewImages, cur, mCanvas.width, mCanvas.height);
+        }
+      }, 33);
+    }
 
     function togglePlayVideo() {
       const player = document.getElementById('player-preview');
       const maliAudio = document.getElementById('player-mali-audio');
+      const bgmAudio = document.getElementById('player-bgm');
       const icon = document.getElementById('icon-custom-play');
       if (!player) return;
-      if (player.paused) {
-        player.muted = true; // Mute raw video to eliminate ambient background noise
-        player.play().catch(() => {});
-        if (maliAudio && !isMaliMuted) {
-          maliAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
-          maliAudio.play().catch(() => {});
+
+      if (isUserPaused) {
+        isUserPaused = false;
+        const cur = getMasterPreviewTime();
+        const vList = (currentProduct && currentProduct.video_urls && currentProduct.video_urls.length > 0)
+          ? currentProduct.video_urls
+          : (currentProduct && currentProduct.video_url ? [currentProduct.video_url] : []);
+
+        if (vList.length > 0) {
+          player.muted = true;
+          player.classList.remove('hidden');
+          const mCanvas = document.getElementById('player-motion-canvas');
+          if (mCanvas) mCanvas.classList.add('hidden');
+          player.play().catch(() => {});
+        } else {
+          player.classList.add('hidden');
+          const mCanvas = document.getElementById('player-motion-canvas');
+          if (mCanvas) mCanvas.classList.remove('hidden');
         }
+
+        if (maliAudio && !isMaliMuted) {
+          if (cur < (maliAudio.duration || 19.5) - 0.2) {
+            maliAudio.currentTime = cur;
+            maliAudio.play().catch(() => {});
+          }
+        }
+        if (bgmAudio && !isMaliMuted) {
+          bgmAudio.volume = 0.12;
+          bgmAudio.play().catch(() => {});
+        }
+        startMasterPreviewClock(cur);
         if (icon) icon.className = 'ph-fill ph-pause text-xs';
       } else {
+        isUserPaused = true;
         player.pause();
         if (maliAudio) maliAudio.pause();
+        if (bgmAudio) bgmAudio.pause();
         if (icon) icon.className = 'ph-fill ph-play text-xs';
       }
     }
@@ -3542,15 +3757,18 @@
 
     function toggleMuteVoice() {
       const maliAudio = document.getElementById('player-mali-audio');
+      const bgmAudio = document.getElementById('player-bgm');
       const icon = document.getElementById('icon-custom-audio');
       isMaliMuted = !isMaliMuted;
       if (maliAudio) {
         maliAudio.muted = isMaliMuted;
-        if (!isMaliMuted && maliAudio.paused) {
-          const player = document.getElementById('player-preview');
-          maliAudio.currentTime = player ? Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION) : 0;
+        if (!isMaliMuted && !isUserPaused && maliAudio.paused) {
+          maliAudio.currentTime = Math.min(getMasterPreviewTime(), MAX_TARGET_VIDEO_DURATION);
           maliAudio.play().catch(() => {});
         }
+      }
+      if (bgmAudio) {
+        bgmAudio.muted = isMaliMuted;
       }
       if (icon) {
         icon.className = isMaliMuted ? 'ph-fill ph-speaker-slash text-xs text-zinc-500' : 'ph-fill ph-speaker-high text-xs text-amber-400';
@@ -3565,19 +3783,20 @@
       const ratio = Math.max(0, Math.min(1, clickX / rect.width));
       const targetTime = ratio * MAX_TARGET_VIDEO_DURATION;
 
+      previewWallStartTime = performance.now() - (targetTime * 1000.0);
       const player = document.getElementById('player-preview');
       const maliAudio = document.getElementById('player-mali-audio');
-      if (player) {
-        player.currentTime = targetTime;
+      if (player && player.duration) {
+        player.currentTime = targetTime % player.duration;
       }
-      if (maliAudio) {
+      if (maliAudio && (!maliAudio.duration || targetTime < maliAudio.duration)) {
         maliAudio.currentTime = targetTime;
       }
     }
 
     let isSubtitleSyncAttached = false;
-        // =========================================================================
-    // MULTI-CLIP SEAMLESS CHAINING & DYNAMIC KEN-BURNS MOTION ENGINE (20S GUARANTEE)
+    // =========================================================================
+    // MULTI-CLIP SEAMLESS CHAINING & B-ROLL CONTINUITY ENGINE (20S GUARANTEE)
     // =========================================================================
     let currentClipIndex = 0;
     let clipStartOffset = 0.0;
@@ -3593,112 +3812,80 @@
       const dur = (player && player.duration && !isNaN(player.duration)) ? player.duration : 12.0;
       clipStartOffset += dur;
 
-      // 1. If another video clip exists in playlist (e.g. review comment video #2):
-      if (currentClipIndex + 1 < vList.length) {
-        currentClipIndex++;
-        player.src = vList[currentClipIndex];
-        player.currentTime = 0;
-        player.play().catch(() => {});
-        showToast(`สลับเล่นคลิปรีวิวที่ ${currentClipIndex + 1} ต่อเนื่อง 🎬`);
+      const curMaster = isRenderingVideo ? 0 : getMasterPreviewTime();
+      if (!isRenderingVideo && curMaster >= MAX_TARGET_VIDEO_DURATION - 0.25) {
+        resetPreviewPlayback();
         return;
       }
 
-      // 2. If no more video clips and we have not reached 20.0s: transition into Ken-Burns product images!
-      if (clipStartOffset < MAX_TARGET_VIDEO_DURATION) {
-        player.classList.add('hidden');
-        const mCanvas = document.getElementById('player-motion-canvas');
-        if (mCanvas) {
-          mCanvas.classList.remove('hidden');
-          startPreviewMotionLoop(clipStartOffset);
+      // 1. If multiple video clips exist (e.g. main gallery video + comment review videos): chain next clip!
+      if (vList.length > 1) {
+        isSwitchingClip = true;
+        currentClipIndex = (currentClipIndex + 1) % vList.length;
+        player.crossOrigin = 'anonymous';
+        player.src = toCorsSafeMediaUrl(vList[currentClipIndex]);
+        player.currentTime = 0;
+        player.play().then(() => {
+          isSwitchingClip = false;
+        }).catch(() => {
+          isSwitchingClip = false;
+        });
+        if (!isRenderingVideo) {
+          showToast(`สลับเล่นคลิปรีวิวที่ ${currentClipIndex + 1} ต่อเนื่อง 🎬`);
         }
-      } else {
-        resetPreviewPlayback();
+        return;
       }
-    }
 
-    function startPreviewMotionLoop(startSec) {
-      if (previewMotionRaf) cancelAnimationFrame(previewMotionRaf);
+      // 2. If 1 video clip exists and is shorter than 20s (e.g. 12s):
+      // DO NOT freeze and DO NOT switch to 1 static image!
+      // Seamlessly cut to a Dynamic Highlight B-Roll Cut of the moving video until 20.0s!
+      if (vList.length === 1 && player) {
+        isSwitchingClip = true;
+        previewBrollCutIndex++;
+        updateVideoPreviewTransform();
+        const highlightStart = (player.duration && player.duration > 4.0) ? Math.min(1.8, player.duration * 0.2) : 0.0;
+        player.currentTime = highlightStart;
+        player.play().then(() => {
+          isSwitchingClip = false;
+        }).catch(() => {
+          isSwitchingClip = false;
+        });
+        return;
+      }
+
+      // 3. Only if NO video clips exist at all (vList.length === 0): use 5-scene Ken-Burns product images
+      if (player) player.classList.add('hidden');
       const mCanvas = document.getElementById('player-motion-canvas');
-      if (!mCanvas) return;
-      mCanvas.width = 720;
-      mCanvas.height = 1280;
-      const mCtx = mCanvas.getContext('2d');
-      const startTime = performance.now() - (startSec * 1000);
-
-      function motionStep() {
-        const nowSec = (performance.now() - startTime) / 1000.0;
-        const maliAudio = document.getElementById('player-mali-audio');
-        const masterTime = (maliAudio && !maliAudio.paused) ? maliAudio.currentTime : nowSec;
-
-        // Update timeline & progress bar
-        const progressFill = document.getElementById('custom-progress-fill');
-        if (progressFill) {
-          progressFill.style.width = Math.min(100, (masterTime / MAX_TARGET_VIDEO_DURATION) * 100) + '%';
-        }
-        const timeDisplay = document.getElementById('custom-time-display');
-        if (timeDisplay) {
-          const s = Math.floor(Math.min(20, masterTime));
-          timeDisplay.innerText = `0:${s < 10 ? '0' : ''}${s} / 0:20`;
-        }
-
-        // Update active subtitle cue
-        if (currentProduct && currentProduct.script) {
-          const subEl = document.getElementById('overlay-subtitle-text');
-          if (subEl) {
-            if (!currentProduct._cachedCues) {
-              const sText = (document.getElementById('textarea-script') && document.getElementById('textarea-script').value.trim()) ||
-                currentProduct.script.full_script || '';
-              currentProduct._cachedCues = buildTimedSubtitleCues(sText);
-            }
-            const cues = currentProduct._cachedCues;
-            if (cues && cues.length > 0) {
-              let activeCue = cues[0];
-              for (let i = 0; i < cues.length; i++) {
-                if (masterTime >= cues[i].start && (masterTime < cues[i].end || i === cues.length - 1)) {
-                  activeCue = cues[i];
-                  break;
-                }
-              }
-              if (activeCue && subEl.innerHTML !== activeCue.html) {
-                subEl.innerHTML = activeCue.html;
-              }
-            }
-          }
-        }
-
-        // Draw Ken-Burns motion on images
-        drawKenBurnsImage(mCtx, preloadedPreviewImages, masterTime - startSec, mCanvas.width, mCanvas.height);
-
-        if (masterTime < MAX_TARGET_VIDEO_DURATION) {
-          previewMotionRaf = requestAnimationFrame(motionStep);
-        } else {
-          resetPreviewPlayback();
-        }
-      }
-      previewMotionRaf = requestAnimationFrame(motionStep);
+      if (mCanvas) mCanvas.classList.remove('hidden');
     }
 
     function resetPreviewPlayback() {
-      if (previewMotionRaf) {
-        cancelAnimationFrame(previewMotionRaf);
-        previewMotionRaf = null;
-      }
-      const mCanvas = document.getElementById('player-motion-canvas');
-      if (mCanvas) mCanvas.classList.add('hidden');
-
       currentClipIndex = 0;
       clipStartOffset = 0.0;
+      previewBrollCutIndex = 0;
+      isUserPaused = false;
+      updateVideoPreviewTransform();
 
       const player = document.getElementById('player-preview');
+      const mCanvas = document.getElementById('player-motion-canvas');
       const vList = (currentProduct && currentProduct.video_urls && currentProduct.video_urls.length > 0) ?
         currentProduct.video_urls :
         (currentProduct && currentProduct.video_url ? [currentProduct.video_url] : []);
 
-      if (player) {
+      if (vList.length > 0 && player) {
+        if (mCanvas) mCanvas.classList.add('hidden');
         player.classList.remove('hidden');
-        player.src = vList[0] || '';
+        isSwitchingClip = true;
+        const targetSrc = toCorsSafeMediaUrl(vList[0]);
+        if (!player.src || !player.src.endsWith(targetSrc.replace(/^https?:\/\/[^/]+/, ''))) {
+          player.crossOrigin = 'anonymous';
+          player.src = targetSrc;
+        }
         player.currentTime = 0;
-        player.play().catch(() => {});
+        player.play().then(() => { isSwitchingClip = false; }).catch(() => { isSwitchingClip = false; });
+      } else {
+        if (player) player.classList.add('hidden');
+        if (mCanvas) mCanvas.classList.remove('hidden');
       }
 
       const maliAudio = document.getElementById('player-mali-audio');
@@ -3707,9 +3894,15 @@
         maliAudio.play().catch(() => {});
       }
       const bgmAudio = document.getElementById('player-bgm');
-      if (bgmAudio) {
+      if (bgmAudio && !isMaliMuted) {
         bgmAudio.currentTime = 0;
+        bgmAudio.volume = 0.12;
+        bgmAudio.play().catch(() => {});
       }
+      const icon = document.getElementById('icon-custom-play');
+      if (icon) icon.className = 'ph-fill ph-pause text-xs';
+
+      startMasterPreviewClock(0.0);
     }
 
     function setupVideoSubtitleSync() {
@@ -3721,76 +3914,27 @@
         handlePreviewClipFinished();
       });
 
-      player.addEventListener('timeupdate', () => {
-        if (!currentProduct || !currentProduct.script) return;
-        const subEl = document.getElementById('overlay-subtitle-text');
-        if (!subEl) return;
-
-        const maliAudio = document.getElementById('player-mali-audio');
-        const cur = (maliAudio && !maliAudio.paused && maliAudio.currentTime > 0) ?
-          Math.min(maliAudio.currentTime, MAX_TARGET_VIDEO_DURATION) :
-          Math.min(clipStartOffset + player.currentTime, MAX_TARGET_VIDEO_DURATION);
-
-        // Loop when reaching 20 seconds
-        if (cur >= MAX_TARGET_VIDEO_DURATION) {
-          resetPreviewPlayback();
-          return;
-        }
-
-        // Update custom sleek timeline (0:00 / 0:20)
-        const progressFill = document.getElementById('custom-progress-fill');
-        if (progressFill) {
-          progressFill.style.width = ((cur / MAX_TARGET_VIDEO_DURATION) * 100) + '%';
-        }
-        const timeDisplay = document.getElementById('custom-time-display');
-        if (timeDisplay) {
-          const curSec = Math.floor(cur);
-          const curStr = `0:${curSec < 10 ? '0' : ''}${curSec}`;
-          timeDisplay.innerText = `${curStr} / 0:20`;
-        }
-
-        // Subtitle timing sync (Word-for-word with Mali speech)
-        if (!currentProduct._cachedCues) {
-          const sText = (document.getElementById('textarea-script') && document.getElementById('textarea-script').value.trim()) ||
-            currentProduct.script.full_script || '';
-          currentProduct._cachedCues = buildTimedSubtitleCues(sText);
-        }
-        const cues = currentProduct._cachedCues;
-        if (!cues || cues.length === 0) return;
-
-        let activeCue = cues[0];
-        for (let i = 0; i < cues.length; i++) {
-          if (cur >= cues[i].start && (cur < cues[i].end || i === cues.length - 1)) {
-            activeCue = cues[i];
-            break;
-          }
-        }
-
-        if (activeCue && subEl.innerHTML !== activeCue.html) {
-          subEl.innerHTML = activeCue.html;
-          subEl.style.transform = 'scale(1.04)';
-          setTimeout(() => { subEl.style.transform = 'scale(1.0)'; }, 90);
+      player.addEventListener('error', () => {
+        // If video URL fails to decode, seamlessly fall back to 5-scene Ken-Burns images
+        const mCanvas = document.getElementById('player-motion-canvas');
+        if (mCanvas) {
+          player.classList.add('hidden');
+          mCanvas.classList.remove('hidden');
         }
       });
 
       player.addEventListener('play', () => {
         player.muted = true; // Always mute raw camera footage so Mali voice is 100% crisp & clear
-        const maliAudio = document.getElementById('player-mali-audio');
-        const bgmAudio = document.getElementById('player-bgm');
         const icon = document.getElementById('icon-custom-play');
         if (icon) icon.className = 'ph-fill ph-pause text-xs';
-        if (maliAudio && !isMaliMuted) {
-          maliAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
-          maliAudio.play().catch(e => console.log('Mali audio auto-play:', e));
-        }
-        if (bgmAudio && !isMaliMuted && maliAudio && maliAudio.src && maliAudio.src.startsWith('data:')) {
-          bgmAudio.volume = 0.12;
-          bgmAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION) % (bgmAudio.duration || 20);
-          bgmAudio.play().catch(() => {});
-        }
       });
 
       player.addEventListener('pause', () => {
+        // CRITICAL FIX: Never pause Mali voiceover when video clip #1 reaches its end at 0:12
+        // or when switching clips! Only pause if the user explicitly clicked Pause!
+        if (!isUserPaused || isSwitchingClip || isRenderingVideo || player.ended) {
+          return;
+        }
         const maliAudio = document.getElementById('player-mali-audio');
         const bgmAudio = document.getElementById('player-bgm');
         const icon = document.getElementById('icon-custom-play');
@@ -3802,30 +3946,30 @@
           bgmAudio.pause();
         }
       });
-
-      player.addEventListener('seeked', () => {
-        const maliAudio = document.getElementById('player-mali-audio');
-        const bgmAudio = document.getElementById('player-bgm');
-        if (maliAudio) {
-          maliAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
-        }
-        if (bgmAudio) {
-          bgmAudio.currentTime = Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION) % (bgmAudio.duration || 20);
-        }
-      });
     }
 
-    // Call Mali TTS API for ANY script text
+    // Call Mali TTS API for ANY script text (with smart caching so we never synthesize twice)
     async function fetchMaliVoiceAudio(text) {
+      const cleanText = (text || '').trim();
+      if (!cleanText) return null;
+
+      if (currentProduct && currentProduct._cachedAudioBase64 && currentProduct._cachedAudioScript === cleanText) {
+        return currentProduct._cachedAudioBase64;
+      }
+
       try {
         const res = await fetch('/api/voice/synthesize', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: text })
+          body: JSON.stringify({ text: cleanText })
         });
         if (res.ok) {
           const data = await res.json();
           if (data && data.audio_base64) {
+            if (currentProduct) {
+              currentProduct._cachedAudioBase64 = data.audio_base64;
+              currentProduct._cachedAudioScript = cleanText;
+            }
             return data.audio_base64;
           }
         }
@@ -3835,9 +3979,41 @@
       return null;
     }
 
+    async function decodeAudioUrlToBuffer(audioCtx, urlOrDataUri) {
+      if (!urlOrDataUri) return null;
+      try {
+        let arrayBuf = null;
+        if (urlOrDataUri.startsWith('data:audio/')) {
+          const b64Part = urlOrDataUri.split(',')[1] || '';
+          const binStr = atob(b64Part);
+          const len = binStr.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binStr.charCodeAt(i);
+          }
+          arrayBuf = bytes.buffer;
+        } else {
+          const r = await fetch(urlOrDataUri);
+          if (r.ok) arrayBuf = await r.arrayBuffer();
+        }
+        if (arrayBuf && arrayBuf.byteLength > 0) {
+          return await audioCtx.decodeAudioData(arrayBuf.slice(0));
+        }
+      } catch (e) {
+        console.warn('Audio decode notice:', e);
+      }
+      return null;
+    }
+
     async function startRenderVideo(autoDownload = false) {
       if (isRenderingVideo) return;
       isRenderingVideo = true;
+      isUserPaused = false;
+
+      if (masterPreviewTimer) {
+        clearInterval(masterPreviewTimer);
+        masterPreviewTimer = null;
+      }
 
       const btn = document.getElementById('btn-start-produce');
       const icon = document.getElementById('icon-produce');
@@ -3853,64 +4029,198 @@
       if (icon) icon.className = 'ph-bold ph-spinner animate-spin text-base';
       if (text) text.innerText = 'กำลังสังเคราะห์เสียงมาลี & ผสานวิดีโอ 9:16...';
 
-      if (pBar) pBar.style.width = '20%';
+      if (pBar) pBar.style.width = '15%';
       if (pText) pText.innerText = '1/4 กำลังเตรียมเสียงพากย์มาลีและคำบรรยายภาษาไทย...';
 
       // 1. Get current script text
-      const scriptText = (currentProduct && currentProduct.script) ?
-        (currentProduct.script.full_script || `${currentProduct.script.hook} ${currentProduct.script.body} ${currentProduct.script.cta}`) :
-        document.getElementById('textarea-script').value;
+      const scriptText = ((document.getElementById('textarea-script') && document.getElementById('textarea-script').value.trim()) ||
+        (currentProduct && currentProduct.script && (currentProduct.script.full_script || `${currentProduct.script.hook} ${currentProduct.script.body} ${currentProduct.script.cta}`)) ||
+        'แนะนำสินค้าคุณภาพดี คุ้มราคา สนใจกดที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ').trim();
 
-      // 2. Synthesize Mali Voiceover
-      let audioBase64 = null;
-      try {
-        audioBase64 = await fetchMaliVoiceAudio(scriptText);
-      } catch (e) {
-        console.warn('Voice fetch notice:', e);
-      }
-
+      // 2. Synthesize Mali Voiceover (uses instant cache if already synthesized)
+      let audioBase64 = await fetchMaliVoiceAudio(scriptText);
       const maliAudio = document.getElementById('player-mali-audio');
-      if (audioBase64 && maliAudio) {
+      if (!audioBase64 && maliAudio && maliAudio.src && maliAudio.src.startsWith('data:audio/')) {
+        audioBase64 = maliAudio.src;
+      }
+      const finalVoiceSrc = audioBase64 || (maliAudio && maliAudio.src ? maliAudio.src : '/assets/sample_elevenlabs_mali.mp3');
+      if (maliAudio && audioBase64) {
         maliAudio.src = audioBase64;
-        maliAudio.load();
       }
 
-      if (pBar) pBar.style.width = '45%';
-      if (pText) pText.innerText = '2/4 กำลังผสานคลิปวิดีโอรีวิวจริง & ภาพโฆษณา 9:16...';
+      if (pBar) pBar.style.width = '35%';
+      if (pText) pText.innerText = '2/4 กำลังโหลดฟุตเทจวิดีโอและภาพโฆษณาผ่านระบบป้องกันภาพค้าง...';
 
-      // 3. Prepare Subtitle Cues
-      const cues = (currentProduct && currentProduct._cachedCues) ?
-        currentProduct._cachedCues :
-        buildTimedSubtitleCues(scriptText);
+      // 3. Prepare Subtitle Cues (with .text and .lines for Canvas burning)
+      const cues = buildTimedSubtitleCues(scriptText);
       if (currentProduct) currentProduct._cachedCues = cues;
 
-      // 4. Setup 1080x1920 Offscreen Canvas for Real Rendering
+      // 4. Unhide phone preview BEFORE starting render so Chrome actively decodes all video frames!
+      const player = document.getElementById('player-preview');
+      const mCanvas = document.getElementById('player-motion-canvas');
+      const emptyState = document.getElementById('preview-empty-state');
+      const renderState = document.getElementById('preview-rendering-state');
+      const subOv = document.getElementById('overlay-subtitles');
+      const ctrlOv = document.getElementById('custom-video-controls');
+
+      const vList = (currentProduct && currentProduct.video_urls && currentProduct.video_urls.length > 0) ?
+        currentProduct.video_urls :
+        (currentProduct && currentProduct.video_url ? [currentProduct.video_url] : []);
+      const hasVideo = vList.length > 0;
+
+      if (emptyState) emptyState.classList.add('hidden');
+      if (renderState) renderState.classList.add('hidden');
+      if (subOv) subOv.classList.remove('hidden');
+      if (ctrlOv) ctrlOv.classList.remove('hidden');
+
+      currentClipIndex = 0;
+      clipStartOffset = 0.0;
+      previewBrollCutIndex = 0;
+      updateVideoPreviewTransform();
+
+      // 5. Preload Product Images via Same-Origin Proxy & await readiness
+      const imgSources = (currentProduct && currentProduct.images) ? currentProduct.images : [];
+      const loadedImages = await Promise.all(
+        imgSources.slice(0, 12).map(src => new Promise(resolve => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          let retriedProxy = false;
+          const timer = setTimeout(() => resolve(img), 3500);
+          img.onload = () => { clearTimeout(timer); resolve(img); };
+          img.onerror = () => {
+            if (!retriedProxy && src && src.startsWith('http')) {
+              retriedProxy = true;
+              img.src = toCorsSafeMediaUrl(src, true);
+              return;
+            }
+            clearTimeout(timer);
+            resolve(null);
+          };
+          img.src = toCorsSafeMediaUrl(src, false);
+        }))
+      ).then(arr => arr.filter(im => im && im.complete && im.naturalWidth > 0));
+      if (loadedImages.length > 0) {
+        preloadedPreviewImages = loadedImages;
+      }
+
+      // 6. Prepare <video> via Same-Origin Proxy & wait until Frame 1 is decoded
+      if (hasVideo && player) {
+        if (mCanvas) mCanvas.classList.add('hidden');
+        player.classList.remove('hidden');
+        player.muted = true;
+        player.crossOrigin = 'anonymous';
+        const safeVideoUrl = toCorsSafeMediaUrl(vList[0]);
+        player.src = safeVideoUrl;
+        player.currentTime = 0;
+
+        await new Promise(resolve => {
+          const timeout = setTimeout(resolve, 4000);
+          const onReady = () => {
+            clearTimeout(timeout);
+            player.removeEventListener('canplay', onReady);
+            player.removeEventListener('loadeddata', onReady);
+            resolve();
+          };
+          if (player.readyState >= 2) {
+            clearTimeout(timeout);
+            resolve();
+          } else {
+            player.addEventListener('canplay', onReady);
+            player.addEventListener('loadeddata', onReady);
+            player.load();
+          }
+        });
+      } else {
+        if (player) player.classList.add('hidden');
+        if (mCanvas) mCanvas.classList.remove('hidden');
+      }
+
+      // 7. Setup 1080x1920 Full HD Canvas (Mounted in viewport so Chromium GPU compositor flushes all 600 frames!)
       const W = 1080;
       const H = 1920;
       const renderCanvas = document.createElement('canvas');
       renderCanvas.width = W;
       renderCanvas.height = H;
-      const rCtx = renderCanvas.getContext('2d');
+      renderCanvas.style.cssText = 'position:fixed;bottom:0;right:0;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-10;';
+      document.body.appendChild(renderCanvas);
+      const rCtx = renderCanvas.getContext('2d', { alpha: false });
 
-      // 5. Preload Product Images for Motion Fallback / Multi-Clip
-      const loadedImages = [];
-      const imgSources = (currentProduct && currentProduct.images) ? currentProduct.images : [];
-      for (const src of imgSources.slice(0, 10)) {
-        try {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.src = src;
-          loadedImages.push(img);
-        } catch (e) {}
+      const lastFrameCanvas = document.createElement('canvas');
+      lastFrameCanvas.width = W;
+      lastFrameCanvas.height = H;
+      const lastFrameCtx = lastFrameCanvas.getContext('2d');
+      let hasDrawnValidVideoFrame = false;
+
+      // Tiny 2x2 taint-check canvas so renderCanvas can NEVER be tainted
+      const taintTestCanvas = document.createElement('canvas');
+      taintTestCanvas.width = 2;
+      taintTestCanvas.height = 2;
+      const taintTestCtx = taintTestCanvas.getContext('2d');
+      let isVideoCorsClean = true;
+
+      // 8. Setup WebAudio Mixer (Records 100% of Mali Voiceover + BGM directly into the MP4/WebM file!)
+      let audioCtx = null;
+      let audioDest = null;
+      let voiceNode = null;
+      let bgmNode = null;
+
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume().catch(() => {});
+        }
+        audioDest = audioCtx.createMediaStreamDestination();
+
+        const [voiceBuffer, bgmBuffer] = await Promise.all([
+          decodeAudioUrlToBuffer(audioCtx, finalVoiceSrc),
+          decodeAudioUrlToBuffer(audioCtx, '/audio/bgm_sample.mp3')
+        ]);
+
+        if (voiceBuffer) {
+          voiceNode = audioCtx.createBufferSource();
+          voiceNode.buffer = voiceBuffer;
+          const voiceGain = audioCtx.createGain();
+          voiceGain.gain.value = 1.0;
+          voiceNode.connect(voiceGain);
+          voiceGain.connect(audioDest); // Recorded into exported video file
+          if (!isMaliMuted) {
+            voiceGain.connect(audioCtx.destination); // Heard live through speakers
+          }
+        }
+
+        if (bgmBuffer) {
+          bgmNode = audioCtx.createBufferSource();
+          bgmNode.buffer = bgmBuffer;
+          bgmNode.loop = true;
+          const bgmGain = audioCtx.createGain();
+          bgmGain.gain.value = 0.10;
+          bgmNode.connect(bgmGain);
+          bgmGain.connect(audioDest);
+          if (!isMaliMuted) {
+            bgmGain.connect(audioCtx.destination);
+          }
+        }
+      } catch (e) {
+        console.warn('WebAudio mixer setup notice:', e);
       }
 
-      // 6. Setup AudioContext to mix Mali voice + BGM into recorder stream
-      let stream = null;
+      // 9. Combine 30fps Canvas Video Track + Mixed Audio Track into MediaRecorder
+      let combinedStream = null;
+      let canvasVideoTrack = null;
       try {
-        stream = renderCanvas.captureStream(30);
-      } catch (e) {}
+        const canvasStream = renderCanvas.captureStream(30);
+        canvasVideoTrack = canvasStream.getVideoTracks()[0] || null;
+        const tracks = [...canvasStream.getVideoTracks()];
+        if (audioDest && audioDest.stream && audioDest.stream.getAudioTracks().length > 0) {
+          tracks.push(...audioDest.stream.getAudioTracks());
+        }
+        combinedStream = new MediaStream(tracks);
+      } catch (e) {
+        console.warn('Stream capture notice:', e);
+      }
 
-      let mimeType = 'video/webm;codecs=vp9,opus';
+      let mimeType = 'video/webm';
       if (typeof MediaRecorder !== 'undefined') {
         const testTypes = [
           'video/mp4;codecs=avc1,mp4a',
@@ -3927,58 +4237,112 @@
         }
       }
 
-      let recordedChunks = [];
+      const recordedChunks = [];
       let recorder = null;
-      if (stream && typeof MediaRecorder !== 'undefined') {
+      if (combinedStream && typeof MediaRecorder !== 'undefined') {
         try {
-          recorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: 4500000 });
+          recorder = new MediaRecorder(combinedStream, {
+            mimeType: mimeType,
+            videoBitsPerSecond: 5000000,
+            audioBitsPerSecond: 192000
+          });
           recorder.ondataavailable = (e) => {
-            if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+            if (e.data && e.data.size > 0) {
+              recordedChunks.push(e.data);
+            }
           };
-          recorder.start(100);
+          recorder.start(200);
         } catch (e) {
-          console.warn('Recorder init notice:', e);
+          console.warn('Recorder start notice:', e);
         }
       }
 
-      // Synchronize player and audio
-      const player = document.getElementById('player-preview');
+      // 10. Start Synchronized Playback (Video + WebAudio Voiceover)
+      if (maliAudio) maliAudio.pause(); // WebAudio voiceNode plays the voice cleanly without echo
       const bgmAudio = document.getElementById('player-bgm');
+      if (bgmAudio) bgmAudio.pause();
 
-      if (player) {
+      if (hasVideo && player) {
         player.currentTime = 0;
-        player.play().catch(() => {});
+        await player.play().catch(() => {});
       }
-      if (maliAudio) {
-        maliAudio.currentTime = 0;
-        maliAudio.play().catch(() => {});
+      if (voiceNode) {
+        try { voiceNode.start(0); } catch (e) {}
       }
-      if (bgmAudio) {
-        bgmAudio.currentTime = 0;
-        bgmAudio.volume = 0.12;
-        bgmAudio.play().catch(() => {});
+      if (bgmNode) {
+        try { bgmNode.start(0); } catch (e) {}
       }
-
-      const headlineText = (currentProduct && currentProduct.script && currentProduct.script.headline) ||
-        (document.getElementById('input-on-screen-headline') ? document.getElementById('input-on-screen-headline').value : 'บอกลาของเดิมได้เลย');
 
       const TARGET_DURATION = 20.0;
       const renderStartTime = performance.now();
+      let renderIntervalId = null;
 
-      function renderFrame() {
+      function renderTick() {
         const elapsedSec = (performance.now() - renderStartTime) / 1000.0;
         const pct = Math.min(100, Math.round((elapsedSec / TARGET_DURATION) * 100));
 
-        if (pBar) pBar.style.width = `${Math.min(95, 45 + Math.round(pct * 0.5))}%`;
+        if (pBar) pBar.style.width = `${Math.min(98, 35 + Math.round(pct * 0.63))}%`;
         if (pText) pText.innerText = `3/4 กำลังเรนเดอร์วิดีโอ 9:16 พร้อมซับและเสียงพากย์... ${pct}%`;
 
-        // 1. Draw Background & Visual Frame
+        // Update live phone preview timeline & subtitle DOM in sync
+        const progressFill = document.getElementById('custom-progress-fill');
+        if (progressFill) {
+          progressFill.style.width = Math.min(100, (elapsedSec / TARGET_DURATION) * 100) + '%';
+        }
+        const timeDisplay = document.getElementById('custom-time-display');
+        if (timeDisplay) {
+          const s = Math.floor(Math.min(20, elapsedSec));
+          timeDisplay.innerText = `0:${s < 10 ? '0' : ''}${s} / 0:20`;
+        }
+        const subEl = document.getElementById('overlay-subtitle-text');
+        if (subEl && cues && cues.length > 0) {
+          let activeCue = cues[0];
+          for (let i = 0; i < cues.length; i++) {
+            if (elapsedSec >= cues[i].start && (elapsedSec < cues[i].end || i === cues.length - 1)) {
+              activeCue = cues[i];
+              break;
+            }
+          }
+          if (activeCue && subEl.innerHTML !== activeCue.html) {
+            subEl.innerHTML = activeCue.html;
+          }
+        }
+
+        // If in image-only mode, also animate #player-motion-canvas in the phone preview
+        if (!hasVideo && mCanvas) {
+          if (mCanvas.width !== 720) {
+            mCanvas.width = 720;
+            mCanvas.height = 1280;
+          }
+          drawKenBurnsImage(mCanvas.getContext('2d'), loadedImages, elapsedSec, mCanvas.width, mCanvas.height);
+        }
+
+        // Keep <video> playing if it somehow paused mid-render
+        if (hasVideo && player && player.paused && !player.ended && !isSwitchingClip) {
+          player.play().catch(() => {});
+        }
+
+        // 1. Draw Background & Visual Frame onto 1080x1920 renderCanvas
         rCtx.fillStyle = '#000000';
         rCtx.fillRect(0, 0, W, H);
 
-        const isVideoActive = player && player.readyState >= 2 && !player.paused && !player.ended;
-        if (isVideoActive) {
-          const scale = isSmartCropEnabled ? 1.35 : 1.0;
+        const canDrawVideo = hasVideo && player && player.readyState >= 2 && player.videoWidth > 0 && isVideoCorsClean;
+        if (canDrawVideo) {
+          // Verify CORS cleanliness on first draw so renderCanvas is NEVER tainted
+          if (!hasDrawnValidVideoFrame) {
+            try {
+              taintTestCtx.drawImage(player, 0, 0, 2, 2);
+              taintTestCtx.getImageData(0, 0, 1, 1);
+            } catch (secErr) {
+              console.warn('Taint protection triggered:', secErr);
+              isVideoCorsClean = false;
+            }
+          }
+        }
+
+        if (canDrawVideo && isVideoCorsClean) {
+          const brollBoost = (previewBrollCutIndex % 2 === 1) ? 1.14 : 1.0;
+          const scale = (isSmartCropEnabled ? 1.35 : 1.0) * brollBoost;
           const vw = player.videoWidth || 1080;
           const vh = player.videoHeight || 1920;
           const vAspect = vw / vh;
@@ -4002,29 +4366,43 @@
           }
           try {
             rCtx.drawImage(player, dx, dy, dw, dh);
+            // Save to lastFrameCanvas so clip transitions never flash a static image
+            lastFrameCtx.fillStyle = '#000000';
+            lastFrameCtx.fillRect(0, 0, W, H);
+            lastFrameCtx.drawImage(renderCanvas, 0, 0);
+            hasDrawnValidVideoFrame = true;
           } catch (e) {
-            drawKenBurnsImage(rCtx, loadedImages, elapsedSec, W, H);
+            if (hasDrawnValidVideoFrame) {
+              rCtx.drawImage(lastFrameCanvas, 0, 0);
+            } else {
+              drawKenBurnsImage(rCtx, loadedImages, elapsedSec, W, H);
+            }
           }
           rCtx.restore();
+        } else if (hasVideo && hasDrawnValidVideoFrame) {
+          // During 50ms seek/clip-switch between Clip #1 and Clip #2, hold the last moving video frame!
+          rCtx.drawImage(lastFrameCanvas, 0, 0);
         } else {
-          // If video finished earlier than 20s (e.g. 11s) or no video: use product advertisement images
+          // Product has no video clips -> use 5-scene dynamic Ken-Burns showcase
           drawKenBurnsImage(rCtx, loadedImages, elapsedSec, W, H);
         }
 
-        // Draw Bottom Subtitle Fade Mask
+        // 2. Draw Bottom Subtitle Fade Mask (covers burned-in seller subtitles)
         if (isBottomMaskEnabled) {
           drawBottomSubtitleMask(rCtx, W, H);
         }
 
-        // 2. Draw Top Headline Badge
-        drawHeadlineBadge(rCtx, headlineText, W);
-
-        // 3. Draw Synchronized Subtitles at Safe Zone
+        // 3. Draw Synchronized Viral Orange Subtitles with White Stroke
         drawSubtitlesAtSafeZone(rCtx, cues, elapsedSec, W, H);
 
-        if (elapsedSec < TARGET_DURATION) {
-          requestAnimationFrame(renderFrame);
-        } else {
+        // 4. Force Chromium Skia GPU flush & explicit MediaStreamTrack frame commit (prevents 1-frame / 0.0 MB bug!)
+        try { rCtx.getImageData(0, 0, 1, 1); } catch (e) {}
+        if (canvasVideoTrack && typeof canvasVideoTrack.requestFrame === 'function') {
+          try { canvasVideoTrack.requestFrame(); } catch (e) {}
+        }
+
+        if (elapsedSec >= TARGET_DURATION) {
+          clearInterval(renderIntervalId);
           finishRenderingProcess();
         }
       }
@@ -4032,15 +4410,16 @@
       function finishRenderingProcess() {
         if (pBar) pBar.style.width = '100%';
         if (pText) pText.innerText = 'สำเร็จ! เรนเดอร์วิดีโอ 9:16 เสร็จสมบูรณ์ 🚀';
+        try { if (renderCanvas && renderCanvas.parentNode) renderCanvas.parentNode.removeChild(renderCanvas); } catch (e) {}
 
-        if (recorder && recorder.state !== 'inactive') {
-          recorder.stop();
-        }
+        try { if (voiceNode) voiceNode.stop(); } catch (e) {}
+        try { if (bgmNode) bgmNode.stop(); } catch (e) {}
+        try { if (audioCtx && audioCtx.state !== 'closed') audioCtx.close(); } catch (e) {}
 
-        setTimeout(() => {
-          const ext = mimeType.includes('mp4') ? 'mp4' : 'mp4';
+        const finalizeBlobAndUi = () => {
           const blob = new Blob(recordedChunks, { type: mimeType });
           const blobUrl = URL.createObjectURL(blob);
+          const sizeMb = Math.max(0.1, blob.size / (1024 * 1024)).toFixed(1);
 
           if (currentProduct) {
             currentProduct.rendered_blob = blob;
@@ -4061,37 +4440,40 @@
           if (btnDownload) {
             btnDownload.innerHTML = `
               <i class="ph-bold ph-download-simple text-base"></i>
-              <span>ดาวน์โหลดไฟล์วิดีโอ MP4 (${(blob.size / (1024 * 1024)).toFixed(1)} MB พร้อมโพสต์)</span>
+              <span>ดาวน์โหลดไฟล์วิดีโอ MP4 (${sizeMb} MB พร้อมโพสต์)</span>
             `;
           }
 
-          // Unhide preview player and elements
-          const emptyState = document.getElementById('preview-empty-state');
-          const renderState = document.getElementById('preview-rendering-state');
-          const subOv = document.getElementById('overlay-subtitles');
-          const ctrlOv = document.getElementById('custom-video-controls');
-          if (emptyState) emptyState.classList.add('hidden');
-          if (renderState) renderState.classList.add('hidden');
-          if (player) player.classList.remove('hidden');
-          if (subOv) subOv.classList.remove('hidden');
-          if (ctrlOv) ctrlOv.classList.remove('hidden');
+          showToast('ผลิตวิดีโอ 9:16 สำเร็จ พร้อมเสียงมาลีและซับส้มครบ 20 วินาที!');
 
-          showToast('ผลิตวิดีโอ 9:16 สำเร็จ พร้อมเสียงมาลีและซับส้มตรงสินค้า 100%!');
+          // Start continuous 20s preview playback loop
+          resetPreviewPlayback();
 
-          if (autoDownload) {
+          if (autoDownload && blob.size > 0) {
             const dl = document.createElement('a');
             dl.href = blobUrl;
-            dl.download = `${(currentProduct && currentProduct.product_id) || 'shopee'}_916_ready.${ext}`;
+            dl.download = `${(currentProduct && currentProduct.product_id) || 'shopee'}_916_ready.mp4`;
             document.body.appendChild(dl);
             dl.click();
             document.body.removeChild(dl);
             showToast('เริ่มดาวน์โหลดไฟล์วิดีโอ 9:16 สำเร็จรูปเรียบร้อย!');
           }
-        }, 400);
+        };
+
+        if (recorder && recorder.state !== 'inactive') {
+          recorder.onstop = finalizeBlobAndUi;
+          try { recorder.requestData(); } catch (e) {}
+          try { recorder.stop(); } catch (e) { finalizeBlobAndUi(); }
+        } else {
+          finalizeBlobAndUi();
+        }
       }
 
-      requestAnimationFrame(renderFrame);
+      // Use 33ms (30fps) setInterval so rendering NEVER pauses or drops to 1 frame even if user switches browser tabs!
+      renderTick();
+      renderIntervalId = setInterval(renderTick, 33);
     }
+
   </script>
 </body>
 </html>

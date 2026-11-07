@@ -199,6 +199,8 @@
       .replace(/\s*\[.*?\]/g, '')
       .trim();
 
+    // Normalize number commas (e.g. 2,0000 -> 20000)
+    str = str.replace(/(\d+),(\d+)/g, '$1$2');
     // Convert unit abbreviations to clear spoken Thai words
     str = str.replace(/(\d+(?:\.\d+)?)\s*(?:m|เมตร|ม\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 เมตร');
     str = str.replace(/(\d+(?:\.\d+)?)\s*(?:ml|มล|มล\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 มิลลิลิตร');
@@ -242,13 +244,14 @@
     // Accurate Price Extraction (Range & Single)
     const priceData = extractShopeePrice();
 
-    // 1. Real Gallery Video & All On-Page Videos (Reviews & Ads)
+    // 1. Real Gallery Video & All On-Page Videos (Reviews & Ads & Performance Entries & Ratings API Cache)
     let galleryVideo = '';
     const allFoundVideos = [];
+    const reviewVideos = [...(window.__svfCachedReviewVideos || [])];
 
     const videoElements = document.querySelectorAll('video, video source');
     for (const v of videoElements) {
-      const src = v.src || v.getAttribute('src');
+      const src = v.src || v.getAttribute('src') || v.currentSrc;
       if (src && (src.includes('vod.susercontent.com') || src.includes('.mp4'))) {
         if (!galleryVideo && !v.closest('.shopee-product-rating') && !v.closest('[class*="rating"]')) {
           galleryVideo = src;
@@ -259,23 +262,22 @@
       }
     }
 
-    // If video tag is not yet mounted, check for video thumbnail in gallery
-    if (!galleryVideo) {
-      const playIcons = document.querySelectorAll('[class*="play"], [class*="video-icon"]');
-      if (playIcons.length > 0) {
-        const vid = document.querySelector('video');
-        if (vid && vid.src) {
-          galleryVideo = vid.src;
-          if (!allFoundVideos.includes(vid.src)) allFoundVideos.push(vid.src);
+    // Also scan performance resource entries for any MP4 / Shopee VOD video loaded on the page
+    try {
+      const resources = performance.getEntriesByType('resource') || [];
+      for (const res of resources) {
+        if (res.name && (res.name.includes('vod.susercontent.com') || res.name.endsWith('.mp4'))) {
+          if (!allFoundVideos.includes(res.name)) {
+            allFoundVideos.push(res.name);
+          }
         }
       }
-    }
+    } catch (e) {}
 
-    // 2. Buyer Review Comment Videos (Extract from Comments)
-    const reviewVideos = [];
+    // 2. Buyer Review Comment Videos (Extract from Comments DOM)
     const ratingVideoEls = document.querySelectorAll('.shopee-product-rating video, .shopee-product-rating video source, .shopee-product-rating__video video, [class*="rating"] video');
     for (const rv of ratingVideoEls) {
-      const src = rv.src || rv.getAttribute('src');
+      const src = rv.src || rv.getAttribute('src') || rv.currentSrc;
       if (src && (src.includes('vod.susercontent.com') || src.includes('.mp4'))) {
         if (!reviewVideos.includes(src)) reviewVideos.push(src);
         if (!allFoundVideos.includes(src)) allFoundVideos.push(src);
@@ -294,14 +296,18 @@
 
     const primaryVideoUrl = orderedVideos[0] || '';
 
-    // Gallery Images Extraction
-    const images = [];
-    const imgElements = document.querySelectorAll('picture img, [class*="carousel"] img, [class*="gallery"] img');
-    for (const img of imgElements) {
+    // 3. Comprehensive Product & Review Images Extraction (Gallery, Thumbnails, Description, Ratings)
+    const images = [...(window.__svfCachedProductImages || [])];
+    const allImgs = document.querySelectorAll('picture img, [class*="carousel"] img, [class*="gallery"] img, img[src*="susercontent.com"]');
+    for (const img of allImgs) {
       const src = img.src || img.getAttribute('src');
-      if (src && src.includes('susercontent.com') && !src.includes('avatar') && !images.includes(src)) {
-        // Clean to high-resolution URL
-        const clean = src.split('_tn')[0].split('_b')[0];
+      if (!src || !src.includes('susercontent.com')) continue;
+      if (src.includes('avatar') || src.includes('icon') || src.includes('badge')) continue;
+      const w = img.naturalWidth || img.width || 200;
+      const h = img.naturalHeight || img.height || 200;
+      if (w < 48 || h < 48) continue;
+      const clean = src.split('@')[0].split('_tn')[0];
+      if (!images.includes(clean)) {
         images.push(clean);
       }
     }
@@ -322,6 +328,47 @@
       extracted_at: new Date().toISOString()
     };
   }
+
+
+  function __svfPrefetchRatingsMedia() {
+    try {
+      const url = window.location.href.split('?')[0];
+      let shopId = null, itemId = null;
+      const m1 = url.match(/-i\.(\d+)\.(\d+)/);
+      const m2 = url.match(/\/product\/(\d+)\/(\d+)/);
+      if (m1) { shopId = m1[1]; itemId = m1[2]; }
+      else if (m2) { shopId = m2[1]; itemId = m2[2]; }
+      if (!shopId || !itemId) return;
+
+      window.__svfCachedReviewVideos = window.__svfCachedReviewVideos || [];
+      window.__svfCachedProductImages = window.__svfCachedProductImages || [];
+
+      fetch(`/api/v2/item/get_ratings?itemid=${itemId}&shopid=${shopId}&filter=3&flag=1&limit=20&offset=0`, { credentials: 'include' })
+        .then(r => r.ok ? r.json() : null)
+        .then(res => {
+          const ratings = (res && res.data && res.data.ratings) ? res.data.ratings : [];
+          for (const rt of ratings) {
+            if (rt.videos && Array.isArray(rt.videos)) {
+              for (const v of rt.videos) {
+                if (v && v.url && !window.__svfCachedReviewVideos.includes(v.url)) {
+                  window.__svfCachedReviewVideos.push(v.url);
+                }
+              }
+            }
+            if (rt.images && Array.isArray(rt.images)) {
+              for (const imHash of rt.images) {
+                const imUrl = imHash.startsWith('http') ? imHash : `https://down-th.img.susercontent.com/file/${imHash}`;
+                if (!window.__svfCachedProductImages.includes(imUrl)) {
+                  window.__svfCachedProductImages.push(imUrl);
+                }
+              }
+            }
+          }
+        })
+        .catch(() => {});
+    } catch (e) {}
+  }
+  __svfPrefetchRatingsMedia();
 
   // 2. CREATE FLOATING ACTION BUTTON ON SHOPEE PRODUCT PAGE
   function injectFloatingButton() {

@@ -395,6 +395,65 @@ class VoiceoverUploadRequest(BaseModel):
     product_id: str
     audio_base64: str
 
+
+class VideoRenderRequest(BaseModel):
+    product_id: str = "imported_shopee"
+    product_name: str = "สินค้า Shopee"
+    script_text: str = ""
+    headline: str = ""
+    video_urls: List[str] = []
+    images: List[str] = []
+    duration: float = 20.0
+
+@app.post("/api/video/render")
+def render_video_ffmpeg(req: VideoRenderRequest):
+    """
+    Render 1080x1920 9:16 Video with burned subtitles and voiceover via FFmpeg.
+    """
+    pid = req.product_id
+    out_dir = config.OUTPUT_DIR / pid
+    raw_media_dir = out_dir / "raw_media"
+    raw_media_dir.mkdir(parents=True, exist_ok=True)
+
+    # Download remote video URLs if provided
+    total_dur = 0.0
+    from modules import download_file, check_media_duration
+    for idx, u in enumerate(req.video_urls[:5]):
+        dest = raw_media_dir / f"clip_{idx+1}.mp4"
+        if not dest.is_file():
+            ok = download_file(u, dest)
+            if ok and dest.is_file():
+                total_dur += check_media_duration(dest)
+        else:
+            total_dur += check_media_duration(dest)
+
+    # If videos shorter than 20s or no video: download images for Ken-Burns motion
+    if total_dur < 20.0 or not req.video_urls:
+        for idx, u in enumerate(req.images[:8]):
+            dest = raw_media_dir / f"ad_image_{idx+1:02d}.jpg"
+            if not dest.is_file():
+                download_file(u, dest)
+
+    # Save script
+    script_data = {
+        "on_screen_headline": req.headline or "ของดีบอกต่อ!",
+        "full_script": req.script_text,
+        "hook_text": req.script_text[:40],
+        "body_text": req.script_text[40:-30] if len(req.script_text) > 70 else req.script_text,
+        "cta_text": req.script_text[-30:] if len(req.script_text) > 70 else "จิ้มสั่งที่ตะกร้าส้มได้เลยค่ะ"
+    }
+    with open(out_dir / "script.json", "w", encoding="utf-8") as f:
+        json.dump(script_data, f, ensure_ascii=False, indent=2)
+
+    generate_voiceover_and_subtitles(pid, script_data, voice_choice="chirp3_aoede")
+    final_mp4 = assemble_curated_video(pid, target_duration=req.duration)
+
+    return {
+        "status": "success",
+        "download_url": f"/output/{pid}/{final_mp4.name}",
+        "filename": final_mp4.name
+    }
+
 @app.post("/api/voiceover/upload")
 async def upload_custom_voiceover(req: VoiceoverUploadRequest):
     """

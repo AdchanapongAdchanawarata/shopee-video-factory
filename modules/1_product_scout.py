@@ -69,6 +69,21 @@ def extract_product_id(url_or_id: str) -> str:
     clean = url_or_id.split("?")[0].rstrip("/").split("/")[-1]
     return re.sub(r"[^a-zA-Z0-9_-]", "", clean) or "shopee_prod_001"
 
+def check_media_duration(file_path: Path) -> float:
+    """Measure exact video duration in seconds via OpenCV or config."""
+    try:
+        import cv2
+        cap = cv2.VideoCapture(str(file_path))
+        if cap.isOpened():
+            fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            cap.release()
+            if fps > 0:
+                return float(total_frames / fps)
+    except Exception:
+        pass
+    return 0.0
+
 def download_file(url: str, dest_path: Path) -> bool:
     """Download media file safely with headers."""
     try:
@@ -389,21 +404,37 @@ def scout_shopee_products(product_id: str, url: Optional[str] = None, use_mock: 
         print(f"⚠️ WARNING: AMS Commission {ams_rate}% is below threshold {config.MIN_AMS_COMMISSION_RATE}%.")
 
     # Download media: Videos if available, otherwise Fallback to Product Ad Images!
+    # Requirement: "ถ้าคลิปที่ดาวโหลดสั้นไม่ครบ 20 วิ ให้ดาวโหลดคลิปอื่นมาประกอบ ทั้งในคอมเม้นต์และโฆษณา และถ้าตรวจพบว่าไม่มีคลิปใดๆให้ใช้รูปภาพแทน"
     all_videos = scraped.get("product_videos", []) + scraped.get("review_videos", [])
+    downloaded_video_dur = 0.0
+    downloaded_videos = []
+
     if all_videos:
-        print(f"🎬 ตรวจพบวิดีโอ {len(all_videos)} คลิป -> กำลังดาวน์โหลดคลิปวิดีโอจริง...")
-        for idx, vid_url in enumerate(all_videos[:5]):
+        print(f"🎬 ตรวจพบวิดีโอทั้งหมด {len(all_videos)} คลิป (โฆษณาหลัก + รีวิวในคอมเมนต์)")
+        for idx, vid_url in enumerate(all_videos[:8]):
             dest = raw_media_dir / f"clip_{idx+1}.mp4"
-            print(f"⬇️ กำลังดาวน์โหลดวิดีโอ {idx+1}/{min(len(all_videos), 5)}: {vid_url[:50]}...")
-            download_file(vid_url, dest)
-    else:
-        # Fallback Rule: "ถ้าลิ้งค์ไหน ไม่มี vdo ให้ใช้รูปภาพโฆษณาแทน"
-        print("📸 ลิงก์นี้ไม่มีวิดีโอ -> สลับใช้รูปภาพโฆษณาของสินค้าแปลงเป็นโมชัน 9:16 แทนอัตโนมัติ")
-        imgs = scraped.get("product_images", [])
+            print(f"⬇️ กำลังดาวน์โหลดวิดีโอ {idx+1}/{min(len(all_videos), 8)}: {vid_url[:50]}...")
+            ok = download_file(vid_url, dest)
+            if ok and dest.is_file():
+                dur = check_media_duration(dest)
+                downloaded_video_dur += dur
+                downloaded_videos.append(dest)
+                print(f"   ⏱️ ความยาวคลิปนี้: {dur:.1f} วิ (รวมความยาววิดีโอสะสม: {downloaded_video_dur:.1f} / 20.0 วิ)")
+                if downloaded_video_dur >= 20.0:
+                    print("✅ ความยาววิดีโอรวมครบ 20 วินาทีเรียบร้อยแล้ว!")
+                    break
+
+    imgs = scraped.get("product_images", [])
+    # If total video duration is < 20s or no video was found, download product advertisement images as fallback/supplement
+    if downloaded_video_dur < 20.0:
+        if downloaded_video_dur == 0.0:
+            print("📸 [ไม่พบคลิปวิดีโอใดๆ] -> สลับใช้รูปภาพโฆษณาสินค้าแปลงเป็นโมชัน 9:16 แทนอัตโนมัติ 100%")
+        else:
+            print(f"⚠️ [คลิปวิดีโอสั้นไม่ครบ 20 วิ: รวมได้ {downloaded_video_dur:.1f} วิ] -> ดาวน์โหลดภาพโฆษณาสินค้ามาตัดต่อประกอบเสริมจนครบ 20 วิ")
         if imgs:
-            for idx, img_url in enumerate(imgs[:8]):
+            for idx, img_url in enumerate(imgs[:10]):
                 dest = raw_media_dir / f"ad_image_{idx+1:02d}.jpg"
-                print(f"⬇️ กำลังดาวน์โหลดภาพโฆษณา {idx+1}/{min(len(imgs), 8)}: {img_url[:60]}...")
+                print(f"⬇️ กำลังดาวน์โหลดภาพโฆษณา {idx+1}/{min(len(imgs), 10)}: {img_url[:60]}...")
                 download_file(img_url, dest)
 
     # Save outputs

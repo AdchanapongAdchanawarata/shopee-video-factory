@@ -83,6 +83,27 @@ def generate_mock_script(product_id: str, product_title: str, price: float) -> S
             full_script=full
         )
 
+    # Use intelligent category generator based on product title
+    try:
+        from api.index import generate_smart_script_py
+        smart = generate_smart_script_py(product_title)
+        return ShopeeScriptResult(
+            pain_point_identified="ความยุ่งยากหรือไม่สะดวกในการใช้งานแบบเดิมๆ",
+            praised_feature_identified="ฟังก์ชันครบ คุณภาพดี สวยตรงปก คุ้มค่า",
+            on_screen_headline=smart.get("headline", "ของดีบอกต่อ!"),
+            hook_text=smart.get("hook_text", "ใครกำลังมองหาของดีราคาคุ้มค่า ฟังทางนี้ด่วนเลยค่ะ!"),
+            body_text=smart.get("body_text", f"ตัวนี้เป็น {product_title} คุณภาพดี ใช้งานง่าย คุ้มค่ามากเลยค่ะ"),
+            cta_text=smart.get("cta_text", "รีบกดสั่งที่ตะกร้าสีส้มซ้ายมือด่วนเลย ตอนนี้มีโค้ดลดเพิ่มด้วยนะคะ!"),
+            visual_broll_prompts=[
+                f"ช็อตทดสอบการใช้งานจริง {product_title[:25]}",
+                "ภาพโคลสอัพดีเทลสินค้าชัดเจน คุณภาพเกรดพรีเมียม",
+                "ช็อตนิ้วชี้ไปที่มุมซ้ายล่างพร้อมโปรโมชั่น"
+            ],
+            full_script=smart.get("full_script", "")
+        )
+    except Exception:
+        pass
+
     return ShopeeScriptResult(
         pain_point_identified="แมวไม่ยอมกินน้ำ เสี่ยงโรคไต และน้ำพุแบบเก่ามีสายไฟเกะกะแถมกลัวไฟดูด",
         praised_feature_identified="ระบบไร้สาย แบตทน สแตนเลส 304 เสียงเงียบสนิท แมวชอบกินน้ำเยอะขึ้น",

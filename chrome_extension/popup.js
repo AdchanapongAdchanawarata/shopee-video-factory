@@ -16,6 +16,7 @@ function normalizeThaiProductTitle(rawTitle) {
   str = str.replace(/(\d+(?:\.\d+)?)\s*(?:w|วัตต์)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 วัตต์');
   str = str.replace(/(\d+(?:\.\d+)?)\s*(?:kg|กก|กก\.|กิโล|กิโลกรัม)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 กิโลกรัม');
   str = str.replace(/(\d+(?:\.\d+)?)\s*(?:l|ลิตร)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 ลิตร');
+  str = str.replace(/(\d+)\s*(?:mah|มิลลิแอมป์|แอมป์)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 มิลลิแอมป์');
 
   str = str.replace(/[\/\|]/g, ' ')
            .replace(/\s+/g, ' ')
@@ -129,11 +130,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (mediaLabel) {
-      if (data.video_url) {
-        mediaLabel.innerText = '🎬 พบคลิปวิดีโอแท้ 100%';
+      const vCount = (data.video_urls && data.video_urls.length) || (data.video_url ? 1 : 0);
+      if (vCount > 1) {
+        mediaLabel.innerText = `🎬 พบคลิปวิดีโอ ${vCount} คลิป (หลัก + รีวิวคอมเมนต์)`;
+        mediaLabel.style.color = '#34d399';
+      } else if (vCount === 1) {
+        mediaLabel.innerText = '🎬 พบคลิปวิดีโอแท้ (ผสานรีวิว/ภาพต่อหากไม่ครบ 20 วิ)';
         mediaLabel.style.color = '#34d399';
       } else if (data.images && data.images.length > 0) {
-        mediaLabel.innerText = `📸 พบภาพแกลเลอรี ${data.images.length} รูป`;
+        mediaLabel.innerText = `📸 พบภาพสินค้า ${data.images.length} รูป (ใช้ภาพโฆษณาแปลงโมชัน 9:16 แทนอัตโนมัติ)`;
         mediaLabel.style.color = '#f59e0b';
       }
     }

@@ -8,6 +8,8 @@ _voice = importlib.import_module("modules.3_voice_and_sub")
 _assembler = importlib.import_module("modules.4_video_assembler")
 
 scout_shopee_products = _scout.scout_shopee_products
+download_file = _scout.download_file
+check_media_duration = _scout.check_media_duration
 curate_product_videos = _curator.curate_product_videos
 generate_shopee_script = _writer.generate_shopee_script
 generate_voiceover_and_subtitles = _voice.generate_voiceover_and_subtitles
@@ -20,6 +22,8 @@ ShopeeScriptResult = _writer.ShopeeScriptResult
 
 __all__ = [
     "scout_shopee_products",
+    "download_file",
+    "check_media_duration",
     "curate_product_videos",
     "generate_shopee_script",
     "generate_voiceover_and_subtitles",

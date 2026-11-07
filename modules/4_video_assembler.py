@@ -455,35 +455,28 @@ def assemble_curated_video(
                     image_files.append(img_p)
 
         if image_files:
-            # If zero videos exist, calculate duration per image so all images fill 20.0s
-            if len(processed_clips) == 0:
-                print("📸 [โหมดภาพโฆษณาแท้] ตรวจพบว่าลิงก์นี้ไม่มีวิดีโอ -> ใช้รูปภาพโฆษณาสินค้าแปลงเป็นโมชัน 9:16 แทนอัตโนมัติ")
-                num_imgs = min(len(image_files), 7)
-                dur_per_img = round(total_target_dur / num_imgs, 2)
-                for cur_img in image_files[:num_imgs]:
-                    clip_dur = min(dur_per_img, total_target_dur - accumulated_dur)
-                    if clip_dur < 0.5:
-                        break
-                    clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
-                    ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
-                    if ok:
-                        processed_clips.append(clip_p)
-                        accumulated_dur += clip_dur
-                        seg_counter += 1
-            else:
-                # Supplement remaining duration with product ad images
-                for cur_img in image_files:
-                    if accumulated_dur >= total_target_dur:
-                        break
-                    clip_dur = min(2.5, total_target_dur - accumulated_dur)
-                    if clip_dur < 0.8:
-                        clip_dur = total_target_dur - accumulated_dur
-                    clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
-                    ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
-                    if ok:
-                        processed_clips.append(clip_p)
-                        accumulated_dur += clip_dur
-                        seg_counter += 1
+            img_idx = 0
+            # If zero videos exist or video is shorter than 20s, fill duration with dynamic Ken-Burns motion clips
+            while accumulated_dur < total_target_dur and img_idx < 25:
+                cur_img = image_files[img_idx % len(image_files)]
+                rem = total_target_dur - accumulated_dur
+                clip_dur = min(2.5, rem)
+                if clip_dur < 0.8:
+                    clip_dur = rem
+                clip_p = temp_dir / f"img_motion_{seg_counter:02d}.mp4"
+                ok = generate_motion_clip_from_image(cur_img, clip_p, duration=clip_dur, motion_idx=seg_counter)
+                if ok:
+                    processed_clips.append(clip_p)
+                    accumulated_dur += clip_dur
+                    seg_counter += 1
+                img_idx += 1
+
+    # Safety fallback: ensure at least one valid clip exists and duration reaches target
+    if not processed_clips:
+        clip_p = temp_dir / f"clip_fallback_00.mp4"
+        generate_motion_clip_from_color(clip_p, total_target_dur, "black", "Shopee AI Video")
+        processed_clips.append(clip_p)
+        accumulated_dur = total_target_dur
 
     print(f"📦 Stitched {len(processed_clips)} 100% unique cuts (Total visual length: {accumulated_dur:.2f}s)")
 

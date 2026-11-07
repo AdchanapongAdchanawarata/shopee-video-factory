@@ -205,6 +205,7 @@
     str = str.replace(/(\d+(?:\.\d+)?)\s*(?:w|วัตต์)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 วัตต์');
     str = str.replace(/(\d+(?:\.\d+)?)\s*(?:kg|กก|กก\.|กิโล|กิโลกรัม)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 กิโลกรัม');
     str = str.replace(/(\d+(?:\.\d+)?)\s*(?:l|ลิตร)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 ลิตร');
+    str = str.replace(/(\d+)\s*(?:mah|มิลลิแอมป์|แอมป์)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 มิลลิแอมป์');
 
     str = str.replace(/[\/\|]/g, ' ')
              .replace(/\s+/g, ' ')
@@ -241,26 +242,57 @@
     // Accurate Price Extraction (Range & Single)
     const priceData = extractShopeePrice();
 
-    // Real Gallery Video Extraction
-    let videoUrl = '';
+    // 1. Real Gallery Video & All On-Page Videos (Reviews & Ads)
+    let galleryVideo = '';
+    const allFoundVideos = [];
+
     const videoElements = document.querySelectorAll('video, video source');
     for (const v of videoElements) {
       const src = v.src || v.getAttribute('src');
       if (src && (src.includes('vod.susercontent.com') || src.includes('.mp4'))) {
-        videoUrl = src;
-        break;
+        if (!galleryVideo && !v.closest('.shopee-product-rating') && !v.closest('[class*="rating"]')) {
+          galleryVideo = src;
+        }
+        if (!allFoundVideos.includes(src)) {
+          allFoundVideos.push(src);
+        }
       }
     }
 
     // If video tag is not yet mounted, check for video thumbnail in gallery
-    if (!videoUrl) {
+    if (!galleryVideo) {
       const playIcons = document.querySelectorAll('[class*="play"], [class*="video-icon"]');
       if (playIcons.length > 0) {
-        // Thumbnail has video indicator; if user clicks it, it loads
         const vid = document.querySelector('video');
-        if (vid && vid.src) videoUrl = vid.src;
+        if (vid && vid.src) {
+          galleryVideo = vid.src;
+          if (!allFoundVideos.includes(vid.src)) allFoundVideos.push(vid.src);
+        }
       }
     }
+
+    // 2. Buyer Review Comment Videos (Extract from Comments)
+    const reviewVideos = [];
+    const ratingVideoEls = document.querySelectorAll('.shopee-product-rating video, .shopee-product-rating video source, .shopee-product-rating__video video, [class*="rating"] video');
+    for (const rv of ratingVideoEls) {
+      const src = rv.src || rv.getAttribute('src');
+      if (src && (src.includes('vod.susercontent.com') || src.includes('.mp4'))) {
+        if (!reviewVideos.includes(src)) reviewVideos.push(src);
+        if (!allFoundVideos.includes(src)) allFoundVideos.push(src);
+      }
+    }
+
+    // Combine in priority order: Main gallery video -> Buyer review videos in comments -> Ad/promotional videos
+    const orderedVideos = [];
+    if (galleryVideo) orderedVideos.push(galleryVideo);
+    for (const rv of reviewVideos) {
+      if (!orderedVideos.includes(rv)) orderedVideos.push(rv);
+    }
+    for (const v of allFoundVideos) {
+      if (!orderedVideos.includes(v)) orderedVideos.push(v);
+    }
+
+    const primaryVideoUrl = orderedVideos[0] || '';
 
     // Gallery Images Extraction
     const images = [];
@@ -280,8 +312,12 @@
       max_price: priceData.max_price,
       price_str: priceData.price_str,
       is_range: priceData.is_range,
-      video_url: videoUrl,
-      images: images.slice(0, 10),
+      video_url: primaryVideoUrl,
+      video_urls: orderedVideos,
+      review_videos: reviewVideos,
+      has_video: orderedVideos.length > 0,
+      media_mode: orderedVideos.length > 0 ? 'video' : 'ad_images',
+      images: images.slice(0, 15),
       shopee_url: window.location.href.split('?')[0],
       extracted_at: new Date().toISOString()
     };

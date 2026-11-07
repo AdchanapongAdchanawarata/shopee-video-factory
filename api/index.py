@@ -455,6 +455,8 @@ def normalize_thai_title_py(raw_title: str) -> str:
     if not raw_title:
         return ""
     s = str(raw_title)
+    # Normalize number commas: e.g. 2,0000 -> 20000 or 15,000 -> 15000
+    s = re.sub(r'(\d+),(\d+)', r'\1\2', s)
     s = re.sub(r"^\[(Mall|ช้อปปี้|พร้อมส่ง|ของแท้|แท้ 100%|ของแท้ 100%)\]\s*", "", s, flags=re.I)
     s = re.sub(r"\s*\[(Mall|ช้อปปี้|พร้อมส่ง|ของแท้|แท้ 100%|อัตโนมัติ.*?)\]", "", s, flags=re.I)
     s = re.sub(r"\s*\(รับประกัน.*?\)", "", s, flags=re.I)

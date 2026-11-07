@@ -706,6 +706,12 @@
                 muted
               ></video>
 
+              <!-- MOTION IMAGE FALLBACK CANVAS (WHEN VIDEO FINISHES BEFORE 20S OR NO VIDEO) -->
+              <canvas
+                id="player-motion-canvas"
+                class="absolute inset-0 w-full h-full object-cover pointer-events-none hidden z-5"
+              ></canvas>
+
               <div id="top-sub-mask" class="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10 transition-opacity duration-300"></div>
               <!-- SMART BOTTOM SUBTITLE MASK (MASKS ANY BURNED-IN SELLER SUBTITLES CLEANLY) -->
               <div id="bottom-sub-mask" class="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black via-black/85 to-transparent pointer-events-none z-10 transition-opacity duration-300"></div>
@@ -1217,6 +1223,9 @@
         .replace(/\s*【.*?】/g, '')
         .replace(/\s*\[.*?\]/g, '')
         .trim();
+
+      // Normalize numbers with commas: e.g. 2,0000 -> 20000 or 15,000 -> 15000
+      s = s.replace(/(\d+),(\d+)/g, '$1$2');
 
       // Convert unit abbreviations to clear spoken Thai words without breaking decimals
       s = s.replace(/(\d+(?:\.\d+)?)\s*(?:m|เมตร|ม\.)(?=[^ก-๙a-zA-Z]|$)/gi, '$1 เมตร');
@@ -2497,13 +2506,36 @@
         if (adDesc) adDesc.innerText = 'วิดีโอหลักจากแกลเลอรีร้าน (1080x1920 HD)';
       }
 
+      // Reset multi-clip & motion state
+      currentClipIndex = 0;
+      clipStartOffset = 0.0;
+      if (previewMotionRaf) {
+        cancelAnimationFrame(previewMotionRaf);
+        previewMotionRaf = null;
+      }
+      const mCanvasInit = document.getElementById('player-motion-canvas');
+      if (mCanvasInit) mCanvasInit.classList.add('hidden');
+
+      // Preload product ad images for Ken-Burns motion fallback
+      preloadedPreviewImages = [];
+      const prodImgs = (prod.images && prod.images.length > 0) ? prod.images : [];
+      for (const src of prodImgs.slice(0, 10)) {
+        try {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = src;
+          preloadedPreviewImages.push(img);
+        } catch (e) {}
+      }
+
       // Video Player & Synchronized Mali Voiceover (PRELOAD READY, SILENCED UNTIL RENDER 1-CLICK)
       isVideoRendered = false;
       const player = document.getElementById('player-preview');
       if (player) {
         player.pause();
         player.currentTime = 0;
-        player.src = prod.video_url || '';
+        const vList = (prod.video_urls && prod.video_urls.length > 0) ? prod.video_urls : (prod.video_url ? [prod.video_url] : []);
+        player.src = vList[0] || '';
         player.muted = true;
         player.classList.add('hidden');
       }
@@ -3544,39 +3576,166 @@
     }
 
     let isSubtitleSyncAttached = false;
+        // =========================================================================
+    // MULTI-CLIP SEAMLESS CHAINING & DYNAMIC KEN-BURNS MOTION ENGINE (20S GUARANTEE)
+    // =========================================================================
+    let currentClipIndex = 0;
+    let clipStartOffset = 0.0;
+    let previewMotionRaf = null;
+    let preloadedPreviewImages = [];
+
+    function handlePreviewClipFinished() {
+      const vList = (currentProduct && currentProduct.video_urls && currentProduct.video_urls.length > 0) ?
+        currentProduct.video_urls :
+        (currentProduct && currentProduct.video_url ? [currentProduct.video_url] : []);
+
+      const player = document.getElementById('player-preview');
+      const dur = (player && player.duration && !isNaN(player.duration)) ? player.duration : 12.0;
+      clipStartOffset += dur;
+
+      // 1. If another video clip exists in playlist (e.g. review comment video #2):
+      if (currentClipIndex + 1 < vList.length) {
+        currentClipIndex++;
+        player.src = vList[currentClipIndex];
+        player.currentTime = 0;
+        player.play().catch(() => {});
+        showToast(`สลับเล่นคลิปรีวิวที่ ${currentClipIndex + 1} ต่อเนื่อง 🎬`);
+        return;
+      }
+
+      // 2. If no more video clips and we have not reached 20.0s: transition into Ken-Burns product images!
+      if (clipStartOffset < MAX_TARGET_VIDEO_DURATION) {
+        player.classList.add('hidden');
+        const mCanvas = document.getElementById('player-motion-canvas');
+        if (mCanvas) {
+          mCanvas.classList.remove('hidden');
+          startPreviewMotionLoop(clipStartOffset);
+        }
+      } else {
+        resetPreviewPlayback();
+      }
+    }
+
+    function startPreviewMotionLoop(startSec) {
+      if (previewMotionRaf) cancelAnimationFrame(previewMotionRaf);
+      const mCanvas = document.getElementById('player-motion-canvas');
+      if (!mCanvas) return;
+      mCanvas.width = 720;
+      mCanvas.height = 1280;
+      const mCtx = mCanvas.getContext('2d');
+      const startTime = performance.now() - (startSec * 1000);
+
+      function motionStep() {
+        const nowSec = (performance.now() - startTime) / 1000.0;
+        const maliAudio = document.getElementById('player-mali-audio');
+        const masterTime = (maliAudio && !maliAudio.paused) ? maliAudio.currentTime : nowSec;
+
+        // Update timeline & progress bar
+        const progressFill = document.getElementById('custom-progress-fill');
+        if (progressFill) {
+          progressFill.style.width = Math.min(100, (masterTime / MAX_TARGET_VIDEO_DURATION) * 100) + '%';
+        }
+        const timeDisplay = document.getElementById('custom-time-display');
+        if (timeDisplay) {
+          const s = Math.floor(Math.min(20, masterTime));
+          timeDisplay.innerText = `0:${s < 10 ? '0' : ''}${s} / 0:20`;
+        }
+
+        // Update active subtitle cue
+        if (currentProduct && currentProduct.script) {
+          const subEl = document.getElementById('overlay-subtitle-text');
+          if (subEl) {
+            if (!currentProduct._cachedCues) {
+              const sText = (document.getElementById('textarea-script') && document.getElementById('textarea-script').value.trim()) ||
+                currentProduct.script.full_script || '';
+              currentProduct._cachedCues = buildTimedSubtitleCues(sText);
+            }
+            const cues = currentProduct._cachedCues;
+            if (cues && cues.length > 0) {
+              let activeCue = cues[0];
+              for (let i = 0; i < cues.length; i++) {
+                if (masterTime >= cues[i].start && (masterTime < cues[i].end || i === cues.length - 1)) {
+                  activeCue = cues[i];
+                  break;
+                }
+              }
+              if (activeCue && subEl.innerHTML !== activeCue.html) {
+                subEl.innerHTML = activeCue.html;
+              }
+            }
+          }
+        }
+
+        // Draw Ken-Burns motion on images
+        drawKenBurnsImage(mCtx, preloadedPreviewImages, masterTime - startSec, mCanvas.width, mCanvas.height);
+
+        if (masterTime < MAX_TARGET_VIDEO_DURATION) {
+          previewMotionRaf = requestAnimationFrame(motionStep);
+        } else {
+          resetPreviewPlayback();
+        }
+      }
+      previewMotionRaf = requestAnimationFrame(motionStep);
+    }
+
+    function resetPreviewPlayback() {
+      if (previewMotionRaf) {
+        cancelAnimationFrame(previewMotionRaf);
+        previewMotionRaf = null;
+      }
+      const mCanvas = document.getElementById('player-motion-canvas');
+      if (mCanvas) mCanvas.classList.add('hidden');
+
+      currentClipIndex = 0;
+      clipStartOffset = 0.0;
+
+      const player = document.getElementById('player-preview');
+      const vList = (currentProduct && currentProduct.video_urls && currentProduct.video_urls.length > 0) ?
+        currentProduct.video_urls :
+        (currentProduct && currentProduct.video_url ? [currentProduct.video_url] : []);
+
+      if (player) {
+        player.classList.remove('hidden');
+        player.src = vList[0] || '';
+        player.currentTime = 0;
+        player.play().catch(() => {});
+      }
+
+      const maliAudio = document.getElementById('player-mali-audio');
+      if (maliAudio && !isMaliMuted) {
+        maliAudio.currentTime = 0;
+        maliAudio.play().catch(() => {});
+      }
+      const bgmAudio = document.getElementById('player-bgm');
+      if (bgmAudio) {
+        bgmAudio.currentTime = 0;
+      }
+    }
+
     function setupVideoSubtitleSync() {
       const player = document.getElementById('player-preview');
       if (!player || isSubtitleSyncAttached) return;
       isSubtitleSyncAttached = true;
+
+      player.addEventListener('ended', () => {
+        handlePreviewClipFinished();
+      });
 
       player.addEventListener('timeupdate', () => {
         if (!currentProduct || !currentProduct.script) return;
         const subEl = document.getElementById('overlay-subtitle-text');
         if (!subEl) return;
 
-        // Strictly enforce 20.0 seconds limit (Never let video run to 31s)
-        if (player.currentTime >= MAX_TARGET_VIDEO_DURATION) {
-          player.currentTime = 0;
-          const maliAudio = document.getElementById('player-mali-audio');
-          if (maliAudio) {
-            maliAudio.currentTime = 0;
-            if (!isMaliMuted) maliAudio.play().catch(() => {});
-          }
-          const bgmAudio = document.getElementById('player-bgm');
-          if (bgmAudio) {
-            bgmAudio.currentTime = 0;
-            if (!isMaliMuted && maliAudio && maliAudio.src && maliAudio.src.startsWith('data:')) {
-              bgmAudio.play().catch(() => {});
-            }
-          }
-          player.play().catch(() => {});
-          return;
-        }
-
         const maliAudio = document.getElementById('player-mali-audio');
         const cur = (maliAudio && !maliAudio.paused && maliAudio.currentTime > 0) ?
           Math.min(maliAudio.currentTime, MAX_TARGET_VIDEO_DURATION) :
-          Math.min(player.currentTime, MAX_TARGET_VIDEO_DURATION);
+          Math.min(clipStartOffset + player.currentTime, MAX_TARGET_VIDEO_DURATION);
+
+        // Loop when reaching 20 seconds
+        if (cur >= MAX_TARGET_VIDEO_DURATION) {
+          resetPreviewPlayback();
+          return;
+        }
 
         // Update custom sleek timeline (0:00 / 0:20)
         const progressFill = document.getElementById('custom-progress-fill');

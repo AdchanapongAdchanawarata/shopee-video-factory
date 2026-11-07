@@ -71,9 +71,23 @@
       box-sizing: border-box;
       transition: transform 0.1s ease-out;
     }
-    .video-smart-crop {
-      transform: scale(1.42) translateY(3%);
+    .video-smart-crop, .video-preview-crop-zoomed {
+      transform: scale(1.35) translateY(-5%);
       transform-origin: center center;
+      transition: transform 0.3s ease-out;
+    }
+    .video-preview-crop-zoomed-flipped {
+      transform: scale(1.35) translateY(-5%) scaleX(-1);
+      transform-origin: center center;
+      transition: transform 0.3s ease-out;
+    }
+    .video-preview-flipped-only {
+      transform: scaleX(-1);
+      transform-origin: center center;
+      transition: transform 0.3s ease-out;
+    }
+    .video-preview-crop-normal {
+      transform: none;
       transition: transform 0.3s ease-out;
     }
     .subtle-card:hover {
@@ -344,19 +358,60 @@
           </div>
         </div>
 
-        <!-- SMART CROP & SUBTITLE REMOVAL TOGGLE -->
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80">
-          <div class="flex items-center space-x-2 truncate">
-            <i class="ph-bold ph-crop text-shopee text-base"></i>
-            <div>
-              <div class="text-xs font-bold text-zinc-200">ครอปหลบซับไตเติลเดิม (Smart Crop 1.30x)</div>
-              <div class="text-[10px] text-zinc-400">ซูมและครอปหลบซับเดิมที่ติดมากับคลิปรีวิวร้านค้า พร้อมมาสก์ขอบล่างอัตโนมัติ</div>
-            </div>
+        <!-- ANTI-DUPLICATE & SUBTITLE CONCEALMENT CONTROLS -->
+        <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-zinc-200 flex items-center space-x-1.5">
+              <i class="ph-bold ph-shield-check text-shopee"></i>
+              <span>ระบบลบซับ & ป้องกันคลิปซ้ำ (Shopee & TikTok Anti-Ban)</span>
+            </span>
+            <span class="text-[10px] text-emerald-400 font-mono">100% ปลอดภัย</span>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
-            <input type="checkbox" id="toggle-smart-crop-s1" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
-            <div class="w-8 h-4 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-shopee"></div>
-          </label>
+
+          <!-- 1. SMART CROP 1.35x -->
+          <div class="flex items-center justify-between text-xs pt-1">
+            <div class="flex items-center space-x-2 truncate">
+              <i class="ph-bold ph-crop text-shopee text-sm"></i>
+              <div>
+                <div class="text-[11px] font-semibold text-zinc-200">ครอปหลบซับเดิม (Smart Crop 1.35x)</div>
+                <div class="text-[10px] text-zinc-400">ซูมและดันเฟรมขึ้นเพื่อดันซับจีน/ซับเดิมออกนอกจอ</div>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+              <input type="checkbox" id="toggle-smart-crop-s1" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
+              <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-shopee"></div>
+            </label>
+          </div>
+
+          <!-- 2. SUBTITLE FADE MASK -->
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-zinc-800/50">
+            <div class="flex items-center space-x-2 truncate">
+              <i class="ph-bold ph-gradient text-amber-400 text-sm"></i>
+              <div>
+                <div class="text-[11px] font-semibold text-zinc-200">มาสก์ดำปิดซับล่าง (Subtitle Fade Mask 100%)</div>
+                <div class="text-[10px] text-zinc-400">แถบดำไล่เฉดปิดทับซับเดิม 100% ซับไทยส้มเด่นชัด</div>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+              <input type="checkbox" id="toggle-fade-mask-s1" checked onchange="handleFadeMaskToggle(this.checked)" class="sr-only peer">
+              <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+          </div>
+
+          <!-- 3. ANTI-DUPLICATE FLIP -->
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-zinc-800/50">
+            <div class="flex items-center space-x-2 truncate">
+              <i class="ph-bold ph-arrows-left-right text-cyan-400 text-sm"></i>
+              <div>
+                <div class="text-[11px] font-semibold text-zinc-200">กลับด้านวิดีโอแก้คลิปซ้ำ (Anti-Duplicate Flip)</div>
+                <div class="text-[10px] text-zinc-400">พลิกภาพซ้าย-ขวา หลบระบบตรวจจับคลิปซ้ำและ OCR</div>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+              <input type="checkbox" id="toggle-anti-flip-s1" onchange="handleAntiFlipToggle(this.checked)" class="sr-only peer">
+              <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-500"></div>
+            </label>
+          </div>
         </div>
 
         <p class="text-[11px] text-zinc-400 pt-1 flex items-center space-x-1">
@@ -686,16 +741,51 @@
             </div>
           </div>
 
-          <!-- SMART CROP & PREVIEW CONTROLS UNDER PHONE -->
-          <div class="w-full max-w-[260px] p-2 rounded-xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
-            <div class="flex items-center space-x-1.5 truncate">
-              <i class="ph-bold ph-crop text-shopee"></i>
-              <span class="text-[11px] font-medium text-zinc-300">ครอปหลบซับเดิม (Smart Crop 1.30x)</span>
+          <!-- ANTI-DUPLICATE & SUBTITLE REMOVAL CONTROLS UNDER PHONE -->
+          <div class="w-full max-w-[260px] p-2.5 rounded-2xl bg-zinc-900/95 border border-zinc-800 space-y-2 text-xs shadow-md">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center space-x-1">
+                <i class="ph-bold ph-shield-check text-shopee"></i>
+                <span>ลบซับ & ป้องกันคลิปซ้ำ</span>
+              </span>
+              <span class="text-[9px] text-emerald-400 font-mono">Anti-Ban</span>
             </div>
-            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
-              <input type="checkbox" id="toggle-smart-crop" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
-              <div class="w-8 h-4 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-shopee"></div>
-            </label>
+
+            <!-- TOGGLE 1: SMART CROP 1.35x -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-1.5 truncate">
+                <i class="ph-bold ph-crop text-shopee text-xs"></i>
+                <span class="text-[11px] text-zinc-300">ครอปหลบซับเดิม (Crop 1.35x)</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+                <input type="checkbox" id="toggle-smart-crop" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
+                <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-shopee"></div>
+              </label>
+            </div>
+
+            <!-- TOGGLE 2: SUBTITLE FADE MASK -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-1.5 truncate">
+                <i class="ph-bold ph-gradient text-amber-400 text-xs"></i>
+                <span class="text-[11px] text-zinc-300">มาสก์ดำปิดซับล่าง (Fade Mask)</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+                <input type="checkbox" id="toggle-fade-mask" checked onchange="handleFadeMaskToggle(this.checked)" class="sr-only peer">
+                <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
+              </label>
+            </div>
+
+            <!-- TOGGLE 3: ANTI-DUPLICATE HORIZONTAL FLIP -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-1.5 truncate">
+                <i class="ph-bold ph-arrows-left-right text-cyan-400 text-xs"></i>
+                <span class="text-[11px] text-zinc-300">กลับด้านแก้คลิปซ้ำ (Anti-Flip)</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+                <input type="checkbox" id="toggle-anti-flip" onchange="handleAntiFlipToggle(this.checked)" class="sr-only peer">
+                <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-500"></div>
+              </label>
+            </div>
           </div>
 
           <p class="text-[10px] text-zinc-500 font-mono">หน้าจอพรีวิว 9:16 (TikTok & Shopee Video)</p>
@@ -1255,12 +1345,252 @@
       if (low.includes('กันแดด') || low.includes('sunscreen')) return 'ครีมกันแดดเนื้อบางเบาตัวนี้';
       if (low.includes('ครีม') || low.includes('cream')) return 'ครีมบำรุงผิวตัวนี้';
 
+      // 13. Universal Prefix & Qualifier Matching (covers all e-commerce categories permanently)
+      const UNIVERSAL_PREFIXES = [
+        "พาวเวอร์แบงค์", "แบตเตอรี่สำรอง", "แบตสำรอง", "หัวชาร์จ", "สายชาร์จ", "แท่นชาร์จ", "ปลั๊กไฟ", "รางปลั๊ก",
+        "เครื่องฟอกอากาศ", "เครื่องดูดฝุ่น", "เครื่องดูดไรฝุ่น", "เครื่องชงกาแฟ", "เครื่องปั่น", "เครื่องบด", 
+        "เครื่องม้วนผม", "เครื่องหนีบผม", "เครื่องโกนหนวด", "เครื่องฉีดน้ำแรงดันสูง", "เครื่องฉีดน้ำ", "เครื่องพ่น",
+        "พัดลมพกพา", "พัดลมคล้องคอ", "พัดลมไร้สาย", "พัดลม",
+        "หม้อทอดไร้น้ำมัน", "หม้อต้มไฟฟ้า", "หม้อหุงข้าว", "หม้อชาบู", "หม้ออบลมร้อน", "หม้อไฟฟ้า", "หม้อ",
+        "กระทะไฟฟ้า", "กระทะเคลือบหินอ่อน", "กระทะ", "เตาปิ้งย่าง", "เตาแม่เหล็กไฟฟ้า", "เตาอบ",
+        "แก้วเก็บความเย็น", "แก้วน้ำสแตนเลส", "แก้วน้ำ", "กระบอกน้ำ",
+        "ขนตาปลอม", "ที่ดัดขนตา", "มาสคาร่า", "ลิปสติก", "ลิปบาล์ม", "เซรั่มบำรุงผิว", "เซรั่ม", 
+        "ครีมกันแดด", "ครีมบำรุงผิว", "ครีมทาหน้า", "ครีม", "โฟมล้างหน้า", "คลีนซิ่ง",
+        "แผ่นแปะแก้ปวด", "แผ่นแปะสิว", "ยานวดคลายเส้น", "แผ่นรองเมาส์", "แผ่นกรอง", "แผ่นกันลื่น", "แผ่นแปะ",
+        "โคมไฟตั้งโต๊ะ", "โคมไฟโซลาร์เซลล์", "โคมไฟหัวเตียง", "โคมไฟดักยุง", "โคมไฟ", "หลอดไฟไล่ยุง", "หลอดไฟโซลาร์เซลล์", "หลอดไฟ",
+        "ไม้เซลฟี่", "ไม้ถูพื้น", "ไม้แขวนเสื้อ", "ไม้นวด", "ไม้กวาด",
+        "ขาตั้งกล้อง", "ขาตั้งมือถือ", "ขาตั้งไอแพด", "ขาตั้ง",
+        "เก้าอี้แคมป์ปิ้ง", "เก้าอี้พับ", "เต็นท์แคมป์ปิ้ง", "เต็นท์", "โต๊ะพับ",
+        "กระเป๋าเดินทาง", "กระเป๋าสะพาย", "กระเป๋าสตางค์", "กระเป๋าเป้", "กระเป๋าผ้า", "กระเป๋า",
+        "หูฟังบลูทูธ", "หูฟังไร้สาย", "หูฟังเกมมิ่ง", "หูฟัง", "ลำโพงบลูทูธ", "ลำโพง",
+        "กางเกงยีนส์", "กางเกงขายาว", "กางเกงขาสั้น", "กางเกงคาร์โก้", "กางเกง", 
+        "เสื้อยืด", "เสื้อเชิ้ต", "เสื้อคลุม", "เสื้อกันหนาว", "เสื้อ", "ชุดเดรส", "ชุดนอน", "กระโปรง", 
+        "รองเท้าผ้าใบ", "รองเท้าแตะ", "รองเท้า",
+        "ถุงขยะ", "ถุงซิปล็อค", "ถุงสุญญากาศ", "กล่องเก็บของ", "กล่องอาหาร", "กล่องทิชชู่", "กล่อง",
+        "ที่นอนแมว", "คอนโดแมว", "ทรายแมวเต้าหู้", "ทรายแมว", "น้ำพุแมว", "ของเล่นแมว", "อาหารแมว", "อาหารสุนัข",
+        "กรรไกรตัดกิ่ง", "กรรไกร"
+      ];
+
+      const UNIVERSAL_QUALIFIERS = [
+        "ไร้สาย", "กันน้ำ", "ชาร์จไว", "พกพาง่าย", "พับได้", "สแตนเลส 304", "สแตนเลส", "สูตรร้อน", "สูตรเย็น",
+        "ออร์แกนิค", "เกรดพรีเมียม", "ระบบสัมผัส", "เสียงเงียบ", "อัจฉริยะ", "มัลติฟังก์ชั่น", "เก็บอุณหภูมิ",
+        "เคลือบเซรามิก", "ตัดเสียงรบกวน", "บลูทูธ", "ประหยัดไฟ", "ทรงสวย", "ผ้านุ่ม", "แกนสปริง"
+      ];
+
+      let matchedPrefix = null;
+      for (const p of UNIVERSAL_PREFIXES) {
+        if (norm.includes(p)) {
+          matchedPrefix = p;
+          break;
+        }
+      }
+
+      if (matchedPrefix) {
+        let matchedQual = "";
+        for (const q of UNIVERSAL_QUALIFIERS) {
+          if (norm.includes(q) && !matchedPrefix.includes(q)) {
+            matchedQual = q;
+            break;
+          }
+        }
+        return `${matchedPrefix}${matchedQual}ตัวนี้`;
+      }
+
       // Fallback: extract short title cleanly without broken Thai character cuts
       const parts = norm.split(/[,，、\-–—]/);
-      return cleanShortThaiTitle(parts[0] || norm, 30);
+      return cleanShortThaiTitle(parts[0] || norm, 24);
     }
 
     const JS_CATEGORY_RULES = [
+      {
+        id: "beauty_makeup",
+        keywords: ["ขนตา", "ขนตาปลอม", "ที่ดัดขนตา", "มาสคาร่า", "อายไลเนอร์", "ลิป", "ลิปสติก", "ลิปบาล์ม", "แป้งพัฟ", "คุชชั่น"],
+        angles: [
+          {
+            type: "pain_point",
+            headline: "บอกลาขนตาหลุดง่าย ไม่ตรงปก",
+            hook: "ใครเจอปัญหาติดขนตายาก, หลุดง่ายระหว่างวัน, หรือดูหลอกตาบ้างคะ?",
+            body: "{name} แกนใสนุ่มเบาสบายตา, ติดง่ายมากในนาทีเดียว, ขนตาเรียงเส้นสวยเป็นธรรมชาติเหมือนต่อร้าน, สวยตรงปกทั้งวันเลยค่ะ.",
+            cta: "สวยเป๊ะระดับมือโปร, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "discovery",
+            headline: "ค้นพบขนตาปลอมลุคธรรมชาติ 100%",
+            hook: "ไปเจอขนตาปลอมที่ติดแล้วตาหวานฉ่ำแบบสาวเกาหลีมาแล้วค่ะทุกคน!",
+            body: "{name} น้ำหนักเบามากเหมือนไม่ได้ติด, ไม่เคืองตา, แกนบางเนียนไปกับขอบตา, ถอดใช้ซ้ำได้หลายรอบ คุ้มมากค่ะ.",
+            cta: "แปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ, รีบไปตำเลย."
+          },
+          {
+            type: "benefit",
+            headline: "ติดง่าย น้ำหนักเบา ใช้ซ้ำได้คุ้มค่า",
+            hook: "ใครมองหาขนตาปลอมที่คุ้มค่า, สเปกเนียนสวยสมจริง, แนะนำรุ่นนี้เลยค่ะ!",
+            body: "{name} เส้นขนไฟเบอร์เกรดพรีเมียม, โค้งงอนเป็นธรรมชาติ, ทนทานไม่เสียทรง, สวยทุกลุคแน่นอนค่ะ.",
+            cta: "ของแท้ส่งไว, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          }
+        ]
+      },
+      {
+        id: "camping_outdoor",
+        keywords: ["เก้าอี้แคมป์ปิ้ง", "เต็นท์", "โต๊ะพับ", "แคมป์ปิ้ง", "เก้าอี้พับ", "กางเต็นท์", "outdoor"],
+        angles: [
+          {
+            type: "pain_point",
+            headline: "บอกลาเก้าอี้หนัก นั่งปวดหลัง",
+            hook: "สายแคมป์ปิ้งคนไหน เบื่อเก้าอี้หนักๆ, กางยาก, นั่งแล้วเมื่อยหลังบ้างคะ?",
+            body: "{name} โครงสร้างแข็งแรงรับน้ำหนักได้เยอะ, กางและพับเก็บใน 3 วินาที, นั่งสบายไม่เมื่อยหลัง, พกพาสะดวกมากค่ะ.",
+            cta: "เตรียมทริปให้พร้อม, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "discovery",
+            headline: "ไอเทมลับสายแคมป์ปิ้ง นั่งสบายสุดๆ",
+            hook: "ไปเจอไอเทมแคมป์ปิ้งที่ชีวิตดีขึ้นเยอะมากมาแล้วค่ะทุกคน!",
+            body: "{name} ดีไซน์มินิมอลสวยตรงปก, ผ้าหนาระบายอากาศดี, พับแล้วขนาดกะทัดรัดใส่ท้ายรถสบาย, สายเที่ยวต้องมีเลยค่ะ.",
+            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง, รีบกดสั่งก่อนของหมดนะคะ."
+          },
+          {
+            type: "benefit",
+            headline: "โครงสร้างเหล็กกล้า แข็งแรง ทนทาน",
+            hook: "ใครมองหาอุปกรณ์แคมป์ปิ้งเกรดพรีเมียม, ใช้งานยาวนานหลายปี, แนะนำรุ่นนี้เลยค่ะ!",
+            body: "{name} วัสดุคุณภาพสูงทนแดดทนฝน, ข้อต่อแน่นหนาปลอดภัย, ผ่านการทดสอบรับน้ำหนักจริง, คุ้มค่าเงินทุกบาทแน่นอนค่ะ.",
+            cta: "มีโปรส่งฟรี, จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          }
+        ]
+      },
+      {
+        id: "health_wellness",
+        keywords: ["แผ่นแปะแก้ปวด", "แก้ปวด", "ยานวด", "ยาหม่อง", "ปวดเมื่อย", "ออฟฟิศซินโดรม", "คลายเส้น", "พลาสเตอร์"],
+        angles: [
+          {
+            type: "pain_point",
+            headline: "กู้อาการปวดเมื่อย ออฟฟิศซินโดรม",
+            hook: "ใครนั่งทำงานนานๆ แล้วปวดคอบ่าไหล่, ปวดหลังทรมานบ้างคะ?",
+            body: "{name} ออกฤทธิ์ไวซึมลึกถึงชั้นกล้ามเนื้อ, แปะปุ๊บรู้สึกโล่งผ่อนคลายทันที, ไม่เหนียวเหนอะหนะ, แปะทำงานได้ทั้งวันเลยค่ะ.",
+            cta: "หมดกังวลเรื่องปวดเมื่อย, จิ้มสั่งที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "discovery",
+            headline: "แผ่นแปะสมุนไพรสูตรเข้มข้น คลายกล้ามเนื้อ",
+            hook: "เจอแผ่นแปะแก้ปวดที่ใช้ดีจนต้องตุนติดบ้านไว้แล้วค่ะทุกคน!",
+            body: "{name} กลิ่นหอมสมุนไพรธรรมชาติผ่อนคลาย, แผ่นยืดหยุ่นติดแน่นไม่หลุดง่าย, ช่วยคลายเส้นได้ตรงจุด, คนทำงานต้องมีติดโต๊ะไว้ค่ะ.",
+            cta: "ของแท้ 100%, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "benefit",
+            headline: "ออกฤทธิ์ยาวนาน คุ้มค่า ปลอดภัย",
+            hook: "ใครมองหาตัวช่วยคลายปวดเมื่อยสูตรพรีเมียม, ตัวนี้การันตีความคุ้มค่าแน่นอนค่ะ!",
+            body: "{name} ผ่านการรับรองมาตรฐานปลอดภัย, ออกฤทธิ์ยาวนานต่อเนื่องหลายชั่วโมง, อ่อนโยนต่อผิวไม่แสบร้อน, แนะนำเลยค่ะ.",
+            cta: "ส่งไวมีโค้ดลด, จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          }
+        ]
+      },
+      {
+        id: "kitchen_cooking",
+        keywords: ["หม้อต้ม", "กระทะ", "หม้อหุงข้าว", "เตาแม่เหล็ก", "กาน้ำร้อน", "เครื่องปั่น", "เครื่องบด", "กระทะไฟฟ้า", "หม้อไฟฟ้า"],
+        angles: [
+          {
+            type: "pain_point",
+            headline: "ทำอาหารง่าย ไม่ติดกระทะ ล้างสะดวก",
+            hook: "ใครอยู่หอหรือคอนโด, อยากทำอาหารง่ายๆ แต่ขี้เกียจล้างหม้อหลายใบมะคะ?",
+            body: "{name} ร้อนเร็วทั่วถึง, เคลือบกันติดอย่างดีไม่ติดก้นหม้อ, ต้ม ผัด ทอดในหม้อเดียวจบ, เช็ดล้างทำความสะอาดง่ายมากค่ะ.",
+            cta: "เด็กหอและคนรักครัว, จิ้มสั่งตรงตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "discovery",
+            headline: "หม้อไฟฟ้ามินิมอล ร้อนไว จบในใบเดียว",
+            hook: "ไปเจอหม้อไฟฟ้ามินิมอลที่น่ารักและใช้งานดีเกินราคามาแล้วค่ะ!",
+            body: "{name} ปรับระดับความร้อนได้ดั่งใจ, ปลอดภัยด้วยระบบตัดไฟอัตโนมัติ, ขนาดกะทัดรัดวางตรงไหนก็น่ารัก, คุ้มค่าสมราคาจริงๆ ค่ะ.",
+            cta: "แปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ, รีบไปตำเลย."
+          },
+          {
+            type: "benefit",
+            headline: "ฟู้ดเกรดแท้ ปลอดภัย ประหยัดไฟ",
+            hook: "ใครมองหาเครื่องครัวไฟฟ้าคุณภาพมาตรฐาน, ปลอดภัยและทนทาน, แนะนำรุ่นนี้เลยค่ะ!",
+            body: "{name} วัสดุฟู้ดเกรดปลอดภัยไร้สารตกค้าง, กำลังไฟเสถียรประหยัดพลังงาน, ใช้งานได้ยาวนาน, คุ้มค่าเงินแน่นอนค่ะ.",
+            cta: "รับประกันของแท้, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          }
+        ]
+      },
+      {
+        id: "home_living",
+        keywords: ["เครื่องฟอกอากาศ", "เครื่องดูดฝุ่น", "เครื่องดูดไรฝุ่น", "พัดลม", "โคมไฟ", "หลอดไฟไล่ยุง", "ถุงขยะ", "ชั้นวางของ"],
+        angles: [
+          {
+            type: "pain_point",
+            headline: "หมดปัญหาฝุ่น ยุง และอากาศไม่บริสุทธิ์",
+            hook: "ใครที่บ้านมีฝุ่นเยอะ, จามบ่อย, หรือเจอปัญหายุงกวนใจบ้างคะ?",
+            body: "{name} ช่วยจัดการปัญหาในบ้านได้อย่างเห็นผล, ใช้งานง่าย, เสียงเงียบไม่รบกวน, ช่วยให้บรรยากาศในบ้านน่าอยู่ขึ้นเยอะมากค่ะ.",
+            cta: "เพื่อสุขภาพคนในบ้าน, จิ้มสั่งที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "discovery",
+            headline: "ไอเทมยกระดับบ้านให้น่าอยู่ขึ้น 10 เท่า",
+            hook: "ของใช้ในบ้านที่ซื้อมาแล้วรู้สึกคุ้มค่าเงินที่สุดเลยค่ะทุกคน!",
+            body: "{name} ดีไซน์สวยโมเดิร์นเข้ากับทุกมุมห้อง, คุณภาพมาตรฐาน, ใช้งานสะดวกสบาย, ชีวิตดีขึ้นชัดเจนค่ะ.",
+            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง, รีบกดสั่งก่อนของหมดนะคะ."
+          },
+          {
+            type: "benefit",
+            headline: "มาตรฐานระดับสากล ทนทาน ประหยัดไฟ",
+            hook: "ใครกำลังเล็งของใช้ในบ้านรุ่นนี้อยู่, บอกเลยว่าสเปกคุ้มค่าเกินราคามากค่ะ!",
+            body: "{name} ผ่านการตรวจสอบคุณภาพมาตรฐาน มอก., ทนทานแข็งแรง, ประหยัดพลังงาน, ใช้งานยาวนานคุ้มค่าแน่นอนค่ะ.",
+            cta: "ส่งฟรีของแท้ 100%, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          }
+        ]
+      },
+      {
+        id: "luggage_bags",
+        keywords: ["กระเป๋าเดินทาง", "กระเป๋าเป้", "กระเป๋าสะพาย", "กระเป๋าสตางค์", "กระเป๋า"],
+        angles: [
+          {
+            type: "pain_point",
+            headline: "ลากลื่น 360 องศา หมดกังวลเรื่องกระเป๋าพัง",
+            hook: "ใครเวลาเดินทาง กลัวกระเป๋าซิปแตก, หรือล้อสะดุดลากยากบ้างคะ?",
+            body: "{name} โครงสร้างเหนียวทนทานกันกระแทก, ล้อลื่นหมุนได้ 360 องศาไร้เสียงรบกวน, จุของได้จุใจ, เดินทางไกลสบายใจหายห่วงค่ะ.",
+            cta: "พร้อมเดินทางทริปใหม่, จิ้มสั่งที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "discovery",
+            headline: "กระเป๋าเดินทางตัวจบ ดีไซน์หรูตรงปก",
+            hook: "ไปเจอกระเป๋าเดินทางที่สวยหรูและฟังก์ชันแน่นเกินราคามาแล้วค่ะ!",
+            body: "{name} คันชักปรับระดับแข็งแรง, ภายในแบ่งช่องจัดระเบียบของได้เป๊ะ, ดีไซน์สวยตรงปกถ่ายรูปขึ้นมากค่ะ.",
+            cta: "แปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ, รีบไปตำเลย."
+          },
+          {
+            type: "benefit",
+            headline: "ระบบล็อค TSA แท้ วัสดุกันรอยพรีเมียม",
+            hook: "ใครมองหากระเป๋าเดินทางคุณภาพสูง, สำหรับเดินทางทำงานหรือเที่ยว, แนะนำรุ่นนี้เลยค่ะ!",
+            body: "{name} วัสดุโพลีคาร์บอเนต 100% เหนียวทนทาน, ระบบล็อคมาตรฐานสากล, น้ำหนักเบา, คุ้มค่าสมราคาที่สุดค่ะ.",
+            cta: "รับประกันสินค้า, จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          }
+        ]
+      },
+      {
+        id: "tools_garden",
+        keywords: ["กรรไกรตัดกิ่ง", "กรรไกร", "เครื่องฉีดน้ำ", "ไขควง", "สว่าน", "เครื่องมือช่าง"],
+        angles: [
+          {
+            type: "pain_point",
+            headline: "ตัดกิ่งไม้หนาได้สบาย ผ่อนแรง ไม่เจ็บมือ",
+            hook: "คนรักต้นไม้คนไหน เบื่อกรรไกรทื่อๆ, ตัดกิ่งหนาไม่เข้า, เจ็บมือไปหมดบ้างคะ?",
+            body: "{name} ใบมีดเหล็กกล้าคมกริบ, มีระบบสปริงผ่อนแรงช่วยทุ่นแรงได้เยอะมาก, ตัดกิ่งไม้หนาได้ขาดในชับเดียว, จับกระชับมือไม่ลื่นเลยค่ะ.",
+            cta: "ดูแลสวนให้สวยงาม, จิ้มสั่งที่ตะกร้าส้มมุมซ้ายล่างได้เลยนะคะ."
+          },
+          {
+            type: "discovery",
+            headline: "กรรไกรตัดกิ่งเกรดพรีเมียม คมกริบสุดๆ",
+            hook: "ไอเทมทำสวนที่ทุกคนต้องมีติดบ้านไว้เลยค่ะ, ใช้งานง่ายและคมมาก!",
+            body: "{name} วัสดุสแตนเลสแท้ไม่เป็นสนิม, ล็อคเก็บปลอดภัย, งานตัดเนียนเรียบไม่ทำร้ายต้นไม้, คุ้มค่าราคามากค่ะ.",
+            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง, รีบกดสั่งก่อนของหมดนะคะ."
+          },
+          {
+            type: "benefit",
+            headline: "เหล็ก SK5 ญี่ปุ่น คมทนทาน ไม่เป็นสนิม",
+            hook: "ใครมองหาเครื่องมือคุณภาพระดับมืออาชีพ, รุ่นนี้สเปกดีเกินราคาแน่นอนค่ะ!",
+            body: "{name} ทนทานต่อการสึกหรอ, รองรับงานหนักได้สบาย, ลับคมง่าย, ใช้งานได้ยาวนานหลายปี, แนะนำเลยค่ะ.",
+            cta: "ของแท้ส่งไว, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+          }
+        ]
+      },
       {
         id: "power_bank",
         keywords: ["พาวเวอร์แบงค์", "แบตสำรอง", "powerbank", "power bank", "แบตเตอรี่สำรอง", "acmic", "eloop", "remax", "romoss", "mah", "มิลลิแอมป์"],
@@ -1632,24 +1962,24 @@
         const fallbacks = [
           {
             type: "pain_point",
-            headline: "ไอเทมแก้ปัญหาที่คนรีวิวเยอะจนต้องสั่ง",
-            hook: "ใครเจอปัญหาแบบเดิมๆ อยู่, บอกเลยว่าต้องดูตัวนี้ด่วนเลยค่ะ!",
-            body: `${spokenName} ตอบโจทย์การใช้งานจริง, แก้ปัญหาตรงจุด, ใช้งานง่าย, คุ้มค่าสมราคาจริงๆ ค่ะ.`,
-            cta: "ใครสนใจแปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ."
+            headline: "ไอเทมแก้ปัญหาที่รีวิวแน่น",
+            hook: "ใครเจอปัญหากับของเดิมๆ ที่ใช้อยู่, บอกเลยว่าต้องดูตัวนี้ด่วนเลยค่ะ!",
+            body: `${spokenName} ตอบโจทย์การใช้งานจริง, แก้ปัญหาตรงจุด, ใช้ง่าย, คุ้มค่าสมราคาจริงๆ ค่ะ.`,
+            cta: "รับประกันของแท้, จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
           },
           {
             type: "discovery",
             headline: "ไอเทมเด็ดที่รีวิวเยอะจนต้องสั่ง",
-            hook: "เห็นคนรีวิวกันเยอะมาก, จนต้องสั่งมาลองเอง แล้วคือดีจริงค่ะ!",
-            body: `${spokenName} ใช้งานง่าย, ดีไซน์สวยตรงปก, ฟังก์ชันครบ, คุ้มค่าสมราคาจริงๆ ค่ะ.`,
-            cta: "ใครสนใจแปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ."
+            hook: "เห็นคนรีวิวกันเยอะมาก, จนต้องสั่งมาลองเอง แล้วคือดีงามตรงปกจริงค่ะ!",
+            body: `${spokenName} ดีไซน์สวยตรงปก, ฟังก์ชันครบครัน, ใช้งานง่าย, คุ้มค่าสมราคาจริงๆ ค่ะ.`,
+            cta: "ใครสนใจแปะพิกัดไว้ที่ตะกร้าส้มมุมซ้ายล่างแล้วนะคะ, รีบไปตำเลย."
           },
           {
             type: "benefit",
             headline: "ของดีบอกต่อ คุ้มค่าเกินราคา",
             hook: "ใครที่กำลังเล็งตัวนี้อยู่, บอกเลยว่ากดสั่งได้เลย ไม่ผิดหวังแน่นอนค่ะ!",
-            body: `${spokenName} ตอบโจทย์การใช้งานจริง, คุณภาพดีเกินราคา, ได้ของแท้แน่นอนค่ะ.`,
-            cta: "จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ, ส่งไวมากค่ะ."
+            body: `${spokenName} คุณภาพดีเกินราคา, สเปกแน่น, ทนทานใช้งานได้ยาวนาน, ได้ของแท้แน่นอนค่ะ.`,
+            cta: "มีโปรส่งฟรี, จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ, ส่งไวมากค่ะ."
           }
         ];
         if (styleType === 'pain_point') chosen = fallbacks[0];
@@ -2791,28 +3121,75 @@
     // Global render state & Smart Crop tracking
     let isVideoRendered = false;
     let isSmartCropEnabled = true;
+    let isBottomMaskEnabled = true;
+    let isFlipEnabled = false;
+
+    function updateVideoPreviewTransform() {
+      const player = document.getElementById('player-preview');
+      if (!player) return;
+      player.classList.remove(
+        'video-preview-crop-normal',
+        'video-preview-crop-zoomed',
+        'video-preview-crop-zoomed-flipped',
+        'video-preview-flipped-only'
+      );
+      if (isSmartCropEnabled && isFlipEnabled) {
+        player.classList.add('video-preview-crop-zoomed-flipped');
+      } else if (isSmartCropEnabled) {
+        player.classList.add('video-preview-crop-zoomed');
+      } else if (isFlipEnabled) {
+        player.classList.add('video-preview-flipped-only');
+      } else {
+        player.classList.add('video-preview-crop-normal');
+      }
+    }
 
     function handleSmartCropToggle(enabled) {
       isSmartCropEnabled = enabled;
-      const player = document.getElementById('player-preview');
-      const mask = document.getElementById('bottom-sub-mask');
       const t1 = document.getElementById('toggle-smart-crop');
       const t2 = document.getElementById('toggle-smart-crop-s1');
-
       if (t1) t1.checked = enabled;
       if (t2) t2.checked = enabled;
 
-      if (player) {
-        if (enabled) {
-          player.classList.add('video-smart-crop');
-        } else {
-          player.classList.remove('video-smart-crop');
-        }
-      }
-      if (mask) {
-        mask.style.opacity = enabled ? '1' : '0';
-      }
-      showToast(enabled ? 'เปิดโหมดครอปหลบซับเดิม (Smart Crop 1.30x)' : 'ปิดโหมดครอป (แสดงสัดส่วนปกติ)');
+      updateVideoPreviewTransform();
+      showToast(enabled ? 'เปิดโหมดครอปหลบซับเดิม (Smart Crop 1.35x)' : 'ปิดโหมดครอป (แสดงสัดส่วนปกติ)');
+    }
+
+    function handleFadeMaskToggle(enabled) {
+      isBottomMaskEnabled = enabled;
+      const t1 = document.getElementById('toggle-fade-mask');
+      const t2 = document.getElementById('toggle-fade-mask-s1');
+      if (t1) t1.checked = enabled;
+      if (t2) t2.checked = enabled;
+
+      const mask = document.getElementById('bottom-sub-mask');
+      if (mask) mask.style.opacity = enabled ? '1' : '0';
+      showToast(enabled ? 'เปิดแถบมาสก์ปิดทับซับเดิม 100%' : 'ปิดแถบมาสก์');
+    }
+
+    function handleAntiFlipToggle(enabled) {
+      isFlipEnabled = enabled;
+      const t1 = document.getElementById('toggle-anti-flip');
+      const t2 = document.getElementById('toggle-anti-flip-s1');
+      if (t1) t1.checked = enabled;
+      if (t2) t2.checked = enabled;
+
+      updateVideoPreviewTransform();
+      showToast(enabled ? 'เปิดโหมดกลับด้านวิดีโอ (ป้องกันระบบตรวจคลิปซ้ำ Shopee)' : 'ปิดโหมดกลับด้าน');
+    }
+
+    function drawBottomSubtitleMask(ctx, W, H) {
+      ctx.save();
+      const maskHeight = 520;
+      const maskY = H - maskHeight;
+      const grad = ctx.createLinearGradient(0, maskY, 0, H);
+      grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      grad.addColorStop(0.25, 'rgba(0, 0, 0, 0.65)');
+      grad.addColorStop(0.60, 'rgba(0, 0, 0, 0.92)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0.98)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, maskY, W, maskHeight);
+      ctx.restore();
     }
 
     // Real-Time Subtitle & Audio Synchronization on Video Play (Safe Zone max 22-24 chars/line)
@@ -3442,7 +3819,7 @@
 
         const isVideoActive = player && player.readyState >= 2 && !player.paused && !player.ended;
         if (isVideoActive) {
-          const scale = isSmartCropActive ? 1.30 : 1.0;
+          const scale = isSmartCropEnabled ? 1.35 : 1.0;
           const vw = player.videoWidth || 1080;
           const vh = player.videoHeight || 1920;
           const vAspect = vw / vh;
@@ -3457,16 +3834,27 @@
             dh = dw / vAspect;
           }
           const dx = (W - dw) / 2;
-          const dy = (H - dh) / 2;
+          const dy = ((H - dh) / 2) - (isSmartCropEnabled ? (H * 0.05) : 0);
 
+          rCtx.save();
+          if (isFlipEnabled) {
+            rCtx.translate(W, 0);
+            rCtx.scale(-1, 1);
+          }
           try {
             rCtx.drawImage(player, dx, dy, dw, dh);
           } catch (e) {
             drawKenBurnsImage(rCtx, loadedImages, elapsedSec, W, H);
           }
+          rCtx.restore();
         } else {
           // If video finished earlier than 20s (e.g. 11s) or no video: use product advertisement images
           drawKenBurnsImage(rCtx, loadedImages, elapsedSec, W, H);
+        }
+
+        // Draw Bottom Subtitle Fade Mask
+        if (isBottomMaskEnabled) {
+          drawBottomSubtitleMask(rCtx, W, H);
         }
 
         // 2. Draw Top Headline Badge

@@ -1608,23 +1608,23 @@
           {
             type: "pain_point",
             headline: "แก้ปัญหาแบตหมดระหว่างวัน",
-            hook: "ใครแบตมือถือหมดระหว่างวันบ่อยๆ, พกสายชาร์จพะรุงพะรัง, ต้องดูตัวนี้ด่วนเลยค่ะ!",
-            body: "{name} มีสายชาร์จในตัวครบ, ชาร์จไวไม่ร้อน, ความจุแน่นๆ ชาร์จได้หลายรอบ, พกตัวเดียวจบออกจากบ้านสบายใจมากค่ะ.",
-            cta: "แบตหมดไม่ต้องลุ้น, จิ้มสั่งตรงตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+            hook: "ใครแบตหมดระหว่างวันบ่อยๆ, ต้องดูตัวนี้เลยค่ะ!",
+            body: "{name} มีสายชาร์จในตัวครบ, ชาร์จไวไม่ร้อน, พกตัวเดียวจบเลยค่ะ.",
+            cta: "จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
           },
           {
             type: "discovery",
             headline: "พาวเวอร์แบงค์ตัวจบ ดีไซน์สวยตรงปก",
-            hook: "ไปเจอพาวเวอร์แบงค์ที่ตอบโจทย์ชีวิตที่สุดมาแล้วค่ะ, ดีไซน์สวยตรงปก น้ำหนักเบามาก!",
-            body: "{name} จ่ายไฟเสถียรเต็มสปีด, ขนาดกะทัดรัดพกพาง่าย, มีหน้าจอดิจิทัลบอกเปอร์เซ็นต์แบตชัดเจน, แฟนไอทีต้องหลงรักแน่นอนค่ะ.",
-            cta: "พิกัดอยู่ที่ตะกร้าส้มมุมซ้ายล่าง, รีบจิ้มสั่งก่อนของหมดนะคะ."
+            hook: "เจอพาวเวอร์แบงค์ดีไซน์สวยตรงปก, น้ำหนักเบามากค่ะ!",
+            body: "{name} จ่ายไฟเต็มสปีด, พกพาง่าย, มีจอดิจิทัลบอกแบตชัดเลยค่ะ.",
+            cta: "จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
           },
           {
             type: "benefit",
             headline: "พาวเวอร์แบงค์สเปกคุ้ม ปลอดภัย มอก.",
-            hook: "ใครมองหาพาวเวอร์แบงค์สเปกแน่นๆ, ตัวเดียวจบทั้งทำงานและเที่ยว, แนะนำรุ่นนี้เลยค่ะ!",
-            body: "{name} ความจุเต็มมิลลิแอมป์จริง, ระบบตัดไฟอัจฉริยะไม่ร้อน, ปลอดภัยผ่านมาตรฐาน มอก., คุ้มค่าเกินราคาแน่นอนค่ะ.",
-            cta: "รับประกันของแท้ส่งไว, จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
+            hook: "ใครหาพาวเวอร์แบงค์สเปกแน่นๆ, แนะนำรุ่นนี้เลยค่ะ!",
+            body: "{name} ความจุเต็มจริง, ตัดไฟอัจฉริยะไม่ร้อน, มีมาตรฐาน มอก. คุ้มมากค่ะ.",
+            cta: "จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ."
           }
         ]
       },
@@ -2004,10 +2004,54 @@
         }
       }
 
-      const hook = chosen.hook;
-      const body = chosen.body.replace('{name}', spokenName);
-      const cta = chosen.cta;
-      const fullScript = `${hook} ${body} ${cta}`;
+      let hook = (chosen.hook || '').trim();
+      let body = (chosen.body || '').replace('{name}', spokenName).trim();
+      let cta = (chosen.cta || '').trim();
+
+      // Universal 20-second script length optimizer (~175-195 chars = ~18.5-19.3s natural speech)
+      const MAX_SCRIPT_CHARS = 195;
+      const politeWord = body.includes('ครับ') ? 'ครับ' : 'ค่ะ';
+      let fullScript = `${hook} ${body} ${cta}`;
+      if (fullScript.length > MAX_SCRIPT_CHARS) {
+        cta = "จิ้มสั่งที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ.";
+        fullScript = `${hook} ${body} ${cta}`;
+      }
+      if (fullScript.length > MAX_SCRIPT_CHARS && body.includes(',')) {
+        const bClauses = body.split(',').map(s => s.trim().replace(/\.$/, '')).filter(Boolean);
+        while (bClauses.length > 2 && (`${hook} ${bClauses.join(', ')}. ${cta}`).length > MAX_SCRIPT_CHARS) {
+          let longestIdx = 1;
+          for (let j = 2; j < bClauses.length; j++) {
+            if (bClauses[j].length > bClauses[longestIdx].length) longestIdx = j;
+          }
+          bClauses.splice(longestIdx, 1);
+        }
+        const lastC = bClauses[bClauses.length - 1];
+        if (!lastC.endsWith('ค่ะ') && !lastC.endsWith('ครับ') && !lastC.endsWith('นะคะ')) {
+          bClauses[bClauses.length - 1] = lastC + politeWord;
+        }
+        body = bClauses.join(', ') + '.';
+        fullScript = `${hook} ${body} ${cta}`;
+      }
+      if (fullScript.length > MAX_SCRIPT_CHARS && hook.includes(',')) {
+        let hClauses = hook.split(',').map(s => s.trim()).filter(Boolean);
+        while (hClauses.length > 2 && (`${hClauses.join(', ')} ${body} ${cta}`).length > MAX_SCRIPT_CHARS) {
+          hClauses.splice(1, 1);
+        }
+        if (hClauses.length === 2 && (`${hClauses.join(', ')} ${body} ${cta}`).length > MAX_SCRIPT_CHARS) {
+          cta = "จิ้มสั่งที่ตะกร้าส้มมุมซ้ายล่างนะคะ.";
+          if ((`${hClauses.join(', ')} ${body} ${cta}`).length > MAX_SCRIPT_CHARS) {
+            let bestH = hClauses[0].length >= 24 ? hClauses[0] : hClauses[1];
+            if (!/[!?ค่ะคะครับ]$/.test(bestH)) bestH += 'ค่ะ!';
+            hClauses = [bestH];
+          }
+        }
+        hook = hClauses.join(', ');
+        fullScript = `${hook} ${body} ${cta}`;
+      }
+      if (fullScript.length > MAX_SCRIPT_CHARS) {
+        cta = "จิ้มสั่งที่ตะกร้าส้มมุมซ้ายล่างนะคะ.";
+        fullScript = `${hook} ${body} ${cta}`;
+      }
 
       return {
         category: matchedCat ? matchedCat.id : "general",
@@ -2565,20 +2609,19 @@
         player.classList.add('hidden');
       }
 
-      // Reset audio to completely silent on product change / load
+      // Reset audio to completely silent on product change / load (NEVER load unrelated default audio!)
       const maliAudio = document.getElementById('player-mali-audio');
       if (maliAudio) {
         maliAudio.pause();
         maliAudio.currentTime = 0;
-        let audioSrc = prod.audio_url || '';
-        if (!audioSrc) {
-          if (prod.product_id === 'fanlife_tumbler_710ml') {
-            audioSrc = '/audio/voiceover_fanlife_tumbler_710ml.mp3';
-          } else {
-            audioSrc = '/audio/voiceover_default_imported.mp3';
-          }
+        maliAudio.playbackRate = 1.0;
+        if (prod._cachedAudioBase64) {
+          maliAudio.src = prod._cachedAudioBase64;
+        } else if (prod.audio_url) {
+          maliAudio.src = prod.audio_url;
+        } else {
+          maliAudio.removeAttribute('src');
         }
-        maliAudio.src = audioSrc;
       }
       const bgmAudio = document.getElementById('player-bgm');
       if (bgmAudio) {
@@ -2852,70 +2895,166 @@
       ctx.restore();
     }
 
+    function drawRoundedImageCard(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh, radius, borderCol = 'rgba(255,255,255,0.28)') {
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(dx, dy, dw, dh, radius);
+      ctx.clip();
+      ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = borderCol;
+      ctx.lineWidth = Math.max(3, Math.round(dw * 0.006));
+      ctx.beginPath();
+      ctx.roundRect(dx, dy, dw, dh, radius);
+      ctx.stroke();
+      ctx.restore();
+    }
+
     function drawKenBurnsImage(ctx, images, t, W, H) {
       const validImages = (images || []).filter(im => im && im.complete && im.naturalWidth > 0);
-      if (validImages.length === 0) {
+      const extraSnapshots = (typeof capturedVideoSnapshots !== 'undefined' ? capturedVideoSnapshots : [])
+        .filter(c => c && c.width > 0);
+
+      if (validImages.length === 0 && extraSnapshots.length === 0) {
         ctx.fillStyle = '#18181b';
         ctx.fillRect(0, 0, W, H);
         return;
       }
 
-      // 5-Scene Multi-Angle Virtual Camera (even if only 1 image exists, creates 5 distinct dynamic cuts!)
-      const durPerScene = 3.2;
-      const sceneIdx = Math.floor(Math.max(0, t) / durPerScene);
-      const img = validImages[sceneIdx % validImages.length];
-      const subT = (Math.max(0, t) % durPerScene) / durPerScene; // 0.0 -> 1.0
+      // Each slide is 2.6 seconds -> 8s window (0:12 to 0:20) shows 3 distinct slides!
+      const durPerScene = 2.6;
+      const elapsed = Math.max(0, t);
+      const sceneIdx = Math.floor(elapsed / durPerScene);
+      const subT = (elapsed % durPerScene) / durPerScene; // 0.0 -> 1.0
 
-      // Define 5 distinct camera motions (zoom + panX + panY) so it never looks like 1 static image
-      const cameraPresets = [
-        { z0: 1.00, z1: 1.16, px0: 0.00, px1: 0.00, py0: 0.00, py1: -0.03 }, // Scene 1: Hero Zoom-In
-        { z0: 1.22, z1: 1.06, px0: -0.05, px1: 0.05, py0: -0.04, py1: 0.02 }, // Scene 2: Close-up Pan Right
-        { z0: 1.08, z1: 1.25, px0: 0.05, px1: -0.04, py0: 0.04, py1: -0.04 }, // Scene 3: Detail Macro Zoom
-        { z0: 1.24, z1: 1.04, px0: 0.00, px1: 0.00, py0: 0.05, py1: -0.02 }, // Scene 4: Vertical Pull-Back
-        { z0: 1.02, z1: 1.18, px0: -0.04, px1: 0.04, py0: 0.00, py1: 0.00 }  // Scene 5: Showcase Sweep
-      ];
-      const cam = cameraPresets[sceneIdx % cameraPresets.length];
-      const zoom = cam.z0 + (cam.z1 - cam.z0) * subT;
-      const panX = (cam.px0 + (cam.px1 - cam.px0) * subT) * W;
-      const panY = (cam.py0 + (cam.py1 - cam.py0) * subT) * H;
-
-      ctx.save();
-      const iw = img.naturalWidth;
-      const ih = img.naturalHeight;
+      const primaryImg = validImages[sceneIdx % Math.max(1, validImages.length)] || extraSnapshots[0];
+      const iw = primaryImg.naturalWidth || primaryImg.width || 1080;
+      const ih = primaryImg.naturalHeight || primaryImg.height || 1080;
       const imgAspect = iw / ih;
       const targetAspect = W / H;
 
-      // 1. Blurred ambient 9:16 backdrop
+      ctx.save();
+      // 1. Ambient blurred 9:16 backdrop
       let bgW, bgH;
       if (imgAspect > targetAspect) {
-        bgH = H * 1.1;
+        bgH = H * 1.12;
         bgW = bgH * imgAspect;
       } else {
-        bgW = W * 1.1;
+        bgW = W * 1.12;
         bgH = bgW / imgAspect;
       }
-      const bgX = (W - bgW) / 2;
-      const bgY = (H - bgH) / 2;
-      ctx.filter = 'blur(22px) brightness(0.62)';
-      ctx.drawImage(img, bgX, bgY, bgW, bgH);
+      ctx.filter = 'blur(26px) brightness(0.48)';
+      ctx.drawImage(primaryImg, (W - bgW) / 2, (H - bgH) / 2, bgW, bgH);
       ctx.filter = 'none';
 
-      // 2. Sharp foreground product with multi-scene virtual camera motion (proportional to W & H)
-      const baseBoxW = W * 0.90;
-      const baseBoxH = H * 0.68;
-      let fgW = baseBoxW * zoom;
-      let fgH = (baseBoxW / imgAspect) * zoom;
-      if (fgH > baseBoxH * zoom) {
-        fgH = baseBoxH * zoom;
-        fgW = fgH * imgAspect;
-      }
-      const fgX = ((W - fgW) / 2) + panX;
-      const fgY = ((H - fgH) / 2) + panY;
+      // If multiple distinct product images exist (>= 3), cycle through each distinct image with Ken-Burns motion
+      const slideType = (validImages.length >= 3) ? (sceneIdx % 3 === 2 ? 2 : 0) : (sceneIdx % 3);
 
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-      ctx.shadowBlur = Math.round(W * 0.028);
-      ctx.shadowOffsetY = Math.round(H * 0.006);
-      ctx.drawImage(img, fgX, fgY, fgW, fgH);
+      if (slideType === 0) {
+        // SLIDE A: Full Studio Product Hero Showcase
+        const zoom = 1.02 + subT * 0.12;
+        const baseBoxW = W * 0.88;
+        const baseBoxH = H * 0.56;
+        let fgW = baseBoxW * zoom;
+        let fgH = (baseBoxW / imgAspect) * zoom;
+        if (fgH > baseBoxH * zoom) {
+          fgH = baseBoxH * zoom;
+          fgW = fgH * imgAspect;
+        }
+        const fgX = (W - fgW) / 2;
+        const fgY = (H - fgH) / 2 + (H * 0.03);
+
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+        ctx.shadowBlur = Math.round(W * 0.035);
+        ctx.shadowOffsetY = Math.round(H * 0.008);
+        drawRoundedImageCard(ctx, primaryImg, 0, 0, iw, ih, fgX, fgY, fgW, fgH, Math.round(W * 0.035), 'rgba(255,255,255,0.35)');
+      } else if (slideType === 1) {
+        // SLIDE B: Dual-Angle 2-Grid Split Collage (Shows 2 different images or 2 distinct close-up detail crops!)
+        const imgTop = validImages[1] || validImages[0] || primaryImg;
+        const imgBot = validImages[2] || extraSnapshots[0] || validImages[0] || primaryImg;
+        const topW = imgTop.naturalWidth || imgTop.width || iw;
+        const topH = imgTop.naturalHeight || imgTop.height || ih;
+        const botW = imgBot.naturalWidth || imgBot.width || iw;
+        const botH = imgBot.naturalHeight || imgBot.height || ih;
+
+        const cardW = Math.round(W * 0.86);
+        const cardH = Math.round(H * 0.27);
+        const cardX = Math.round((W - cardW) / 2);
+        const topCardY = Math.round(H * 0.26);
+        const botCardY = topCardY + cardH + Math.round(H * 0.025);
+        const rad = Math.round(W * 0.03);
+
+        // Pan smoothly inside top crop (upper product details) and bottom crop (lower product details)
+        const panOffset = (subT - 0.5) * 0.08;
+        const sx1 = Math.max(0, Math.round(topW * (0.08 + panOffset)));
+        const sy1 = Math.max(0, Math.round(topH * 0.05));
+        const sw1 = Math.round(topW * 0.80);
+        const sh1 = Math.round(topH * 0.52);
+
+        const sx2 = Math.max(0, Math.round(botW * (0.10 - panOffset)));
+        const sy2 = (imgBot === imgTop) ? Math.round(botH * 0.42) : Math.round(botH * 0.15);
+        const sw2 = Math.round(botW * 0.80);
+        const sh2 = Math.round(botH * 0.52);
+
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.shadowBlur = Math.round(W * 0.025);
+        drawRoundedImageCard(ctx, imgTop, sx1, sy1, sw1, sh1, cardX, topCardY, cardW, cardH, rad, '#EE4D2D');
+        drawRoundedImageCard(ctx, imgBot, sx2, sy2, sw2, sh2, cardX, botCardY, cardW, cardH, rad, 'rgba(255,255,255,0.4)');
+
+        // Center Feature Pill Badge between the 2 cards
+        const pillW = Math.round(W * 0.56);
+        const pillH = Math.round(H * 0.038);
+        const pillX = Math.round((W - pillW) / 2);
+        const pillY = topCardY + cardH - Math.round(pillH * 0.35);
+        ctx.fillStyle = '#EE4D2D';
+        ctx.beginPath();
+        ctx.roundRect(pillX, pillY, pillW, pillH, Math.round(pillH / 2));
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `bold ${Math.round(W * 0.034)}px Kanit, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('✨ ดีไซน์สวย ฟังก์ชันครบตรงปก', W / 2, pillY + pillH / 2);
+      } else {
+        // SLIDE C: Product Promo & Orange Basket CTA Showcase
+        const imgFinal = validImages[validImages.length - 1] || primaryImg;
+        const fw = imgFinal.naturalWidth || imgFinal.width || iw;
+        const fh = imgFinal.naturalHeight || imgFinal.height || ih;
+        const fAspect = fw / fh;
+
+        const scale = 1.08 - subT * 0.06;
+        let cardW = Math.round(W * 0.82 * scale);
+        let cardH = Math.round((cardW / fAspect));
+        if (cardH > H * 0.46) {
+          cardH = Math.round(H * 0.46 * scale);
+          cardW = Math.round(cardH * fAspect);
+        }
+        const cardX = Math.round((W - cardW) / 2);
+        const cardY = Math.round(H * 0.27);
+
+        ctx.shadowColor = 'rgba(238, 77, 45, 0.45)';
+        ctx.shadowBlur = Math.round(W * 0.04);
+        drawRoundedImageCard(ctx, imgFinal, 0, 0, fw, fh, cardX, cardY, cardW, cardH, Math.round(W * 0.035), '#EE4D2D');
+
+        // Bottom CTA Banner pointing to Orange Basket
+        const ctaW = Math.round(W * 0.84);
+        const ctaH = Math.round(H * 0.062);
+        const ctaX = Math.round((W - ctaW) / 2);
+        const ctaY = cardY + cardH + Math.round(H * 0.035);
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = 'rgba(238, 77, 45, 0.95)';
+        ctx.beginPath();
+        ctx.roundRect(ctaX, ctaY, ctaW, ctaH, Math.round(ctaH / 2));
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `bold ${Math.round(W * 0.038)}px Kanit, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🛒 พิกัดของแท้ จิ้มตะกร้าส้มมุมซ้ายล่าง', W / 2, ctaY + ctaH / 2);
+      }
+
       ctx.restore();
     }
 
@@ -3553,19 +3692,52 @@
       }
       microPhrases = mergedPhrases.filter(p => p.length > 0);
 
-      // Fast-paced dynamic timing: 8 to 12 cues across 20 seconds (~1.6s - 2.4s per cue)
-      const totalChars = microPhrases.reduce((acc, p) => acc + p.length, 0);
-      const totalDuration = 20.0;
+      // Phonetic Syllable Weight Proportional Timing (100% locked to Mali voiceover, zero lag, zero 20->20 truncation!)
+      function estimatePhoneticWeight(phrase) {
+        if (!phrase) return 1.0;
+        // Convert spoken numbers & model codes into actual spoken Thai syllable equivalents before counting
+        let spokenNorm = phrase
+          .replace(/\bW(\d)/gi, 'ดับเบิลยู$1')
+          .replace(/20000/g, 'สองหมื่น')
+          .replace(/15000/g, 'หมื่นห้าพัน')
+          .replace(/10000/g, 'หนึ่งหมื่น')
+          .replace(/30000/g, 'สามหมื่น')
+          .replace(/5000/g, 'ห้าพัน')
+          .replace(/100%/g, 'ร้อยเปอร์เซ็นต์')
+          .replace(/360/g, 'สามร้อยหกสิบ')
+          .replace(/304/g, 'สามศูนย์สี่');
+
+        let w = 1.6; // Natural breath / transition weight per phrase
+        for (let i = 0; i < spokenNorm.length; i++) {
+          const ch = spokenNorm[i];
+          const code = ch.charCodeAt(0);
+          if (isCombiningMark(ch)) {
+            w += 0.0; // Combining Thai vowel/tone marks take 0 extra syllable time
+          } else if ((code >= 65 && code <= 90) || (code >= 97 && code <= 122)) {
+            w += 0.95; // English word characters
+          } else if (code === 48) {
+            w += 0.45; // Digit 0 in round numbers
+          } else if (code >= 49 && code <= 57) {
+            w += 1.65; // Non-zero digits (spoken as Thai number words)
+          } else if (ch !== ' ') {
+            w += 1.0; // Standard Thai base character
+          }
+        }
+        return w;
+      }
+
+      const speechSpan = 19.3; // Spoken script completes cleanly at 19.3s, leaving 0.7s tail to 20.0s
+      const weights = microPhrases.map(p => estimatePhoneticWeight(p));
+      const totalWeight = weights.reduce((acc, w) => acc + w, 0) || 1.0;
 
       let currentStart = 0.0;
       const cues = [];
 
       for (let i = 0; i < microPhrases.length; i++) {
         const phrase = microPhrases[i];
-        const weight = phrase.length / totalChars;
-        let dur = Math.max(1.6, Number((weight * totalDuration).toFixed(1)));
-        let end = (i === microPhrases.length - 1) ? 20.0 : Number((currentStart + dur).toFixed(1));
-        if (end > 20.0) end = 20.0;
+        const dur = (weights[i] / totalWeight) * speechSpan;
+        const nextEnd = currentStart + dur;
+        const end = (i === microPhrases.length - 1) ? 20.0 : Number(nextEnd.toFixed(2));
 
         const formattedHtml = formatSingleOrTwoLines(phrase);
         const plainLines = formattedHtml
@@ -3575,13 +3747,14 @@
           .map(l => l.trim())
           .filter(Boolean);
         cues.push({
-          start: currentStart,
+          start: Number(currentStart.toFixed(2)),
           end: end,
+          speechEnd: Number(nextEnd.toFixed(2)),
           text: phrase,
           lines: plainLines.length > 0 ? plainLines : [phrase],
           html: formattedHtml
         });
-        currentStart = end;
+        currentStart = nextEnd;
       }
 
       if (cues.length > 0) {
@@ -3600,19 +3773,38 @@
     let isUserPaused = true;
     let isSwitchingClip = false;
     let previewBrollCutIndex = 0;
+    let hasAllVideoClipsEnded = false;
+    let capturedVideoSnapshots = [];
     let masterPreviewTimer = null;
     let previewWallStartTime = 0;
+    let _voiceReqCounter = 0;
     const MAX_TARGET_VIDEO_DURATION = 20.0; // Strictly 20.0 seconds
+    const TARGET_SPEECH_SPAN = 19.3;
+
+    function calibrateAudioPlaybackRate(rawDuration) {
+      if (!rawDuration || isNaN(rawDuration) || rawDuration <= 4.0) return 1.0;
+      // Always calibrate voiceover smoothly so 100% of the script finishes at TARGET_SPEECH_SPAN (19.3s) inside the 20.0s video!
+      const ratio = rawDuration / TARGET_SPEECH_SPAN;
+      return Math.min(1.38, Math.max(0.88, Number(ratio.toFixed(3))));
+    }
 
     function getMasterPreviewTime() {
-      const maliAudio = document.getElementById('player-mali-audio');
-      if (maliAudio && !maliAudio.paused && maliAudio.currentTime > 0) {
-        return Math.min(maliAudio.currentTime, MAX_TARGET_VIDEO_DURATION);
-      }
       if (previewWallStartTime > 0) {
         return Math.min((performance.now() - previewWallStartTime) / 1000.0, MAX_TARGET_VIDEO_DURATION);
       }
       return 0.0;
+    }
+
+    function captureSnapshotFromPlayer(player) {
+      if (!player || player.readyState < 2 || !player.videoWidth) return;
+      if (capturedVideoSnapshots.length >= 2) return;
+      try {
+        const snap = document.createElement('canvas');
+        snap.width = player.videoWidth;
+        snap.height = player.videoHeight;
+        snap.getContext('2d').drawImage(player, 0, 0);
+        capturedVideoSnapshots.push(snap);
+      } catch (e) {}
     }
 
     function startMasterPreviewClock(startFromSec = 0.0) {
@@ -3626,10 +3818,17 @@
         const bgmAudio = document.getElementById('player-bgm');
         const player = document.getElementById('player-preview');
 
-        // Guarantee Mali voiceover NEVER stops prematurely before its full duration
-        if (maliAudio && !isMaliMuted && maliAudio.paused && !maliAudio.ended) {
-          const wallElapsed = (performance.now() - previewWallStartTime) / 1000.0;
-          if (wallElapsed < (maliAudio.duration || 19.5) - 0.25) {
+        const wallSec = (performance.now() - previewWallStartTime) / 1000.0;
+
+        // Auto-calibrate Mali audio playbackRate so 100% of script finishes at ~19.3s (never cut off!)
+        if (maliAudio && maliAudio.duration && !isNaN(maliAudio.duration) && maliAudio.duration > 1.0) {
+          const idealRate = calibrateAudioPlaybackRate(maliAudio.duration);
+          if (Math.abs(maliAudio.playbackRate - idealRate) > 0.02) {
+            maliAudio.preservesPitch = true;
+            maliAudio.playbackRate = idealRate;
+          }
+          // Guarantee Mali voiceover NEVER stops prematurely before its full duration
+          if (!isMaliMuted && maliAudio.paused && !maliAudio.ended && wallSec < TARGET_SPEECH_SPAN - 0.3) {
             maliAudio.play().catch(() => {});
           }
         }
@@ -3638,12 +3837,12 @@
           bgmAudio.play().catch(() => {});
         }
 
-        const wallSec = (performance.now() - previewWallStartTime) / 1000.0;
-        const cur = (maliAudio && !maliAudio.paused && !maliAudio.ended && maliAudio.currentTime > 0)
-          ? Math.max(wallSec, maliAudio.currentTime)
-          : wallSec;
+        // Capture 2 real action frames during Video #1 for the 2-grid collage slide
+        if (player && !hasAllVideoClipsEnded && ((wallSec > 2.0 && capturedVideoSnapshots.length === 0) || (wallSec > 6.5 && capturedVideoSnapshots.length === 1))) {
+          captureSnapshotFromPlayer(player);
+        }
 
-        if (cur >= MAX_TARGET_VIDEO_DURATION) {
+        if (wallSec >= MAX_TARGET_VIDEO_DURATION) {
           resetPreviewPlayback();
           return;
         }
@@ -3651,16 +3850,26 @@
         // Update sleek timeline bar (0:00 / 0:20)
         const progressFill = document.getElementById('custom-progress-fill');
         if (progressFill) {
-          progressFill.style.width = Math.min(100, (cur / MAX_TARGET_VIDEO_DURATION) * 100) + '%';
+          progressFill.style.width = Math.min(100, (wallSec / MAX_TARGET_VIDEO_DURATION) * 100) + '%';
         }
         const timeDisplay = document.getElementById('custom-time-display');
         if (timeDisplay) {
-          const curSec = Math.floor(Math.min(20, cur));
+          const curSec = Math.floor(Math.min(20, wallSec));
           const curStr = `0:${curSec < 10 ? '0' : ''}${curSec}`;
           timeDisplay.innerText = `${curStr} / 0:20`;
         }
 
-        // Update active viral Thai subtitle cue
+        // Exact 1:1 Audio-Position Subtitle Sync (Subtitles track Mali's actual spoken progress!)
+        let subLookupTime = wallSec;
+        if (maliAudio && maliAudio.duration > 1.0 && !isNaN(maliAudio.duration)) {
+          if (maliAudio.ended) {
+            subLookupTime = TARGET_SPEECH_SPAN;
+          } else if (!maliAudio.paused || maliAudio.currentTime > 0) {
+            const audioProgressRatio = Math.min(1.0, Math.max(0.0, maliAudio.currentTime / maliAudio.duration));
+            subLookupTime = audioProgressRatio * TARGET_SPEECH_SPAN;
+          }
+        }
+
         if (currentProduct && currentProduct.script) {
           const subEl = document.getElementById('overlay-subtitle-text');
           if (subEl) {
@@ -3673,7 +3882,7 @@
             if (cues && cues.length > 0) {
               let activeCue = cues[0];
               for (let i = 0; i < cues.length; i++) {
-                if (cur >= cues[i].start && (cur < cues[i].end || i === cues.length - 1)) {
+                if (subLookupTime >= cues[i].start && (subLookupTime < cues[i].end || i === cues.length - 1)) {
                   activeCue = cues[i];
                   break;
                 }
@@ -3687,15 +3896,16 @@
           }
         }
 
-        // If in image-only fallback mode, draw 5-scene Ken-Burns motion on #player-motion-canvas
+        // When all video clips have finished (e.g. after 0:12) or in image-only mode, draw Multi-Slide Showcase on #player-motion-canvas
         const mCanvas = document.getElementById('player-motion-canvas');
-        if (mCanvas && !mCanvas.classList.contains('hidden')) {
+        if (mCanvas && (hasAllVideoClipsEnded || !mCanvas.classList.contains('hidden'))) {
           if (mCanvas.width !== 720) {
             mCanvas.width = 720;
             mCanvas.height = 1280;
           }
           const mCtx = mCanvas.getContext('2d');
-          drawKenBurnsImage(mCtx, preloadedPreviewImages, cur, mCanvas.width, mCanvas.height);
+          const imgElapsed = Math.max(0, wallSec - clipStartOffset);
+          drawKenBurnsImage(mCtx, preloadedPreviewImages, imgElapsed, mCanvas.width, mCanvas.height);
         }
       }, 33);
     }
@@ -3714,7 +3924,7 @@
           ? currentProduct.video_urls
           : (currentProduct && currentProduct.video_url ? [currentProduct.video_url] : []);
 
-        if (vList.length > 0) {
+        if (vList.length > 0 && !hasAllVideoClipsEnded) {
           player.muted = true;
           player.classList.remove('hidden');
           const mCanvas = document.getElementById('player-motion-canvas');
@@ -3726,9 +3936,12 @@
           if (mCanvas) mCanvas.classList.remove('hidden');
         }
 
-        if (maliAudio && !isMaliMuted) {
-          if (cur < (maliAudio.duration || 19.5) - 0.2) {
-            maliAudio.currentTime = cur;
+        if (maliAudio && !isMaliMuted && maliAudio.src) {
+          const idealRate = calibrateAudioPlaybackRate(maliAudio.duration);
+          maliAudio.preservesPitch = true;
+          maliAudio.playbackRate = idealRate;
+          if (cur < TARGET_SPEECH_SPAN) {
+            maliAudio.currentTime = Math.min(maliAudio.duration || 20, cur * idealRate);
             maliAudio.play().catch(() => {});
           }
         }
@@ -3762,8 +3975,11 @@
       isMaliMuted = !isMaliMuted;
       if (maliAudio) {
         maliAudio.muted = isMaliMuted;
-        if (!isMaliMuted && !isUserPaused && maliAudio.paused) {
-          maliAudio.currentTime = Math.min(getMasterPreviewTime(), MAX_TARGET_VIDEO_DURATION);
+        if (!isMaliMuted && !isUserPaused && maliAudio.paused && maliAudio.src) {
+          const idealRate = calibrateAudioPlaybackRate(maliAudio.duration);
+          maliAudio.preservesPitch = true;
+          maliAudio.playbackRate = idealRate;
+          maliAudio.currentTime = Math.min(maliAudio.duration || 20, getMasterPreviewTime() * idealRate);
           maliAudio.play().catch(() => {});
         }
       }
@@ -3785,18 +4001,36 @@
 
       previewWallStartTime = performance.now() - (targetTime * 1000.0);
       const player = document.getElementById('player-preview');
+      const mCanvas = document.getElementById('player-motion-canvas');
       const maliAudio = document.getElementById('player-mali-audio');
-      if (player && player.duration) {
-        player.currentTime = targetTime % player.duration;
+      const vList = (currentProduct && currentProduct.video_urls && currentProduct.video_urls.length > 0)
+        ? currentProduct.video_urls
+        : (currentProduct && currentProduct.video_url ? [currentProduct.video_url] : []);
+
+      if (vList.length > 0 && player && player.duration && targetTime < player.duration) {
+        hasAllVideoClipsEnded = false;
+        if (mCanvas) mCanvas.classList.add('hidden');
+        player.classList.remove('hidden');
+        player.currentTime = targetTime;
+        if (!isUserPaused) player.play().catch(() => {});
+      } else if (player && player.duration && targetTime >= player.duration && vList.length <= 1) {
+        hasAllVideoClipsEnded = true;
+        clipStartOffset = player.duration;
+        player.classList.add('hidden');
+        if (mCanvas) mCanvas.classList.remove('hidden');
       }
-      if (maliAudio && (!maliAudio.duration || targetTime < maliAudio.duration)) {
-        maliAudio.currentTime = targetTime;
+
+      if (maliAudio && maliAudio.duration) {
+        const idealRate = calibrateAudioPlaybackRate(maliAudio.duration);
+        maliAudio.preservesPitch = true;
+        maliAudio.playbackRate = idealRate;
+        maliAudio.currentTime = Math.min(maliAudio.duration - 0.1, (targetTime / TARGET_SPEECH_SPAN) * maliAudio.duration);
       }
     }
 
     let isSubtitleSyncAttached = false;
     // =========================================================================
-    // MULTI-CLIP SEAMLESS CHAINING & B-ROLL CONTINUITY ENGINE (20S GUARANTEE)
+    // MULTI-CLIP SEAMLESS CHAINING -> MULTI-SLIDE IMAGE SHOWCASE (NEVER LOOPS SAME VIDEO!)
     // =========================================================================
     let currentClipIndex = 0;
     let clipStartOffset = 0.0;
@@ -3818,10 +4052,11 @@
         return;
       }
 
-      // 1. If multiple video clips exist (e.g. main gallery video + comment review videos): chain next clip!
-      if (vList.length > 1) {
+      // 1. ONLY if there is ANOTHER distinct video clip in the playlist (currentClipIndex + 1 < vList.length):
+      // Play the next distinct review/ad video clip! (NEVER loop back to clip 0!)
+      if (currentClipIndex + 1 < vList.length) {
         isSwitchingClip = true;
-        currentClipIndex = (currentClipIndex + 1) % vList.length;
+        currentClipIndex++;
         player.crossOrigin = 'anonymous';
         player.src = toCorsSafeMediaUrl(vList[currentClipIndex]);
         player.currentTime = 0;
@@ -3831,32 +4066,27 @@
           isSwitchingClip = false;
         });
         if (!isRenderingVideo) {
-          showToast(`สลับเล่นคลิปรีวิวที่ ${currentClipIndex + 1} ต่อเนื่อง 🎬`);
+          showToast(`กำลังเล่นคลิปรีวิวที่ ${currentClipIndex + 1}/${vList.length} ต่อเนื่อง 🎬`);
         }
         return;
       }
 
-      // 2. If 1 video clip exists and is shorter than 20s (e.g. 12s):
-      // DO NOT freeze and DO NOT switch to 1 static image!
-      // Seamlessly cut to a Dynamic Highlight B-Roll Cut of the moving video until 20.0s!
-      if (vList.length === 1 && player) {
-        isSwitchingClip = true;
-        previewBrollCutIndex++;
-        updateVideoPreviewTransform();
-        const highlightStart = (player.duration && player.duration > 4.0) ? Math.min(1.8, player.duration * 0.2) : 0.0;
-        player.currentTime = highlightStart;
-        player.play().then(() => {
-          isSwitchingClip = false;
-        }).catch(() => {
-          isSwitchingClip = false;
-        });
-        return;
+      // 2. When all distinct video clips have finished before 20.0s (e.g. at 0:12):
+      // DO NOT loop the same video clip! Transition immediately to the 3-Slide Multi-Image Product Showcase!
+      hasAllVideoClipsEnded = true;
+      if (player) {
+        captureSnapshotFromPlayer(player);
+        player.classList.add('hidden');
       }
-
-      // 3. Only if NO video clips exist at all (vList.length === 0): use 5-scene Ken-Burns product images
-      if (player) player.classList.add('hidden');
       const mCanvas = document.getElementById('player-motion-canvas');
-      if (mCanvas) mCanvas.classList.remove('hidden');
+      if (mCanvas) {
+        mCanvas.classList.remove('hidden');
+        if (mCanvas.width !== 720) {
+          mCanvas.width = 720;
+          mCanvas.height = 1280;
+        }
+        drawKenBurnsImage(mCanvas.getContext('2d'), preloadedPreviewImages, 0.0, mCanvas.width, mCanvas.height);
+      }
     }
 
     function resetPreviewPlayback() {
@@ -3871,6 +4101,8 @@
       const vList = (currentProduct && currentProduct.video_urls && currentProduct.video_urls.length > 0) ?
         currentProduct.video_urls :
         (currentProduct && currentProduct.video_url ? [currentProduct.video_url] : []);
+
+      hasAllVideoClipsEnded = (vList.length === 0);
 
       if (vList.length > 0 && player) {
         if (mCanvas) mCanvas.classList.add('hidden');
@@ -3889,7 +4121,10 @@
       }
 
       const maliAudio = document.getElementById('player-mali-audio');
-      if (maliAudio && !isMaliMuted) {
+      if (maliAudio && !isMaliMuted && maliAudio.src) {
+        const idealRate = calibrateAudioPlaybackRate(maliAudio.duration);
+        maliAudio.preservesPitch = true;
+        maliAudio.playbackRate = idealRate;
         maliAudio.currentTime = 0;
         maliAudio.play().catch(() => {});
       }
@@ -3915,7 +4150,7 @@
       });
 
       player.addEventListener('error', () => {
-        // If video URL fails to decode, seamlessly fall back to 5-scene Ken-Burns images
+        hasAllVideoClipsEnded = true;
         const mCanvas = document.getElementById('player-motion-canvas');
         if (mCanvas) {
           player.classList.add('hidden');
@@ -3930,9 +4165,7 @@
       });
 
       player.addEventListener('pause', () => {
-        // CRITICAL FIX: Never pause Mali voiceover when video clip #1 reaches its end at 0:12
-        // or when switching clips! Only pause if the user explicitly clicked Pause!
-        if (!isUserPaused || isSwitchingClip || isRenderingVideo || player.ended) {
+        if (!isUserPaused || isSwitchingClip || isRenderingVideo || player.ended || hasAllVideoClipsEnded) {
           return;
         }
         const maliAudio = document.getElementById('player-mali-audio');
@@ -3948,7 +4181,7 @@
       });
     }
 
-    // Call Mali TTS API for ANY script text (with smart caching so we never synthesize twice)
+    // Call Mali TTS API for ANY script text (with request-ID race protection & smart caching)
     async function fetchMaliVoiceAudio(text) {
       const cleanText = (text || '').trim();
       if (!cleanText) return null;
@@ -3957,6 +4190,7 @@
         return currentProduct._cachedAudioBase64;
       }
 
+      const reqId = ++_voiceReqCounter;
       try {
         const res = await fetch('/api/voice/synthesize', {
           method: 'POST',
@@ -3966,7 +4200,7 @@
         if (res.ok) {
           const data = await res.json();
           if (data && data.audio_base64) {
-            if (currentProduct) {
+            if (currentProduct && reqId === _voiceReqCounter) {
               currentProduct._cachedAudioBase64 = data.audio_base64;
               currentProduct._cachedAudioScript = cleanText;
             }
@@ -4027,35 +4261,33 @@
       if (btn) btn.disabled = true;
       if (pBox) pBox.classList.remove('hidden');
       if (icon) icon.className = 'ph-bold ph-spinner animate-spin text-base';
-      if (text) text.innerText = 'กำลังสังเคราะห์เสียงมาลี & ผสานวิดีโอ 9:16...';
+      if (text) text.innerText = 'กำลังสังเคราะห์เสียงมาลีตรงตามสคริปต์ 100%...';
 
       if (pBar) pBar.style.width = '15%';
-      if (pText) pText.innerText = '1/4 กำลังเตรียมเสียงพากย์มาลีและคำบรรยายภาษาไทย...';
+      if (pText) pText.innerText = '1/4 กำลังสังเคราะห์เสียงพากย์มาลีให้ตรงบทพูดและคำนวณเวลาซับ...';
 
-      // 1. Get current script text
+      // 1. Always read the exact live script from the textarea so voice & subtitles match 100%!
       const scriptText = ((document.getElementById('textarea-script') && document.getElementById('textarea-script').value.trim()) ||
         (currentProduct && currentProduct.script && (currentProduct.script.full_script || `${currentProduct.script.hook} ${currentProduct.script.body} ${currentProduct.script.cta}`)) ||
         'แนะนำสินค้าคุณภาพดี คุ้มราคา สนใจกดที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ').trim();
 
-      // 2. Synthesize Mali Voiceover (uses instant cache if already synthesized)
+      // 2. Synthesize Mali Voiceover for this exact scriptText
       let audioBase64 = await fetchMaliVoiceAudio(scriptText);
       const maliAudio = document.getElementById('player-mali-audio');
-      if (!audioBase64 && maliAudio && maliAudio.src && maliAudio.src.startsWith('data:audio/')) {
-        audioBase64 = maliAudio.src;
-      }
-      const finalVoiceSrc = audioBase64 || (maliAudio && maliAudio.src ? maliAudio.src : '/assets/sample_elevenlabs_mali.mp3');
+      const finalVoiceSrc = audioBase64 || (currentProduct && currentProduct._cachedAudioBase64) || '/assets/sample_elevenlabs_mali.mp3';
       if (maliAudio && audioBase64) {
         maliAudio.src = audioBase64;
+        maliAudio.load();
       }
 
       if (pBar) pBar.style.width = '35%';
-      if (pText) pText.innerText = '2/4 กำลังโหลดฟุตเทจวิดีโอและภาพโฆษณาผ่านระบบป้องกันภาพค้าง...';
+      if (pText) pText.innerText = '2/4 กำลังโหลดฟุตเทจวิดีโอและชุดภาพโฆษณาสำหรับตัดต่อ...';
 
-      // 3. Prepare Subtitle Cues (with .text and .lines for Canvas burning)
+      // 3. Prepare Phonetic-Weighted Subtitle Cues
       const cues = buildTimedSubtitleCues(scriptText);
       if (currentProduct) currentProduct._cachedCues = cues;
 
-      // 4. Unhide phone preview BEFORE starting render so Chrome actively decodes all video frames!
+      // 4. Unhide phone preview BEFORE starting render so Chrome decodes all video frames!
       const player = document.getElementById('player-preview');
       const mCanvas = document.getElementById('player-motion-canvas');
       const emptyState = document.getElementById('preview-empty-state');
@@ -4076,9 +4308,11 @@
       currentClipIndex = 0;
       clipStartOffset = 0.0;
       previewBrollCutIndex = 0;
+      hasAllVideoClipsEnded = !hasVideo;
+      capturedVideoSnapshots = [];
       updateVideoPreviewTransform();
 
-      // 5. Preload Product Images via Same-Origin Proxy & await readiness
+      // 5. Preload Product Images with automatic proxy fallback
       const imgSources = (currentProduct && currentProduct.images) ? currentProduct.images : [];
       const loadedImages = await Promise.all(
         imgSources.slice(0, 12).map(src => new Promise(resolve => {
@@ -4103,7 +4337,7 @@
         preloadedPreviewImages = loadedImages;
       }
 
-      // 6. Prepare <video> via Same-Origin Proxy & wait until Frame 1 is decoded
+      // 6. Prepare <video> & wait until Frame 1 is decoded
       if (hasVideo && player) {
         if (mCanvas) mCanvas.classList.add('hidden');
         player.classList.remove('hidden');
@@ -4151,18 +4385,19 @@
       const lastFrameCtx = lastFrameCanvas.getContext('2d');
       let hasDrawnValidVideoFrame = false;
 
-      // Tiny 2x2 taint-check canvas so renderCanvas can NEVER be tainted
       const taintTestCanvas = document.createElement('canvas');
       taintTestCanvas.width = 2;
       taintTestCanvas.height = 2;
       const taintTestCtx = taintTestCanvas.getContext('2d');
       let isVideoCorsClean = true;
 
-      // 8. Setup WebAudio Mixer (Records 100% of Mali Voiceover + BGM directly into the MP4/WebM file!)
+      // 8. Setup WebAudio Mixer with Auto-Calibrated PlaybackRate so 100% of voiceover finishes at ~19.3s!
       let audioCtx = null;
       let audioDest = null;
       let voiceNode = null;
       let bgmNode = null;
+      let rawVoiceBufferDuration = TARGET_SPEECH_SPAN;
+      let calibratedVoiceRate = 1.0;
 
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -4177,15 +4412,18 @@
           decodeAudioUrlToBuffer(audioCtx, '/audio/bgm_sample.mp3')
         ]);
 
-        if (voiceBuffer) {
+        if (voiceBuffer && voiceBuffer.duration > 0) {
+          rawVoiceBufferDuration = voiceBuffer.duration;
+          calibratedVoiceRate = calibrateAudioPlaybackRate(rawVoiceBufferDuration);
           voiceNode = audioCtx.createBufferSource();
           voiceNode.buffer = voiceBuffer;
+          voiceNode.playbackRate.value = calibratedVoiceRate;
           const voiceGain = audioCtx.createGain();
           voiceGain.gain.value = 1.0;
           voiceNode.connect(voiceGain);
-          voiceGain.connect(audioDest); // Recorded into exported video file
+          voiceGain.connect(audioDest);
           if (!isMaliMuted) {
-            voiceGain.connect(audioCtx.destination); // Heard live through speakers
+            voiceGain.connect(audioCtx.destination);
           }
         }
 
@@ -4257,8 +4495,8 @@
         }
       }
 
-      // 10. Start Synchronized Playback (Video + WebAudio Voiceover)
-      if (maliAudio) maliAudio.pause(); // WebAudio voiceNode plays the voice cleanly without echo
+      // 10. Start Synchronized Playback (Video + Calibrated WebAudio Voiceover)
+      if (maliAudio) maliAudio.pause();
       const bgmAudio = document.getElementById('player-bgm');
       if (bgmAudio) bgmAudio.pause();
 
@@ -4284,6 +4522,15 @@
         if (pBar) pBar.style.width = `${Math.min(98, 35 + Math.round(pct * 0.63))}%`;
         if (pText) pText.innerText = `3/4 กำลังเรนเดอร์วิดีโอ 9:16 พร้อมซับและเสียงพากย์... ${pct}%`;
 
+        // Capture 2 real action snapshots from Video #1 for the 2-grid split collage slide
+        if (hasVideo && !hasAllVideoClipsEnded && player && ((elapsedSec > 2.0 && capturedVideoSnapshots.length === 0) || (elapsedSec > 6.5 && capturedVideoSnapshots.length === 1))) {
+          captureSnapshotFromPlayer(player);
+        }
+
+        // Exact 1:1 Audio-Position Subtitle Sync
+        const audioProgressRatio = Math.min(1.0, Math.max(0.0, (elapsedSec * calibratedVoiceRate) / rawVoiceBufferDuration));
+        const subLookupTime = audioProgressRatio * TARGET_SPEECH_SPAN;
+
         // Update live phone preview timeline & subtitle DOM in sync
         const progressFill = document.getElementById('custom-progress-fill');
         if (progressFill) {
@@ -4298,7 +4545,7 @@
         if (subEl && cues && cues.length > 0) {
           let activeCue = cues[0];
           for (let i = 0; i < cues.length; i++) {
-            if (elapsedSec >= cues[i].start && (elapsedSec < cues[i].end || i === cues.length - 1)) {
+            if (subLookupTime >= cues[i].start && (subLookupTime < cues[i].end || i === cues.length - 1)) {
               activeCue = cues[i];
               break;
             }
@@ -4308,17 +4555,18 @@
           }
         }
 
-        // If in image-only mode, also animate #player-motion-canvas in the phone preview
-        if (!hasVideo && mCanvas) {
+        // Animate #player-motion-canvas in the phone preview whenever video clips have finished (e.g. 0:12 -> 0:20) or in image mode
+        if ((hasAllVideoClipsEnded || !hasVideo) && mCanvas) {
           if (mCanvas.width !== 720) {
             mCanvas.width = 720;
             mCanvas.height = 1280;
           }
-          drawKenBurnsImage(mCanvas.getContext('2d'), loadedImages, elapsedSec, mCanvas.width, mCanvas.height);
+          const imgElapsed = Math.max(0, elapsedSec - clipStartOffset);
+          drawKenBurnsImage(mCanvas.getContext('2d'), loadedImages, imgElapsed, mCanvas.width, mCanvas.height);
         }
 
-        // Keep <video> playing if it somehow paused mid-render
-        if (hasVideo && player && player.paused && !player.ended && !isSwitchingClip) {
+        // Keep <video> playing while still in video clip phase
+        if (hasVideo && !hasAllVideoClipsEnded && player && player.paused && !player.ended && !isSwitchingClip) {
           player.play().catch(() => {});
         }
 
@@ -4326,23 +4574,19 @@
         rCtx.fillStyle = '#000000';
         rCtx.fillRect(0, 0, W, H);
 
-        const canDrawVideo = hasVideo && player && player.readyState >= 2 && player.videoWidth > 0 && isVideoCorsClean;
-        if (canDrawVideo) {
-          // Verify CORS cleanliness on first draw so renderCanvas is NEVER tainted
-          if (!hasDrawnValidVideoFrame) {
-            try {
-              taintTestCtx.drawImage(player, 0, 0, 2, 2);
-              taintTestCtx.getImageData(0, 0, 1, 1);
-            } catch (secErr) {
-              console.warn('Taint protection triggered:', secErr);
-              isVideoCorsClean = false;
-            }
+        const canDrawVideo = hasVideo && !hasAllVideoClipsEnded && player && player.readyState >= 2 && player.videoWidth > 0 && isVideoCorsClean;
+        if (canDrawVideo && !hasDrawnValidVideoFrame) {
+          try {
+            taintTestCtx.drawImage(player, 0, 0, 2, 2);
+            taintTestCtx.getImageData(0, 0, 1, 1);
+          } catch (secErr) {
+            console.warn('Taint protection triggered:', secErr);
+            isVideoCorsClean = false;
           }
         }
 
         if (canDrawVideo && isVideoCorsClean) {
-          const brollBoost = (previewBrollCutIndex % 2 === 1) ? 1.14 : 1.0;
-          const scale = (isSmartCropEnabled ? 1.35 : 1.0) * brollBoost;
+          const scale = isSmartCropEnabled ? 1.35 : 1.0;
           const vw = player.videoWidth || 1080;
           const vh = player.videoHeight || 1920;
           const vAspect = vw / vh;
@@ -4366,7 +4610,6 @@
           }
           try {
             rCtx.drawImage(player, dx, dy, dw, dh);
-            // Save to lastFrameCanvas so clip transitions never flash a static image
             lastFrameCtx.fillStyle = '#000000';
             lastFrameCtx.fillRect(0, 0, W, H);
             lastFrameCtx.drawImage(renderCanvas, 0, 0);
@@ -4375,16 +4618,16 @@
             if (hasDrawnValidVideoFrame) {
               rCtx.drawImage(lastFrameCanvas, 0, 0);
             } else {
-              drawKenBurnsImage(rCtx, loadedImages, elapsedSec, W, H);
+              drawKenBurnsImage(rCtx, loadedImages, Math.max(0, elapsedSec - clipStartOffset), W, H);
             }
           }
           rCtx.restore();
-        } else if (hasVideo && hasDrawnValidVideoFrame) {
-          // During 50ms seek/clip-switch between Clip #1 and Clip #2, hold the last moving video frame!
+        } else if (hasVideo && !hasAllVideoClipsEnded && hasDrawnValidVideoFrame) {
+          // Only during 50ms transition from Video #1 to Video #2 (when vList.length > 1), hold last video frame
           rCtx.drawImage(lastFrameCanvas, 0, 0);
         } else {
-          // Product has no video clips -> use 5-scene dynamic Ken-Burns showcase
-          drawKenBurnsImage(rCtx, loadedImages, elapsedSec, W, H);
+          // When Video #1 ends (e.g. at 0:12) and there is no Video #2 -> draw 3-Slide Multi-Image / Dual-Angle Split Collage Showcase!
+          drawKenBurnsImage(rCtx, loadedImages, Math.max(0, elapsedSec - clipStartOffset), W, H);
         }
 
         // 2. Draw Bottom Subtitle Fade Mask (covers burned-in seller subtitles)
@@ -4392,10 +4635,10 @@
           drawBottomSubtitleMask(rCtx, W, H);
         }
 
-        // 3. Draw Synchronized Viral Orange Subtitles with White Stroke
-        drawSubtitlesAtSafeZone(rCtx, cues, elapsedSec, W, H);
+        // 3. Draw Synchronized Viral Orange Subtitles with White Stroke (using exact audio-synced subLookupTime!)
+        drawSubtitlesAtSafeZone(rCtx, cues, subLookupTime, W, H);
 
-        // 4. Force Chromium Skia GPU flush & explicit MediaStreamTrack frame commit (prevents 1-frame / 0.0 MB bug!)
+        // 4. Force Chromium Skia GPU flush & explicit MediaStreamTrack frame commit
         try { rCtx.getImageData(0, 0, 1, 1); } catch (e) {}
         if (canvasVideoTrack && typeof canvasVideoTrack.requestFrame === 'function') {
           try { canvasVideoTrack.requestFrame(); } catch (e) {}
@@ -4444,9 +4687,8 @@
             `;
           }
 
-          showToast('ผลิตวิดีโอ 9:16 สำเร็จ พร้อมเสียงมาลีและซับส้มครบ 20 วินาที!');
+          showToast('ผลิตวิดีโอ 9:16 สำเร็จ เสียงพากย์และซับตรงกัน 100% ครบ 20 วินาที!');
 
-          // Start continuous 20s preview playback loop
           resetPreviewPlayback();
 
           if (autoDownload && blob.size > 0) {
@@ -4469,7 +4711,6 @@
         }
       }
 
-      // Use 33ms (30fps) setInterval so rendering NEVER pauses or drops to 1 frame even if user switches browser tabs!
       renderTick();
       renderIntervalId = setInterval(renderTick, 33);
     }

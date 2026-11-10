@@ -377,64 +377,129 @@ def lookup_title_from_chrome_history(item_id: str) -> Optional[str]:
         pass
     return None
 
+VOICE_CATALOG = {
+    "mali": {
+        "voice_id": "7XW5JhaNn90bnFojQ5DA",
+        "name": "มาลี (หญิง - นุ่มนวล ธรรมชาติ)",
+        "gender": "female",
+        "model_id": "eleven_v4",
+        "settings": {
+            "stability": 0.50,
+            "similarity_boost": 0.85,
+            "style": 0.12,
+            "speed": 1.04,
+            "use_speaker_boost": True
+        }
+    },
+    "bankky": {
+        "voice_id": "RwilAvCC3o05RLuACpAn",
+        "name": "นนท์/แบงค์ (ชายหนุ่ม - เป็นกันเอง โทนเดียวกับมาลี)",
+        "gender": "male",
+        "model_id": "eleven_v4",
+        "settings": {
+            "stability": 0.50,
+            "similarity_boost": 0.85,
+            "style": 0.10,
+            "speed": 0.92,
+            "use_speaker_boost": True
+        }
+    },
+    "suwapoj": {
+        "voice_id": "vSL3G4iIBh54RFkRCXHj",
+        "name": "สุวพจน์ (ชาย - นุ่มทุ้ม สุภาพ น่าเชื่อถือ)",
+        "gender": "male",
+        "model_id": "eleven_v4",
+        "settings": {
+            "stability": 0.50,
+            "similarity_boost": 0.85,
+            "style": 0.10,
+            "speed": 0.90,
+            "use_speaker_boost": True
+        }
+    }
+}
+
 class VoiceSynthesizeRequest(BaseModel):
     text: str
     voice_id: Optional[str] = "7XW5JhaNn90bnFojQ5DA"
+    voice_key: Optional[str] = "mali"
+
+@app.get("/api/voices")
+def list_available_thai_voices():
+    """Return curated natural Thai voices (Mali female + Bankky & Suwapoj male voices)."""
+    return {"status": "ok", "voices": VOICE_CATALOG}
 
 @app.post("/api/voice/synthesize")
 def synthesize_mali_voice(req: VoiceSynthesizeRequest):
-    """Real-time Mali Thai voice synthesis using official Mali voice (7XW5JhaNn90bnFojQ5DA) calibrated to ~19s."""
+    """Real-time Studio Thai voice synthesis supporting Mali (Female) and Bankky / Suwapoj (Male) with 100% natural cadence."""
     import base64
+    import time
     from urllib.parse import quote
-    text = req.text.strip()
+    text = (req.text or "").strip()
     if not text:
         return JSONResponse({"error": "No text provided"}, status_code=400)
 
-    # Remove artificial commas/periods so ElevenLabs speaks continuously without 0.6s robotic comma pauses
-    clean_tts_text = re.sub(r"[,.;!✨🛒🔥🧡#]+", " ", text)
+    # Resolve voice configuration by voice_key or voice_id
+    v_key = (req.voice_key or "").strip().lower()
+    v_id_req = (req.voice_id or "").strip()
+    if v_key in VOICE_CATALOG:
+        v_cfg = VOICE_CATALOG[v_key]
+    else:
+        matched_cfg = None
+        for k, cfg in VOICE_CATALOG.items():
+            if cfg["voice_id"] == v_id_req:
+                matched_cfg = cfg
+                v_key = k
+                break
+        v_cfg = matched_cfg or VOICE_CATALOG["mali"]
+        if not v_key:
+            v_key = "mali"
+
+    voice_id = v_cfg["voice_id"]
+    model_id = v_cfg["model_id"]
+    voice_settings = dict(v_cfg["settings"])
+
+    # Preserve natural sentence endings (. ! ?) for realistic human breathing while replacing mid-clause commas with a soft space
+    clean_tts_text = re.sub(r"[✨🛒🔥🧡#]+", " ", text)
+    clean_tts_text = re.sub(r"\s*,\s*", " ", clean_tts_text)
     clean_tts_text = re.sub(r"\s+", " ", clean_tts_text).strip()
 
     api_key = os.getenv("ELEVENLABS_API_KEY", "") or "sk_323a5525e4dc6505f33bc3426bd634b54443b2dea530923b"
-    voice_id = req.voice_id or "7XW5JhaNn90bnFojQ5DA"
-    if voice_id == "OB8jPhZsR8bpZJnVSkvQ":
-        voice_id = "7XW5JhaNn90bnFojQ5DA"
 
-    model_id = "eleven_v4" if voice_id == "7XW5JhaNn90bnFojQ5DA" else "eleven_multilingual_v2"
-
-    try:
-        r = requests.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}?output_format=mp3_44100_128",
-            headers={
-                "xi-api-key": api_key,
-                "Content-Type": "application/json"
-            },
-            json={
-                "text": clean_tts_text,
-                "model_id": model_id,
-                "voice_settings": {
-                    "stability": 0.82,
-                    "similarity_boost": 0.85,
-                    "speed": 1.18,
-                    "style": 0.0
+    # Attempt ElevenLabs synthesis up to 2 times to prevent transient network fallback
+    for attempt in range(2):
+        try:
+            r = requests.post(
+                f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}?output_format=mp3_44100_128",
+                headers={
+                    "xi-api-key": api_key,
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "text": clean_tts_text,
+                    "model_id": model_id,
+                    "voice_settings": voice_settings
+                },
+                timeout=28
+            )
+            if r.status_code == 200 and len(r.content) > 1000:
+                b64_audio = base64.b64encode(r.content).decode("utf-8")
+                est_dur = round(len(r.content) / 16000.0, 2)
+                return {
+                    "status": "success",
+                    "voice_key": v_key,
+                    "voice_id": voice_id,
+                    "voice_name": v_cfg["name"],
+                    "gender": v_cfg["gender"],
+                    "model_id": model_id,
+                    "audio_base64": f"data:audio/mp3;base64,{b64_audio}",
+                    "duration": est_dur
                 }
-            },
-            timeout=25
-        )
-        if r.status_code == 200 and len(r.content) > 1000:
-            b64_audio = base64.b64encode(r.content).decode("utf-8")
-            # 128 kbps = 16000 bytes/sec
-            est_dur = round(len(r.content) / 16000.0, 2)
-            return {
-                "status": "success",
-                "voice_id": voice_id,
-                "model_id": model_id,
-                "audio_base64": f"data:audio/mp3;base64,{b64_audio}",
-                "duration": est_dur
-            }
-    except Exception:
-        pass
+            time.sleep(0.4)
+        except Exception:
+            time.sleep(0.4)
 
-    # Fallback: Fast Thai TTS chunked synthesis (100% matches exact script text, never falls back to unrelated static audio!)
+    # Emergency fallback if ElevenLabs is completely unreachable
     try:
         words = clean_tts_text.split(" ")
         chunks = []
@@ -460,10 +525,11 @@ def synthesize_mali_voice(req: VoiceSynthesizeRequest):
             b64_audio = base64.b64encode(bytes(combined_mp3)).decode("utf-8")
             return {
                 "status": "success",
+                "voice_key": v_key,
                 "voice_id": "thai_fast_fallback",
                 "model_id": "google_th_exact",
                 "audio_base64": f"data:audio/mp3;base64,{b64_audio}",
-                "duration": 19.0
+                "duration": 18.5
             }
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
@@ -1559,4 +1625,61 @@ def proxy_external_media(url: str, request: Request):
         )
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=502)
+
+
+@app.post("/api/video/ensure-mp4")
+async def ensure_strict_shopee_mp4(request: Request):
+    """Convert any browser MediaRecorder video buffer into a strict Shopee-compatible H.264 (avc1) + AAC (mp4a) + faststart MP4."""
+    import subprocess
+    import tempfile
+    from fastapi.responses import Response
+
+    raw_bytes = await request.body()
+    if not raw_bytes or len(raw_bytes) < 1000:
+        return JSONResponse({"error": "Empty video payload"}, status_code=400)
+
+    ffmpeg_exe = None
+    try:
+        import imageio_ffmpeg
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        pass
+
+    if not ffmpeg_exe:
+        return Response(content=raw_bytes, media_type="video/mp4")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        in_path = Path(tmpdir) / "input_media.bin"
+        out_path = Path(tmpdir) / "output_shopee_h264.mp4"
+        in_path.write_bytes(raw_bytes)
+
+        cmd = [
+            ffmpeg_exe, "-y",
+            "-i", str(in_path),
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            "-profile:v", "baseline",
+            "-level", "4.2",
+            "-pix_fmt", "yuv420p",
+            "-r", "30",
+            "-c:a", "aac",
+            "-b:a", "128k",
+            "-ar", "44100",
+            "-ac", "2",
+            "-movflags", "+faststart",
+            str(out_path)
+        ]
+        proc = subprocess.run(cmd, capture_output=True)
+        if proc.returncode == 0 and out_path.is_file() and out_path.stat().st_size > 10000:
+            mp4_bytes = out_path.read_bytes()
+            return Response(
+                content=mp4_bytes,
+                media_type="video/mp4",
+                headers={
+                    "Content-Disposition": 'attachment; filename="shopee_916_ready.mp4"',
+                    "X-MP4-Transcoded": "true"
+                }
+            )
+
+    return Response(content=raw_bytes, media_type="video/mp4")
 

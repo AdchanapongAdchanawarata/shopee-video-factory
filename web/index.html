@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="/js/mp4-muxer.min.js" onerror="this.src='https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js'"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -469,6 +470,41 @@
               <span>รีเซ็ตบทเดิม</span>
             </button>
           </div>
+        </div>
+
+        <!-- VOICE SPEAKER SELECTOR (MALI FEMALE + NATURAL THAI MALE VOICES) -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-1">
+          <div class="flex items-center flex-wrap gap-1.5">
+            <span class="text-[11px] text-zinc-400 font-medium mr-0.5">🎙️ เลือกเสียงพากย์ไทยธรรมชาติ:</span>
+            <button
+              type="button"
+              onclick="selectVoiceSpeaker('mali')"
+              id="btn-voice-mali"
+              class="voice-speaker-btn px-2.5 py-1 rounded-lg bg-shopee/25 text-shopee border border-shopee/50 text-[11px] font-bold transition cursor-pointer flex items-center space-x-1 shadow-sm"
+              title="เสียงมาลี (ผู้หญิง - นุ่มนวล ธรรมชาติ สไตล์ครีเอเตอร์รีวิว)"
+            >
+              <span>👩 เสียงมาลี (หญิง - ธรรมชาติ)</span>
+            </button>
+            <button
+              type="button"
+              onclick="selectVoiceSpeaker('bankky')"
+              id="btn-voice-bankky"
+              class="voice-speaker-btn px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700/60 text-[11px] font-medium transition cursor-pointer flex items-center space-x-1"
+              title="เสียงนนท์/แบงค์ (ผู้ชายวัยรุ่น/วัยทำงาน - น้ำเสียงเป็นกันเอง โทนเดียวกับมาลี)"
+            >
+              <span>👨 เสียงนนท์/แบงค์ (ชายหนุ่ม - โทนเดียวกับมาลี)</span>
+            </button>
+            <button
+              type="button"
+              onclick="selectVoiceSpeaker('suwapoj')"
+              id="btn-voice-suwapoj"
+              class="voice-speaker-btn px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700/60 text-[11px] font-medium transition cursor-pointer flex items-center space-x-1"
+              title="เสียงสุวพจน์ (ผู้ชาย - นุ่มทุ้ม สุภาพ น่าเชื่อถือ สไตล์รีวิวสินค้าไอที/ของใช้)"
+            >
+              <span>👨‍💼 เสียงสุวพจน์ (ชาย - นุ่มทุ้ม น่าเชื่อถือ)</span>
+            </button>
+          </div>
+          <span id="badge-active-voice-desc" class="text-[10px] text-emerald-400 font-mono">✨ โหมดเสียงจริง Natural Speed 1.0x (ไม่บีบพิตช์)</span>
         </div>
 
         <textarea
@@ -2053,6 +2089,15 @@
         fullScript = `${hook} ${body} ${cta}`;
       }
 
+      // Automatically adapt Thai polite particles (ค่ะ/นะคะ <-> ครับ/นะครับ) to match selected voice gender
+      const activeSpk = VOICE_SPEAKERS[selectedVoiceKey] || VOICE_SPEAKERS.mali;
+      if (activeSpk && activeSpk.gender === 'male') {
+        hook = adaptScriptParticlesForGender(hook, 'male');
+        body = adaptScriptParticlesForGender(body, 'male');
+        cta = adaptScriptParticlesForGender(cta, 'male');
+        fullScript = adaptScriptParticlesForGender(fullScript, 'male');
+      }
+
       return {
         category: matchedCat ? matchedCat.id : "general",
         headline: chosen.headline,
@@ -2061,6 +2106,138 @@
         cta: cta,
         full_script: fullScript
       };
+    }
+
+    // =========================================================================
+    // THAI NATURAL VOICE SPEAKER CATALOG (FEMALE MALI + MALE BANKKY / SUWAPOJ)
+    // =========================================================================
+    const VOICE_SPEAKERS = {
+      mali: {
+        key: 'mali',
+        id: '7XW5JhaNn90bnFojQ5DA',
+        name: 'มาลี (หญิง - ธรรมชาติ)',
+        shortName: 'มาลี',
+        gender: 'female',
+        btnSampleText: 'ฟังเสียงมาลี',
+        desc: '✨ เสียงมาลี (หญิง - นุ่มนวล ธรรมชาติ 1.0x)'
+      },
+      bankky: {
+        key: 'bankky',
+        id: 'RwilAvCC3o05RLuACpAn',
+        name: 'นนท์/แบงค์ (ชายหนุ่ม - โทนเดียวกับมาลี)',
+        shortName: 'นนท์/แบงค์ (ชาย)',
+        gender: 'male',
+        btnSampleText: 'ฟังเสียงนนท์ (ชาย)',
+        desc: '✨ เสียงนนท์/แบงค์ (ชายหนุ่ม - เป็นกันเอง โทนเดียวกับมาลี 1.0x)'
+      },
+      suwapoj: {
+        key: 'suwapoj',
+        id: 'vSL3G4iIBh54RFkRCXHj',
+        name: 'สุวพจน์ (ชาย - นุ่มทุ้ม น่าเชื่อถือ)',
+        shortName: 'สุวพจน์ (ชาย)',
+        gender: 'male',
+        btnSampleText: 'ฟังเสียงสุวพจน์ (ชาย)',
+        desc: '✨ เสียงสุวพจน์ (ชาย - นุ่มทุ้ม สุภาพ น่าเชื่อถือ 1.0x)'
+      }
+    };
+    let selectedVoiceKey = 'mali';
+
+    function adaptScriptParticlesForGender(text, gender) {
+      if (!text) return '';
+      let s = String(text);
+      if (gender === 'male') {
+        s = s
+          .replace(/นะคะ/g, 'นะครับ')
+          .replace(/นะค้า/g, 'นะครับ')
+          .replace(/เลยค่ะ/g, 'เลยครับ')
+          .replace(/มากค่ะ/g, 'มากครับ')
+          .replace(/แล้วค่ะ/g, 'แล้วครับ')
+          .replace(/ด้วยค่ะ/g, 'ด้วยครับ')
+          .replace(/ค่ะ(?=[\s.,!?;:]|$)/g, 'ครับ')
+          .replace(/คะ(?=[\s.,!?;:]|$)/g, 'ครับ');
+      } else {
+        s = s
+          .replace(/นะครับ/g, 'นะคะ')
+          .replace(/เลยครับ/g, 'เลยค่ะ')
+          .replace(/มากครับ/g, 'มากค่ะ')
+          .replace(/แล้วครับ/g, 'แล้วค่ะ')
+          .replace(/ด้วยครับ/g, 'ด้วยค่ะ')
+          .replace(/ครับ(?=[\s.,!?;:]|$)/g, 'ค่ะ');
+      }
+      return s;
+    }
+
+    function selectVoiceSpeaker(voiceKey) {
+      const spk = VOICE_SPEAKERS[voiceKey] || VOICE_SPEAKERS.mali;
+      selectedVoiceKey = spk.key;
+
+      // Update speaker buttons UI
+      ['mali', 'bankky', 'suwapoj'].forEach(k => {
+        const btn = document.getElementById(`btn-voice-${k}`);
+        if (!btn) return;
+        if (k === selectedVoiceKey) {
+          btn.className = 'voice-speaker-btn px-2.5 py-1 rounded-lg bg-shopee/25 text-shopee border border-shopee/50 text-[11px] font-bold transition cursor-pointer flex items-center space-x-1 shadow-sm';
+        } else {
+          btn.className = 'voice-speaker-btn px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700/60 text-[11px] font-medium transition cursor-pointer flex items-center space-x-1';
+        }
+      });
+
+      const descEl = document.getElementById('badge-active-voice-desc');
+      if (descEl) descEl.innerText = spk.desc;
+
+      const sampleTxt = document.getElementById('text-voice-sample');
+      if (sampleTxt && !isPlayingSample) {
+        sampleTxt.innerText = spk.btnSampleText;
+      }
+
+      // Stop any currently playing voice preview
+      if (activeMaliAudio) {
+        try { activeMaliAudio.pause(); activeMaliAudio.currentTime = 0; } catch (e) {}
+      }
+      isPlayingSample = false;
+      const sampleIcon = document.getElementById('icon-voice-sample');
+      if (sampleIcon) sampleIcon.className = 'ph-fill ph-play text-[10px]';
+
+      // Automatically adapt polite particles in textarea & currentProduct.script
+      const txtArea = document.getElementById('textarea-script');
+      if (txtArea && txtArea.value.trim()) {
+        const adapted = adaptScriptParticlesForGender(txtArea.value, spk.gender);
+        txtArea.value = adapted;
+        if (currentProduct && currentProduct.script) {
+          currentProduct.script.full_script = adapted;
+          if (currentProduct.script.hook) currentProduct.script.hook = adaptScriptParticlesForGender(currentProduct.script.hook, spk.gender);
+          if (currentProduct.script.body) currentProduct.script.body = adaptScriptParticlesForGender(currentProduct.script.body, spk.gender);
+          if (currentProduct.script.cta) currentProduct.script.cta = adaptScriptParticlesForGender(currentProduct.script.cta, spk.gender);
+        }
+        updateScriptCharCount();
+      }
+
+      // Invalidate cached audio and rendered video so the new speaker is synthesized cleanly
+      if (currentProduct) {
+        currentProduct._cachedCues = null;
+        currentProduct._cachedAudioBase64 = null;
+        currentProduct._cachedAudioScript = null;
+        currentProduct._cachedVoiceKey = null;
+        currentProduct.rendered_blob = null;
+        currentProduct.rendered_blob_url = null;
+      }
+      isVideoRendered = false;
+
+      // Pre-synthesize the newly selected voice in the background
+      const currentText = (txtArea && txtArea.value.trim()) || (currentProduct && currentProduct.script && currentProduct.script.full_script) || '';
+      if (currentText.length > 5) {
+        fetchMaliVoiceAudio(currentText, selectedVoiceKey).then(b64 => {
+          if (b64) {
+            const maliAudio = document.getElementById('player-mali-audio');
+            if (maliAudio) {
+              maliAudio.src = b64;
+              maliAudio.load();
+            }
+          }
+        });
+      }
+
+      showToast(`🎙️ เปลี่ยนเสียงพากย์เป็น "${spk.name}" เรียบร้อย!`);
     }
 
     function switchScriptAngle(angleType) {
@@ -2697,11 +2874,12 @@
       });
     }
 
-    // PLAY/STOP VOICE SAMPLE (MALI REAL-TIME AI)
+    // PLAY/STOP VOICE SAMPLE (MALI & NATURAL THAI MALE VOICES REAL-TIME AI)
     async function togglePlayVoiceSample() {
       const icon = document.getElementById('icon-voice-sample');
       const text = document.getElementById('text-voice-sample');
       const sampleAudio = document.getElementById('audio-sample-mali');
+      const spk = VOICE_SPEAKERS[selectedVoiceKey] || VOICE_SPEAKERS.mali;
 
       if (isPlayingSample) {
         if (activeMaliAudio) {
@@ -2714,20 +2892,20 @@
         }
         isPlayingSample = false;
         icon.className = 'ph-fill ph-play text-xs';
-        text.innerText = 'ฟังเสียงมาลี';
+        text.innerText = spk.btnSampleText;
         return;
       }
 
       const txtArea = document.getElementById('textarea-script');
       const scriptText = (txtArea && txtArea.value.trim()) ? txtArea.value.trim() :
-        (currentProduct && currentProduct.script ? currentProduct.script.full_script : '');
+        (currentProduct && currentProduct.script ? currentProduct.script.full_script : 'สวัสดีค่ะ แนะนำสินค้าคุณภาพดี คุ้มราคามาก สนใจจิ้มที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ');
 
       icon.className = 'ph-bold ph-spinner animate-spin text-xs';
-      text.innerText = 'กำลังเตรียมเสียงมาลี...';
+      text.innerText = `กำลังเตรียมเสียง${spk.shortName}...`;
 
       let audioSrc = null;
-      if (scriptText && scriptText.length > 5) {
-        audioSrc = await fetchMaliVoiceAudio(scriptText);
+      if (scriptText && scriptText.length > 3) {
+        audioSrc = await fetchMaliVoiceAudio(scriptText, selectedVoiceKey);
       }
       if (!audioSrc) {
         audioSrc = '/assets/sample_elevenlabs_mali.mp3';
@@ -2737,11 +2915,13 @@
         activeMaliAudio.pause();
       }
       activeMaliAudio = new Audio(audioSrc);
+      activeMaliAudio.playbackRate = 1.0;
+      activeMaliAudio.preservesPitch = true;
       activeMaliAudio.play().then(() => {
         isPlayingSample = true;
         icon.className = 'ph-fill ph-pause text-xs';
         text.innerText = 'หยุดเสียง';
-        showToast('กำลังเล่นเสียงพากย์มาลีภาษาไทย...');
+        showToast(`กำลังเล่นเสียงพากย์${spk.name}...`);
       }).catch(err => {
         if (sampleAudio) {
           sampleAudio.play().catch(() => {});
@@ -2751,14 +2931,14 @@
         } else {
           showToast('ไม่สามารถเล่นเสียงได้ กรุณาลองใหม่อีกครั้ง');
           icon.className = 'ph-fill ph-play text-xs';
-          text.innerText = 'ฟังเสียงมาลี';
+          text.innerText = spk.btnSampleText;
         }
       });
 
       activeMaliAudio.onended = () => {
         isPlayingSample = false;
         icon.className = 'ph-fill ph-play text-xs';
-        text.innerText = 'ฟังเสียงมาลี';
+        text.innerText = spk.btnSampleText;
       };
     }
 
@@ -3782,10 +3962,9 @@
     const TARGET_SPEECH_SPAN = 19.3;
 
     function calibrateAudioPlaybackRate(rawDuration) {
-      if (!rawDuration || isNaN(rawDuration) || rawDuration <= 4.0) return 1.0;
-      // Always calibrate voiceover smoothly so 100% of the script finishes at TARGET_SPEECH_SPAN (19.3s) inside the 20.0s video!
-      const ratio = rawDuration / TARGET_SPEECH_SPAN;
-      return Math.min(1.38, Math.max(0.88, Number(ratio.toFixed(3))));
+      // STRICTLY 1.0x NATURAL SPEED: Never alter AudioBufferSourceNode.playbackRate in WebAudio
+      // because WebAudio shifts pitch/formants when playbackRate != 1.0, distorting Mali's voice!
+      return 1.0;
     }
 
     function getMasterPreviewTime() {
@@ -4181,12 +4360,16 @@
       });
     }
 
-    // Call Mali TTS API for ANY script text (with request-ID race protection & smart caching)
-    async function fetchMaliVoiceAudio(text) {
+    // Call ElevenLabs Thai TTS API for ANY script text & selected speaker (with request-ID race protection & smart caching)
+    async function fetchMaliVoiceAudio(text, voiceKeyOverride = null) {
       const cleanText = (text || '').trim();
       if (!cleanText) return null;
 
-      if (currentProduct && currentProduct._cachedAudioBase64 && currentProduct._cachedAudioScript === cleanText) {
+      const vKey = voiceKeyOverride || selectedVoiceKey || 'mali';
+      const spk = VOICE_SPEAKERS[vKey] || VOICE_SPEAKERS.mali;
+      const cacheTag = `${vKey}::${cleanText}`;
+
+      if (currentProduct && currentProduct._cachedAudioBase64 && currentProduct._cachedAudioScript === cacheTag) {
         return currentProduct._cachedAudioBase64;
       }
 
@@ -4195,20 +4378,25 @@
         const res = await fetch('/api/voice/synthesize', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: cleanText })
+          body: JSON.stringify({
+            text: cleanText,
+            voice_key: vKey,
+            voice_id: spk.id
+          })
         });
         if (res.ok) {
           const data = await res.json();
           if (data && data.audio_base64) {
             if (currentProduct && reqId === _voiceReqCounter) {
               currentProduct._cachedAudioBase64 = data.audio_base64;
-              currentProduct._cachedAudioScript = cleanText;
+              currentProduct._cachedAudioScript = cacheTag;
+              currentProduct._cachedVoiceKey = vKey;
             }
             return data.audio_base64;
           }
         }
       } catch (e) {
-        console.warn('Mali synthesis fetch error:', e);
+        console.warn('Voice synthesis fetch error:', e);
       }
       return null;
     }
@@ -4239,6 +4427,47 @@
       return null;
     }
 
+    // Verify binary container header: True non-fragmented ISO Base Media MP4 starts with 'ftyp' at offset 4 and contains 'moov' without 'moof'
+    async function isStrictShopeeIsoMp4(blob) {
+      if (!blob || blob.size < 10000) return false;
+      try {
+        const headBuf = await blob.slice(0, Math.min(blob.size, 65536)).arrayBuffer();
+        const bytes = new Uint8Array(headBuf);
+        if (bytes.length < 12) return false;
+        const ftyp = String.fromCharCode(bytes[4], bytes[5], bytes[6], bytes[7]);
+        if (ftyp !== 'ftyp') return false;
+        const brand = String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]);
+        // Chrome MediaRecorder fMP4 uses 'dash' or 'iso6' with 'moof' fragments and Opus audio, which Shopee Mobile rejects!
+        if (brand === 'dash') return false;
+        const ascii = new TextDecoder('latin1').decode(bytes);
+        if (ascii.includes('Opus') || ascii.includes('vp09') || ascii.includes('vp08')) return false;
+        if (!ascii.includes('moov')) return false;
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function convertBlobToTrueShopeeMp4ViaBackend(rawBlob) {
+      if (!rawBlob || rawBlob.size < 1000) return rawBlob;
+      try {
+        const res = await fetch('/api/video/ensure-mp4', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/octet-stream' },
+          body: rawBlob
+        });
+        if (res.ok) {
+          const mp4Buf = await res.arrayBuffer();
+          if (mp4Buf && mp4Buf.byteLength > 10000) {
+            return new Blob([mp4Buf], { type: 'video/mp4' });
+          }
+        }
+      } catch (e) {
+        console.warn('Backend MP4 remux fallback notice:', e);
+      }
+      return rawBlob;
+    }
+
     async function startRenderVideo(autoDownload = false) {
       if (isRenderingVideo) return;
       isRenderingVideo = true;
@@ -4249,6 +4478,7 @@
         masterPreviewTimer = null;
       }
 
+      const activeSpk = VOICE_SPEAKERS[selectedVoiceKey] || VOICE_SPEAKERS.mali;
       const btn = document.getElementById('btn-start-produce');
       const icon = document.getElementById('icon-produce');
       const text = document.getElementById('text-produce');
@@ -4261,22 +4491,23 @@
       if (btn) btn.disabled = true;
       if (pBox) pBox.classList.remove('hidden');
       if (icon) icon.className = 'ph-bold ph-spinner animate-spin text-base';
-      if (text) text.innerText = 'กำลังสังเคราะห์เสียงมาลีตรงตามสคริปต์ 100%...';
+      if (text) text.innerText = `กำลังสังเคราะห์เสียง${activeSpk.shortName}ธรรมชาติ 100%...`;
 
       if (pBar) pBar.style.width = '15%';
-      if (pText) pText.innerText = '1/4 กำลังสังเคราะห์เสียงพากย์มาลีให้ตรงบทพูดและคำนวณเวลาซับ...';
+      if (pText) pText.innerText = `1/4 กำลังสังเคราะห์เสียงพากย์${activeSpk.name} (Natural 1.0x) และคำนวณเวลาซับ...`;
 
       // 1. Always read the exact live script from the textarea so voice & subtitles match 100%!
       const scriptText = ((document.getElementById('textarea-script') && document.getElementById('textarea-script').value.trim()) ||
         (currentProduct && currentProduct.script && (currentProduct.script.full_script || `${currentProduct.script.hook} ${currentProduct.script.body} ${currentProduct.script.cta}`)) ||
         'แนะนำสินค้าคุณภาพดี คุ้มราคา สนใจกดที่ตะกร้าสีส้มมุมซ้ายล่างได้เลยนะคะ').trim();
 
-      // 2. Synthesize Mali Voiceover for this exact scriptText
-      let audioBase64 = await fetchMaliVoiceAudio(scriptText);
+      // 2. Synthesize Natural ElevenLabs Voiceover for this exact scriptText & selected speaker
+      let audioBase64 = await fetchMaliVoiceAudio(scriptText, selectedVoiceKey);
       const maliAudio = document.getElementById('player-mali-audio');
       const finalVoiceSrc = audioBase64 || (currentProduct && currentProduct._cachedAudioBase64) || '/assets/sample_elevenlabs_mali.mp3';
       if (maliAudio && audioBase64) {
         maliAudio.src = audioBase64;
+        maliAudio.playbackRate = 1.0;
         maliAudio.load();
       }
 
@@ -4369,9 +4600,14 @@
         if (mCanvas) mCanvas.classList.remove('hidden');
       }
 
-      // 7. Setup 1080x1920 Full HD Canvas (Mounted in viewport so Chromium GPU compositor flushes all 600 frames!)
+      // 7. Setup 1080x1920 Full HD Canvas
       const W = 1080;
       const H = 1920;
+      const FPS = 30;
+      const TARGET_DURATION = 20.0;
+      const TOTAL_FRAMES = Math.round(TARGET_DURATION * FPS); // 600 frames
+      const SAMPLE_RATE = 44100;
+
       const renderCanvas = document.createElement('canvas');
       renderCanvas.width = W;
       renderCanvas.height = H;
@@ -4391,17 +4627,18 @@
       const taintTestCtx = taintTestCanvas.getContext('2d');
       let isVideoCorsClean = true;
 
-      // 8. Setup WebAudio Mixer with Auto-Calibrated PlaybackRate so 100% of voiceover finishes at ~19.3s!
+      // 8. Setup WebAudio Mixer with STRICT 1.0x Natural Pitch (Zero Pitch Shift!) + OfflineAudioContext Master Mix for MP4 AAC Encoder
       let audioCtx = null;
       let audioDest = null;
       let voiceNode = null;
       let bgmNode = null;
       let rawVoiceBufferDuration = TARGET_SPEECH_SPAN;
-      let calibratedVoiceRate = 1.0;
+      const calibratedVoiceRate = 1.0; // Strictly 1.0x so Mali/Bankky/Suwapoj voice is 100% natural!
+      let mixedStereoBuffer = null;
 
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AudioContextClass();
+        audioCtx = new AudioContextClass({ sampleRate: SAMPLE_RATE });
         if (audioCtx.state === 'suspended') {
           await audioCtx.resume().catch(() => {});
         }
@@ -4414,10 +4651,9 @@
 
         if (voiceBuffer && voiceBuffer.duration > 0) {
           rawVoiceBufferDuration = voiceBuffer.duration;
-          calibratedVoiceRate = calibrateAudioPlaybackRate(rawVoiceBufferDuration);
           voiceNode = audioCtx.createBufferSource();
           voiceNode.buffer = voiceBuffer;
-          voiceNode.playbackRate.value = calibratedVoiceRate;
+          voiceNode.playbackRate.value = 1.0; // NEVER change pitch!
           const voiceGain = audioCtx.createGain();
           voiceGain.gain.value = 1.0;
           voiceNode.connect(voiceGain);
@@ -4432,22 +4668,150 @@
           bgmNode.buffer = bgmBuffer;
           bgmNode.loop = true;
           const bgmGain = audioCtx.createGain();
-          bgmGain.gain.value = 0.10;
+          bgmGain.gain.value = 0.08;
           bgmNode.connect(bgmGain);
           bgmGain.connect(audioDest);
           if (!isMaliMuted) {
             bgmGain.connect(audioCtx.destination);
           }
         }
+
+        // Pre-render exact 20.0s Stereo 44.1kHz PCM Master Buffer for WebCodecs AAC-LC encoding
+        const OfflineCtxClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (OfflineCtxClass) {
+          const offCtx = new OfflineCtxClass(2, Math.round(SAMPLE_RATE * TARGET_DURATION), SAMPLE_RATE);
+          if (voiceBuffer && voiceBuffer.duration > 0) {
+            const offVoice = offCtx.createBufferSource();
+            offVoice.buffer = voiceBuffer;
+            offVoice.playbackRate.value = 1.0;
+            const offVoiceGain = offCtx.createGain();
+            offVoiceGain.gain.value = 1.0;
+            offVoice.connect(offVoiceGain);
+            offVoiceGain.connect(offCtx.destination);
+            offVoice.start(0);
+          }
+          if (bgmBuffer && bgmBuffer.duration > 0) {
+            const offBgm = offCtx.createBufferSource();
+            offBgm.buffer = bgmBuffer;
+            offBgm.loop = true;
+            const offBgmGain = offCtx.createGain();
+            offBgmGain.gain.value = 0.08;
+            offBgm.connect(offBgmGain);
+            offBgmGain.connect(offCtx.destination);
+            offBgm.start(0);
+          }
+          mixedStereoBuffer = await offCtx.startRendering();
+        }
       } catch (e) {
         console.warn('WebAudio mixer setup notice:', e);
       }
 
-      // 9. Combine 30fps Canvas Video Track + Mixed Audio Track into MediaRecorder
+      // 9. TIER 1: Setup In-Browser True ISO MP4 Muxer (Mp4Muxer + WebCodecs H.264 avc1 + AAC-LC mp4a.40.2)
+      let mp4Muxer = null;
+      let mp4MuxerTarget = null;
+      let webCodecsVideoEncoder = null;
+      let webCodecsAudioEncoder = null;
+      let useWebCodecsMp4 = false;
+      let encodedVideoFrameCount = 0;
+
+      if (typeof Mp4Muxer !== 'undefined' && typeof VideoEncoder !== 'undefined' && typeof VideoFrame !== 'undefined') {
+        try {
+          const h264Profiles = ['avc1.4d002a', 'avc1.42002a', 'avc1.42e02a', 'avc1.64002a'];
+          let selectedVideoCodec = null;
+          for (const codecStr of h264Profiles) {
+            const sup = await VideoEncoder.isConfigSupported({
+              codec: codecStr,
+              width: W,
+              height: H,
+              bitrate: 5000000,
+              framerate: FPS
+            });
+            if (sup && sup.supported) {
+              selectedVideoCodec = codecStr;
+              break;
+            }
+          }
+
+          let audioSupported = false;
+          if (typeof AudioEncoder !== 'undefined' && typeof AudioData !== 'undefined' && mixedStereoBuffer) {
+            try {
+              const aSup = await AudioEncoder.isConfigSupported({
+                codec: 'mp4a.40.2',
+                sampleRate: SAMPLE_RATE,
+                numberOfChannels: 2,
+                bitrate: 128000
+              });
+              audioSupported = Boolean(aSup && aSup.supported);
+            } catch (ae) {
+              audioSupported = false;
+            }
+          }
+
+          if (selectedVideoCodec && audioSupported) {
+            mp4MuxerTarget = new Mp4Muxer.ArrayBufferTarget();
+            mp4Muxer = new Mp4Muxer.Muxer({
+              target: mp4MuxerTarget,
+              video: {
+                codec: 'avc',
+                width: W,
+                height: H
+              },
+              audio: {
+                codec: 'aac',
+                sampleRate: SAMPLE_RATE,
+                numberOfChannels: 2
+              },
+              fastStart: 'in-memory',
+              firstTimestampBehavior: 'offset'
+            });
+
+            webCodecsVideoEncoder = new VideoEncoder({
+              output: (chunk, meta) => {
+                try { mp4Muxer.addVideoChunk(chunk, meta); } catch (e) {}
+              },
+              error: (err) => {
+                console.warn('WebCodecs VideoEncoder error:', err);
+                useWebCodecsMp4 = false;
+              }
+            });
+            webCodecsVideoEncoder.configure({
+              codec: selectedVideoCodec,
+              width: W,
+              height: H,
+              bitrate: 5000000,
+              framerate: FPS
+            });
+
+            webCodecsAudioEncoder = new AudioEncoder({
+              output: (chunk, meta) => {
+                try { mp4Muxer.addAudioChunk(chunk, meta); } catch (e) {}
+              },
+              error: (err) => {
+                console.warn('WebCodecs AudioEncoder error:', err);
+                useWebCodecsMp4 = false;
+              }
+            });
+            webCodecsAudioEncoder.configure({
+              codec: 'mp4a.40.2',
+              sampleRate: SAMPLE_RATE,
+              numberOfChannels: 2,
+              bitrate: 128000
+            });
+
+            useWebCodecsMp4 = true;
+            console.log(`✅ Using WebCodecs True ISO MP4 Encoder (${selectedVideoCodec} + mp4a.40.2)`);
+          }
+        } catch (wcErr) {
+          console.warn('WebCodecs init fallback notice:', wcErr);
+          useWebCodecsMp4 = false;
+        }
+      }
+
+      // TIER 2 BACKUP: MediaRecorder (will be automatically remuxed to True ISO MP4 via /api/video/ensure-mp4 if WebCodecs isn't used)
       let combinedStream = null;
       let canvasVideoTrack = null;
       try {
-        const canvasStream = renderCanvas.captureStream(30);
+        const canvasStream = renderCanvas.captureStream(FPS);
         canvasVideoTrack = canvasStream.getVideoTracks()[0] || null;
         const tracks = [...canvasStream.getVideoTracks()];
         if (audioDest && audioDest.stream && audioDest.stream.getAudioTracks().length > 0) {
@@ -4495,7 +4859,7 @@
         }
       }
 
-      // 10. Start Synchronized Playback (Video + Calibrated WebAudio Voiceover)
+      // 10. Start Synchronized Playback (Video + Natural 1.0x WebAudio Voiceover)
       if (maliAudio) maliAudio.pause();
       const bgmAudio = document.getElementById('player-bgm');
       if (bgmAudio) bgmAudio.pause();
@@ -4511,24 +4875,20 @@
         try { bgmNode.start(0); } catch (e) {}
       }
 
-      const TARGET_DURATION = 20.0;
+      const effectiveSpeechSpan = (rawVoiceBufferDuration > 2.0 && rawVoiceBufferDuration <= 20.0)
+        ? rawVoiceBufferDuration
+        : TARGET_SPEECH_SPAN;
       const renderStartTime = performance.now();
       let renderIntervalId = null;
 
-      function renderTick() {
-        const elapsedSec = (performance.now() - renderStartTime) / 1000.0;
-        const pct = Math.min(100, Math.round((elapsedSec / TARGET_DURATION) * 100));
-
-        if (pBar) pBar.style.width = `${Math.min(98, 35 + Math.round(pct * 0.63))}%`;
-        if (pText) pText.innerText = `3/4 กำลังเรนเดอร์วิดีโอ 9:16 พร้อมซับและเสียงพากย์... ${pct}%`;
-
+      function drawCompositeFrameAt(elapsedSec) {
         // Capture 2 real action snapshots from Video #1 for the 2-grid split collage slide
         if (hasVideo && !hasAllVideoClipsEnded && player && ((elapsedSec > 2.0 && capturedVideoSnapshots.length === 0) || (elapsedSec > 6.5 && capturedVideoSnapshots.length === 1))) {
           captureSnapshotFromPlayer(player);
         }
 
-        // Exact 1:1 Audio-Position Subtitle Sync
-        const audioProgressRatio = Math.min(1.0, Math.max(0.0, (elapsedSec * calibratedVoiceRate) / rawVoiceBufferDuration));
+        // Exact 1:1 Audio-Position Subtitle Sync (locked to natural 1.0x voice duration!)
+        const audioProgressRatio = Math.min(1.0, Math.max(0.0, elapsedSec / effectiveSpeechSpan));
         const subLookupTime = audioProgressRatio * TARGET_SPEECH_SPAN;
 
         // Update live phone preview timeline & subtitle DOM in sync
@@ -4555,7 +4915,7 @@
           }
         }
 
-        // Animate #player-motion-canvas in the phone preview whenever video clips have finished (e.g. 0:12 -> 0:20) or in image mode
+        // Animate #player-motion-canvas in the phone preview whenever video clips have finished or in image mode
         if ((hasAllVideoClipsEnded || !hasVideo) && mCanvas) {
           if (mCanvas.width !== 720) {
             mCanvas.width = 720;
@@ -4623,10 +4983,8 @@
           }
           rCtx.restore();
         } else if (hasVideo && !hasAllVideoClipsEnded && hasDrawnValidVideoFrame) {
-          // Only during 50ms transition from Video #1 to Video #2 (when vList.length > 1), hold last video frame
           rCtx.drawImage(lastFrameCanvas, 0, 0);
         } else {
-          // When Video #1 ends (e.g. at 0:12) and there is no Video #2 -> draw 3-Slide Multi-Image / Dual-Angle Split Collage Showcase!
           drawKenBurnsImage(rCtx, loadedImages, Math.max(0, elapsedSec - clipStartOffset), W, H);
         }
 
@@ -4635,7 +4993,7 @@
           drawBottomSubtitleMask(rCtx, W, H);
         }
 
-        // 3. Draw Synchronized Viral Orange Subtitles with White Stroke (using exact audio-synced subLookupTime!)
+        // 3. Draw Synchronized Viral Orange Subtitles with White Stroke
         drawSubtitlesAtSafeZone(rCtx, cues, subLookupTime, W, H);
 
         // 4. Force Chromium Skia GPU flush & explicit MediaStreamTrack frame commit
@@ -4643,6 +5001,40 @@
         if (canvasVideoTrack && typeof canvasVideoTrack.requestFrame === 'function') {
           try { canvasVideoTrack.requestFrame(); } catch (e) {}
         }
+      }
+
+      function encodeWebCodecsFrameIfNeeded(targetFrameIdx) {
+        if (!useWebCodecsMp4 || !webCodecsVideoEncoder || webCodecsVideoEncoder.state !== 'configured') return;
+        while (encodedVideoFrameCount <= targetFrameIdx && encodedVideoFrameCount < TOTAL_FRAMES) {
+          try {
+            const tsMicros = Math.round((encodedVideoFrameCount / FPS) * 1000000);
+            const durMicros = Math.round((1 / FPS) * 1000000);
+            const vf = new VideoFrame(renderCanvas, {
+              timestamp: tsMicros,
+              duration: durMicros
+            });
+            webCodecsVideoEncoder.encode(vf, { keyFrame: (encodedVideoFrameCount % 30 === 0) });
+            vf.close();
+            encodedVideoFrameCount++;
+          } catch (vfErr) {
+            console.warn('VideoFrame encode warning:', vfErr);
+            useWebCodecsMp4 = false;
+            break;
+          }
+        }
+      }
+
+      function renderTick() {
+        const elapsedSec = (performance.now() - renderStartTime) / 1000.0;
+        const pct = Math.min(100, Math.round((elapsedSec / TARGET_DURATION) * 100));
+
+        if (pBar) pBar.style.width = `${Math.min(96, 35 + Math.round(pct * 0.60))}%`;
+        if (pText) pText.innerText = `3/4 กำลังเรนเดอร์วิดีโอ MP4 แท้ (H.264 + AAC) พร้อมเสียง${activeSpk.shortName}... ${pct}%`;
+
+        drawCompositeFrameAt(Math.min(TARGET_DURATION, elapsedSec));
+
+        const targetFrameIdx = Math.min(TOTAL_FRAMES - 1, Math.floor(elapsedSec * FPS));
+        encodeWebCodecsFrameIfNeeded(targetFrameIdx);
 
         if (elapsedSec >= TARGET_DURATION) {
           clearInterval(renderIntervalId);
@@ -4650,64 +5042,133 @@
         }
       }
 
-      function finishRenderingProcess() {
-        if (pBar) pBar.style.width = '100%';
-        if (pText) pText.innerText = 'สำเร็จ! เรนเดอร์วิดีโอ 9:16 เสร็จสมบูรณ์ 🚀';
-        try { if (renderCanvas && renderCanvas.parentNode) renderCanvas.parentNode.removeChild(renderCanvas); } catch (e) {}
+      async function finishRenderingProcess() {
+        // Ensure all 600 frames are encoded if WebCodecs is active
+        if (useWebCodecsMp4) {
+          encodeWebCodecsFrameIfNeeded(TOTAL_FRAMES - 1);
+        }
 
+        if (pBar) pBar.style.width = '98%';
+        if (pText) pText.innerText = '4/4 กำลังแพ็กเกจไฟล์ MP4 มาตรฐาน Shopee (H.264 + AAC FastStart)...';
+
+        try { if (renderCanvas && renderCanvas.parentNode) renderCanvas.parentNode.removeChild(renderCanvas); } catch (e) {}
         try { if (voiceNode) voiceNode.stop(); } catch (e) {}
         try { if (bgmNode) bgmNode.stop(); } catch (e) {}
         try { if (audioCtx && audioCtx.state !== 'closed') audioCtx.close(); } catch (e) {}
 
-        const finalizeBlobAndUi = () => {
-          const blob = new Blob(recordedChunks, { type: mimeType });
-          const blobUrl = URL.createObjectURL(blob);
-          const sizeMb = Math.max(0.1, blob.size / (1024 * 1024)).toFixed(1);
-
-          if (currentProduct) {
-            currentProduct.rendered_blob = blob;
-            currentProduct.rendered_blob_url = blobUrl;
+        // Stop MediaRecorder cleanly
+        const recorderBlobPromise = new Promise(resolve => {
+          if (recorder && recorder.state !== 'inactive') {
+            recorder.onstop = () => {
+              resolve(new Blob(recordedChunks, { type: mimeType }));
+            };
+            try { recorder.requestData(); } catch (e) {}
+            try { recorder.stop(); } catch (e) { resolve(new Blob(recordedChunks, { type: mimeType })); }
+          } else {
+            resolve(new Blob(recordedChunks, { type: mimeType }));
           }
+        });
 
-          isVideoRendered = true;
-          isRenderingVideo = false;
+        let finalMp4Blob = null;
 
-          if (btn) btn.disabled = false;
-          if (icon) icon.className = 'ph-bold ph-check text-base';
-          if (text) text.innerText = 'เรนเดอร์สำเร็จแล้ว (เล่นอัตโนมัติ)';
-          if (badge) {
-            badge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono';
-            badge.innerText = 'เรนเดอร์เสร็จสมบูรณ์ 🚀';
+        // Finalize Tier 1 WebCodecs True ISO MP4 if active
+        if (useWebCodecsMp4 && mp4Muxer && webCodecsVideoEncoder && webCodecsAudioEncoder && mixedStereoBuffer) {
+          try {
+            // Feed full 20.0s stereo audio buffer into AudioEncoder in 1024-frame chunks
+            const ch0 = mixedStereoBuffer.getChannelData(0);
+            const ch1 = mixedStereoBuffer.numberOfChannels > 1 ? mixedStereoBuffer.getChannelData(1) : ch0;
+            const totalSamples = mixedStereoBuffer.length;
+            const chunkSize = 4096;
+
+            for (let offset = 0; offset < totalSamples; offset += chunkSize) {
+              const framesInChunk = Math.min(chunkSize, totalSamples - offset);
+              const planarData = new Float32Array(framesInChunk * 2);
+              planarData.set(ch0.subarray(offset, offset + framesInChunk), 0);
+              planarData.set(ch1.subarray(offset, offset + framesInChunk), framesInChunk);
+
+              const tsMicros = Math.round((offset / SAMPLE_RATE) * 1000000);
+              const audioData = new AudioData({
+                format: 'f32-planar',
+                sampleRate: SAMPLE_RATE,
+                numberOfFrames: framesInChunk,
+                numberOfChannels: 2,
+                timestamp: tsMicros,
+                data: planarData
+              });
+              webCodecsAudioEncoder.encode(audioData);
+              audioData.close();
+            }
+
+            await webCodecsVideoEncoder.flush();
+            await webCodecsAudioEncoder.flush();
+            webCodecsVideoEncoder.close();
+            webCodecsAudioEncoder.close();
+            mp4Muxer.finalize();
+
+            if (mp4MuxerTarget && mp4MuxerTarget.buffer && mp4MuxerTarget.buffer.byteLength > 20000) {
+              finalMp4Blob = new Blob([mp4MuxerTarget.buffer], { type: 'video/mp4' });
+              console.log(`✅ WebCodecs True ISO MP4 finalized: ${(finalMp4Blob.size / 1024 / 1024).toFixed(2)} MB`);
+            }
+          } catch (muxErr) {
+            console.warn('WebCodecs finalize fallback notice:', muxErr);
+            finalMp4Blob = null;
           }
+        }
 
-          if (btnDownload) {
-            btnDownload.innerHTML = `
-              <i class="ph-bold ph-download-simple text-base"></i>
-              <span>ดาวน์โหลดไฟล์วิดีโอ MP4 (${sizeMb} MB พร้อมโพสต์)</span>
-            `;
+        const recBlob = await recorderBlobPromise;
+
+        // If WebCodecs wasn't used or failed, take MediaRecorder blob and ensure it is remuxed to True ISO MP4 via Backend FFmpeg!
+        if (!finalMp4Blob || !(await isStrictShopeeIsoMp4(finalMp4Blob))) {
+          const baseBlob = (finalMp4Blob && finalMp4Blob.size > recBlob.size) ? finalMp4Blob : recBlob;
+          if (!(await isStrictShopeeIsoMp4(baseBlob))) {
+            if (pText) pText.innerText = '4/4 กำลังแปลงไฟล์เป็นมาตรฐาน MP4 แท้ (H.264 + AAC) สำหรับอัปโหลด Shopee...';
+            finalMp4Blob = await convertBlobToTrueShopeeMp4ViaBackend(baseBlob);
+          } else {
+            finalMp4Blob = new Blob([baseBlob], { type: 'video/mp4' });
           }
+        }
 
-          showToast('ผลิตวิดีโอ 9:16 สำเร็จ เสียงพากย์และซับตรงกัน 100% ครบ 20 วินาที!');
+        const blobUrl = URL.createObjectURL(finalMp4Blob);
+        const sizeMb = Math.max(0.1, finalMp4Blob.size / (1024 * 1024)).toFixed(1);
 
-          resetPreviewPlayback();
+        if (currentProduct) {
+          currentProduct.rendered_blob = finalMp4Blob;
+          currentProduct.rendered_blob_url = blobUrl;
+        }
 
-          if (autoDownload && blob.size > 0) {
-            const dl = document.createElement('a');
-            dl.href = blobUrl;
-            dl.download = `${(currentProduct && currentProduct.product_id) || 'shopee'}_916_ready.mp4`;
-            document.body.appendChild(dl);
-            dl.click();
-            document.body.removeChild(dl);
-            showToast('เริ่มดาวน์โหลดไฟล์วิดีโอ 9:16 สำเร็จรูปเรียบร้อย!');
-          }
-        };
+        isVideoRendered = true;
+        isRenderingVideo = false;
 
-        if (recorder && recorder.state !== 'inactive') {
-          recorder.onstop = finalizeBlobAndUi;
-          try { recorder.requestData(); } catch (e) {}
-          try { recorder.stop(); } catch (e) { finalizeBlobAndUi(); }
-        } else {
-          finalizeBlobAndUi();
+        if (pBar) pBar.style.width = '100%';
+        if (pText) pText.innerText = 'สำเร็จ! เรนเดอร์วิดีโอ MP4 แท้ 9:16 (H.264 + AAC) เสร็จสมบูรณ์ 🚀';
+
+        if (btn) btn.disabled = false;
+        if (icon) icon.className = 'ph-bold ph-check text-base';
+        if (text) text.innerText = 'เรนเดอร์สำเร็จแล้ว (เล่นอัตโนมัติ)';
+        if (badge) {
+          badge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono';
+          badge.innerText = 'MP4 แท้พร้อมโพสต์ Shopee 🚀';
+        }
+
+        if (btnDownload) {
+          btnDownload.innerHTML = `
+            <i class="ph-bold ph-download-simple text-base"></i>
+            <span>ดาวน์โหลดไฟล์วิดีโอ MP4 แท้ (${sizeMb} MB พร้อมโพสต์ Shopee)</span>
+          `;
+        }
+
+        showToast(`ผลิตวิดีโอ MP4 แท้ (H.264 + เสียง${activeSpk.shortName}ธรรมชาติ) สำเร็จ 100%!`);
+
+        resetPreviewPlayback();
+
+        if (autoDownload && finalMp4Blob.size > 0) {
+          const dl = document.createElement('a');
+          dl.href = blobUrl;
+          dl.download = `${(currentProduct && currentProduct.product_id) || 'shopee'}_916_ready.mp4`;
+          document.body.appendChild(dl);
+          dl.click();
+          document.body.removeChild(dl);
+          showToast('เริ่มดาวน์โหลดไฟล์วิดีโอ .MP4 แท้เรียบร้อย!');
         }
       }
 

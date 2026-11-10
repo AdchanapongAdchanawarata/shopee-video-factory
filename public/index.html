@@ -72,24 +72,8 @@
       box-sizing: border-box;
       transition: transform 0.1s ease-out;
     }
-    .video-smart-crop, .video-preview-crop-zoomed {
-      transform: scale(1.35) translateY(-5%);
-      transform-origin: center center;
-      transition: transform 0.3s ease-out;
-    }
-    .video-preview-crop-zoomed-flipped {
-      transform: scale(1.35) translateY(-5%) scaleX(-1);
-      transform-origin: center center;
-      transition: transform 0.3s ease-out;
-    }
-    .video-preview-flipped-only {
-      transform: scaleX(-1);
-      transform-origin: center center;
-      transition: transform 0.3s ease-out;
-    }
     .video-preview-crop-normal {
       transform: none;
-      transition: transform 0.3s ease-out;
     }
     .subtle-card:hover {
       border-color: rgba(255, 255, 255, 0.14);
@@ -356,62 +340,6 @@
               <span id="review-footage-label" class="text-zinc-300 truncate">วิดีโอรีวิวสินค้าจริง #1 (เคลื่อนไหวจริง 100%)</span>
             </div>
             <span class="text-[10px] text-emerald-400 font-mono shrink-0 ml-2">พร้อมใช้งาน</span>
-          </div>
-        </div>
-
-        <!-- ANTI-DUPLICATE & SUBTITLE CONCEALMENT CONTROLS -->
-        <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-zinc-200 flex items-center space-x-1.5">
-              <i class="ph-bold ph-shield-check text-shopee"></i>
-              <span>ระบบลบซับ & ป้องกันคลิปซ้ำ (Shopee & TikTok Anti-Ban)</span>
-            </span>
-            <span class="text-[10px] text-emerald-400 font-mono">100% ปลอดภัย</span>
-          </div>
-
-          <!-- 1. SMART CROP 1.35x -->
-          <div class="flex items-center justify-between text-xs pt-1">
-            <div class="flex items-center space-x-2 truncate">
-              <i class="ph-bold ph-crop text-shopee text-sm"></i>
-              <div>
-                <div class="text-[11px] font-semibold text-zinc-200">ครอปหลบซับเดิม (Smart Crop 1.35x)</div>
-                <div class="text-[10px] text-zinc-400">ซูมและดันเฟรมขึ้นเพื่อดันซับจีน/ซับเดิมออกนอกจอ</div>
-              </div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
-              <input type="checkbox" id="toggle-smart-crop-s1" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
-              <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-shopee"></div>
-            </label>
-          </div>
-
-          <!-- 2. SUBTITLE FADE MASK -->
-          <div class="flex items-center justify-between text-xs pt-1 border-t border-zinc-800/50">
-            <div class="flex items-center space-x-2 truncate">
-              <i class="ph-bold ph-gradient text-amber-400 text-sm"></i>
-              <div>
-                <div class="text-[11px] font-semibold text-zinc-200">มาสก์ดำปิดซับล่าง (Subtitle Fade Mask 100%)</div>
-                <div class="text-[10px] text-zinc-400">แถบดำไล่เฉดปิดทับซับเดิม 100% ซับไทยส้มเด่นชัด</div>
-              </div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
-              <input type="checkbox" id="toggle-fade-mask-s1" checked onchange="handleFadeMaskToggle(this.checked)" class="sr-only peer">
-              <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
-            </label>
-          </div>
-
-          <!-- 3. ANTI-DUPLICATE FLIP -->
-          <div class="flex items-center justify-between text-xs pt-1 border-t border-zinc-800/50">
-            <div class="flex items-center space-x-2 truncate">
-              <i class="ph-bold ph-arrows-left-right text-cyan-400 text-sm"></i>
-              <div>
-                <div class="text-[11px] font-semibold text-zinc-200">กลับด้านวิดีโอแก้คลิปซ้ำ (Anti-Duplicate Flip)</div>
-                <div class="text-[10px] text-zinc-400">พลิกภาพซ้าย-ขวา หลบระบบตรวจจับคลิปซ้ำและ OCR</div>
-              </div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
-              <input type="checkbox" id="toggle-anti-flip-s1" onchange="handleAntiFlipToggle(this.checked)" class="sr-only peer">
-              <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-500"></div>
-            </label>
           </div>
         </div>
 
@@ -737,7 +665,7 @@
               <!-- ACTUAL VIDEO PLAYER (MUTED RAW VIDEO TO ISOLATE CRISP MALI AI VOICEOVER) -->
               <video
                 id="player-preview"
-                class="w-full h-full object-cover cursor-pointer video-smart-crop hidden"
+                class="w-full h-full object-cover cursor-pointer hidden"
                 playsinline
                 muted
                 crossorigin="anonymous"
@@ -748,10 +676,6 @@
                 id="player-motion-canvas"
                 class="absolute inset-0 w-full h-full object-cover pointer-events-none hidden z-5"
               ></canvas>
-
-              <div id="top-sub-mask" class="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10 transition-opacity duration-300"></div>
-              <!-- SMART BOTTOM SUBTITLE MASK (MASKS ANY BURNED-IN SELLER SUBTITLES CLEANLY) -->
-              <div id="bottom-sub-mask" class="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black via-black/85 to-transparent pointer-events-none z-10 transition-opacity duration-300"></div>
 
               <!-- DEDICATED MALI AI VOICE AUDIO (SYNCHRONIZED REAL-TIME, PRELOAD NONE TO PREVENT PREMATURE AUDIO) -->
               <audio id="player-mali-audio" preload="none"></audio>
@@ -781,53 +705,6 @@
                   <i class="ph-fill ph-speaker-high text-xs text-amber-400" id="icon-custom-audio"></i>
                 </button>
               </div>
-            </div>
-          </div>
-
-          <!-- ANTI-DUPLICATE & SUBTITLE REMOVAL CONTROLS UNDER PHONE -->
-          <div class="w-full max-w-[260px] p-2.5 rounded-2xl bg-zinc-900/95 border border-zinc-800 space-y-2 text-xs shadow-md">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center space-x-1">
-                <i class="ph-bold ph-shield-check text-shopee"></i>
-                <span>ลบซับ & ป้องกันคลิปซ้ำ</span>
-              </span>
-              <span class="text-[9px] text-emerald-400 font-mono">Anti-Ban</span>
-            </div>
-
-            <!-- TOGGLE 1: SMART CROP 1.35x -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-1.5 truncate">
-                <i class="ph-bold ph-crop text-shopee text-xs"></i>
-                <span class="text-[11px] text-zinc-300">ครอปหลบซับเดิม (Crop 1.35x)</span>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
-                <input type="checkbox" id="toggle-smart-crop" checked onchange="handleSmartCropToggle(this.checked)" class="sr-only peer">
-                <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-shopee"></div>
-              </label>
-            </div>
-
-            <!-- TOGGLE 2: SUBTITLE FADE MASK -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-1.5 truncate">
-                <i class="ph-bold ph-gradient text-amber-400 text-xs"></i>
-                <span class="text-[11px] text-zinc-300">มาสก์ดำปิดซับล่าง (Fade Mask)</span>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
-                <input type="checkbox" id="toggle-fade-mask" checked onchange="handleFadeMaskToggle(this.checked)" class="sr-only peer">
-                <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- TOGGLE 3: ANTI-DUPLICATE HORIZONTAL FLIP -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-1.5 truncate">
-                <i class="ph-bold ph-arrows-left-right text-cyan-400 text-xs"></i>
-                <span class="text-[11px] text-zinc-300">กลับด้านแก้คลิปซ้ำ (Anti-Flip)</span>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
-                <input type="checkbox" id="toggle-anti-flip" onchange="handleAntiFlipToggle(this.checked)" class="sr-only peer">
-                <div class="w-7 h-3.5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-500"></div>
-              </label>
             </div>
           </div>
 
@@ -3551,75 +3428,16 @@
     
     let activeMaliAudio = null;
 
-    // Global render state & Smart Crop tracking
+    // Global render state (Original 1.0x uncropped, unflipped, unmasked video)
     let isVideoRendered = false;
-    let isSmartCropEnabled = true;
-    let isBottomMaskEnabled = true;
+    let isSmartCropEnabled = false;
+    let isBottomMaskEnabled = false;
     let isFlipEnabled = false;
 
     function updateVideoPreviewTransform() {
       const player = document.getElementById('player-preview');
       if (!player) return;
-      player.classList.remove(
-        'video-preview-crop-normal',
-        'video-preview-crop-zoomed',
-        'video-preview-crop-zoomed-flipped',
-        'video-preview-flipped-only'
-      );
-      const brollBoost = (typeof previewBrollCutIndex !== 'undefined' && previewBrollCutIndex % 2 === 1) ? 1.14 : 1.0;
-      const baseScale = isSmartCropEnabled ? 1.35 : 1.0;
-      const finalScale = Number((baseScale * brollBoost).toFixed(2));
-      const sx = isFlipEnabled ? -finalScale : finalScale;
-      const ty = isSmartCropEnabled ? '-5%' : '0%';
-      player.style.transform = `scale(${sx}, ${finalScale}) translateY(${ty})`;
-    }
-
-    function handleSmartCropToggle(enabled) {
-      isSmartCropEnabled = enabled;
-      const t1 = document.getElementById('toggle-smart-crop');
-      const t2 = document.getElementById('toggle-smart-crop-s1');
-      if (t1) t1.checked = enabled;
-      if (t2) t2.checked = enabled;
-
-      updateVideoPreviewTransform();
-      showToast(enabled ? 'เปิดโหมดครอปหลบซับเดิม (Smart Crop 1.35x)' : 'ปิดโหมดครอป (แสดงสัดส่วนปกติ)');
-    }
-
-    function handleFadeMaskToggle(enabled) {
-      isBottomMaskEnabled = enabled;
-      const t1 = document.getElementById('toggle-fade-mask');
-      const t2 = document.getElementById('toggle-fade-mask-s1');
-      if (t1) t1.checked = enabled;
-      if (t2) t2.checked = enabled;
-
-      const mask = document.getElementById('bottom-sub-mask');
-      if (mask) mask.style.opacity = enabled ? '1' : '0';
-      showToast(enabled ? 'เปิดแถบมาสก์ปิดทับซับเดิม 100%' : 'ปิดแถบมาสก์');
-    }
-
-    function handleAntiFlipToggle(enabled) {
-      isFlipEnabled = enabled;
-      const t1 = document.getElementById('toggle-anti-flip');
-      const t2 = document.getElementById('toggle-anti-flip-s1');
-      if (t1) t1.checked = enabled;
-      if (t2) t2.checked = enabled;
-
-      updateVideoPreviewTransform();
-      showToast(enabled ? 'เปิดโหมดกลับด้านวิดีโอ (ป้องกันระบบตรวจคลิปซ้ำ Shopee)' : 'ปิดโหมดกลับด้าน');
-    }
-
-    function drawBottomSubtitleMask(ctx, W, H) {
-      ctx.save();
-      const maskHeight = 520;
-      const maskY = H - maskHeight;
-      const grad = ctx.createLinearGradient(0, maskY, 0, H);
-      grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      grad.addColorStop(0.25, 'rgba(0, 0, 0, 0.65)');
-      grad.addColorStop(0.60, 'rgba(0, 0, 0, 0.92)');
-      grad.addColorStop(1, 'rgba(0, 0, 0, 0.98)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, maskY, W, maskHeight);
-      ctx.restore();
+      player.style.transform = 'none';
     }
 
     // Real-Time Subtitle & Audio Synchronization on Video Play (Safe Zone max 22-24 chars/line)
@@ -4946,7 +4764,6 @@
         }
 
         if (canDrawVideo && isVideoCorsClean) {
-          const scale = isSmartCropEnabled ? 1.35 : 1.0;
           const vw = player.videoWidth || 1080;
           const vh = player.videoHeight || 1920;
           const vAspect = vw / vh;
@@ -4954,20 +4771,16 @@
 
           let dw, dh;
           if (vAspect > tAspect) {
-            dh = H * scale;
+            dh = H;
             dw = dh * vAspect;
           } else {
-            dw = W * scale;
+            dw = W;
             dh = dw / vAspect;
           }
           const dx = (W - dw) / 2;
-          const dy = ((H - dh) / 2) - (isSmartCropEnabled ? (H * 0.05) : 0);
+          const dy = (H - dh) / 2;
 
           rCtx.save();
-          if (isFlipEnabled) {
-            rCtx.translate(W, 0);
-            rCtx.scale(-1, 1);
-          }
           try {
             rCtx.drawImage(player, dx, dy, dw, dh);
             lastFrameCtx.fillStyle = '#000000';
@@ -4986,11 +4799,6 @@
           rCtx.drawImage(lastFrameCanvas, 0, 0);
         } else {
           drawKenBurnsImage(rCtx, loadedImages, Math.max(0, elapsedSec - clipStartOffset), W, H);
-        }
-
-        // 2. Draw Bottom Subtitle Fade Mask (covers burned-in seller subtitles)
-        if (isBottomMaskEnabled) {
-          drawBottomSubtitleMask(rCtx, W, H);
         }
 
         // 3. Draw Synchronized Viral Orange Subtitles with White Stroke
